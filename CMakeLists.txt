@@ -18,5 +18,6 @@ enable_testing()
 file(GLOB RUNTIME_TEST_SRC "tests/runtime/*.c")
 
 add_executable(test_blruntime ${RUNTIME_TEST_SRC})
+target_link_libraries(test_blruntime blruntime)
 add_test(NAME blruntime
          COMMAND test_blruntime)

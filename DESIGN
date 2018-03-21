@@ -4,6 +4,11 @@ runtime lib:
    evaluates s-expressions
    FFI for external integration
 
+   bearlang/common.h - stuff common to all library users (like init etc)
+       bl_init()      - init the library ready for use, can be run multiple times
+
+   bearlang/types.h - type definitions etc
+       bl_ast_t - struct that defines an AST
 
    bearlang/sexp.h - S-expression and AST stuff
        bl_parse_sexp() - returns an AST
