@@ -1,0 +1,12 @@
+runtime lib:
+   C-side data types
+   parses s-expressions from strings
+   evaluates s-expressions
+   FFI for external integration
+
+
+   bearlang/sexp.h - S-expression and AST stuff
+       bl_parse_sexp() - returns an AST
+       bl_ser_sexp()   - serialises an S-expression (from an AST)
+
+       
