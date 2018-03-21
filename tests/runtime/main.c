@@ -7,7 +7,7 @@
 
 #define TEST(desc,f) fprintf(stderr,"Testing %s\t\t",desc); if(f()==0) { passed_tests++; fprintf(stderr,"PASS\n");} else { failed_tests++; fprintf(stderr,"FAIL\n");}; total_tests++;
 
-#define ASSERT(cond) if(! cond) return 1;
+#define ASSERT(cond) if(! (cond)) { fprintf(stderr,"FAIL\nAssert failed\n"); return 1;}
 
 int test_simple_sexp_list() {
     // this is a VERY basic test, we just want to make sure we get a correct list
