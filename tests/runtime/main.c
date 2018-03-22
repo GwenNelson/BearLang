@@ -28,6 +28,8 @@ int test_sexp_parse_list() {
     ASSERT("children[1] is int",   ast->children[1]->node_type == BL_VAL_TYPE_NUMBER)
     ASSERT("children[2] is int",   ast->children[2]->node_type == BL_VAL_TYPE_NUMBER)
 
+    ASSERT("children[0] has value +", strcmp(ast->children[0]->node_val.s_val,"+")==0)
+
     ASSERT("children[1] has value 1", ast->children[1]->node_val.i_val == 1)
     ASSERT("children[2] has value 2", ast->children[2]->node_val.i_val == 2)
 
