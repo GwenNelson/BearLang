@@ -4,7 +4,7 @@
 
 typedef enum bl_val_type_t {
         BL_VAL_TYPE_NULL,
-        BL_VAL_TYPE_LIST,
+        BL_VAL_TYPE_AST_LIST,
         BL_VAL_TYPE_SYMBOL,
         BL_VAL_TYPE_NUMBER,
 } bl_val_type_t;

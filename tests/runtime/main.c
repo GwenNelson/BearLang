@@ -23,7 +23,7 @@ int test_sexp_parse_list() {
 
     ASSERT("child_count==3",child_count == 3)
 
-    ASSERT("node_type==BL_VAL_TYPE_LIST",ast->node_type == BL_VAL_TYPE_LIST)
+    ASSERT("node_type==BL_VAL_TYPE_LIST",ast->node_type == BL_VAL_TYPE_AST_LIST)
 
     ASSERT("children[0] is symbol",ast->children[0]->node_type == BL_VAL_TYPE_SYMBOL)
     ASSERT("children[1] is int",   ast->children[1]->node_type == BL_VAL_TYPE_NUMBER)
@@ -47,7 +47,7 @@ int test_ser_sexp() {
 
     ast->children = (bl_ast_node_t**)(GC_MALLOC(sizeof(bl_ast_node_t*)*3));
 
-    ast->node_type = BL_VAL_TYPE_LIST;
+    ast->node_type = BL_VAL_TYPE_AST_LIST;
 
     ast->children[0] = (bl_ast_node_t*)GC_MALLOC(sizeof(bl_ast_node_t));
     ast->children[1] = (bl_ast_node_t*)GC_MALLOC(sizeof(bl_ast_node_t));
@@ -63,7 +63,7 @@ int test_ser_sexp() {
     ast->children[2]->node_type         = BL_VAL_TYPE_NUMBER;
     ast->children[2]->node_val.i_val    = 2;
 
-    char* sexp = bl_ser_sexp(ast);
+    char* sexp = bl_ser_ast(ast);
 
     ASSERT("strcmp(sexp,\"(+ 1 2)\")==0", strcmp(sexp,"(+ 1 2)")==0)
 
