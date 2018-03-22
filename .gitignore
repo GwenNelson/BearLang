@@ -1,0 +1,15 @@
+build/
+config.log
+config.status
+*.la
+.deps
+*.o
+*.lo
+*.swp
+vendor/gc-7.6.4/Makefile
+vendor/gc-7.6.4/bdw-gc.pc
+vendor/gc-7.6.4/include/config.h
+vendor/gc-7.6.4/include/stamp-h1
+.libs
+vendor/gc-7.6.4/cord/.dirstamp
+vendor/gc-7.6.4/libtool
