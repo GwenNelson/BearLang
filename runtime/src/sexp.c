@@ -85,7 +85,32 @@ bl_ast_node_t* bl_parse_sexp(char* sexp) {
 }
 
 char* bl_ser_sexp(bl_ast_node_t* ast) {
-      char* retval = (char*)GC_MALLOC(sizeof(char)*5);
-      snprintf(retval, 5, "None");
+      char* retval = "";
+      switch(ast->node_type) {
+         case BL_VAL_TYPE_NULL:
+           retval = (char*)GC_MALLOC(sizeof(char)*5);
+           snprintf(retval, 5, "None");
+         break;
+         case BL_VAL_TYPE_LIST:
+           retval = (char*)GC_MALLOC(sizeof(char)*3);
+           snprintf(retval,2,"(");
+           int i=0;
+           for(i=0; i < ast->child_count; i++) {
+               char* tmpbuf = bl_ser_sexp(ast->children[i]);
+               retval = (char*)GC_realloc(retval,strlen(retval)+strlen(tmpbuf)+3);
+               strncat(retval, (const char*)tmpbuf,strlen(tmpbuf));
+               if(i < (ast->child_count-1)) strncat(retval, " ",1);
+           }
+           strncat(retval,")",1);
+         break;
+         case BL_VAL_TYPE_SYMBOL:
+           retval = (char*)GC_MALLOC(sizeof(char)*(strlen(ast->node_val.s_val)));
+           snprintf(retval,"%s",ast->node_val.s_val);
+         break;
+         case BL_VAL_TYPE_NUMBER:
+           retval = (char*)GC_MALLOC(sizeof(char)*10); // TODO - switch numbers to libgmp
+           snprintf(retval,10,"%d",ast->node_val.i_val);
+         break;
+      }
       return retval;
 }

@@ -61,7 +61,7 @@ int test_ser_sexp() {
     ast->children[2]->node_val.i_val    = 2;
 
     char* sexp = bl_ser_sexp(ast);
-    
+
     ASSERT("strcmp(sexp,\"(+ 1 2)\")==0", strcmp(sexp,"(+ 1 2)")==0)
 
     return 0;
