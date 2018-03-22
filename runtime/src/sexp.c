@@ -32,26 +32,26 @@ bl_ast_node_t* mpc_to_bl(mpc_ast_t* T) {
       bl_ast_node_t* retval = (bl_ast_node_t*)GC_MALLOC(sizeof(bl_ast_node_t));
 
       if(strstr(T->tag,"number")) {
-         retval->node_type = BL_VAL_TYPE_NUMBER;
+         retval->node_val.type      = BL_VAL_TYPE_NUMBER;
          retval->node_val.i_val = atoi(T->contents);
          return retval;
       }
       if(strstr(T->tag,"symbol")) {
          int content_len = strlen(T->contents);
-         retval->node_type      = BL_VAL_TYPE_SYMBOL;
+         retval->node_val.type      = BL_VAL_TYPE_SYMBOL;
          retval->node_val.s_val = (char*)GC_MALLOC(content_len+1);
          snprintf(retval->node_val.s_val,content_len+1,"%s",T->contents);
          return retval;
       }
 
       if(strcmp(T->tag,">") == 0) {
-         retval->node_type   = BL_VAL_TYPE_AST_LIST;
-         retval->children    = (bl_ast_node_t**)GC_MALLOC(sizeof(bl_ast_node_t*)*T->children_num);
+         retval->node_val.type = BL_VAL_TYPE_AST_LIST;
+         retval->children      = (bl_ast_node_t**)GC_MALLOC(sizeof(bl_ast_node_t*)*T->children_num);
       }
 
       if(strstr(T->tag, "sexpr")) {
-         retval->node_type   = BL_VAL_TYPE_AST_LIST;
-         retval->children    = (bl_ast_node_t**)GC_MALLOC(sizeof(bl_ast_node_t*)*T->children_num);
+         retval->node_val.type = BL_VAL_TYPE_AST_LIST;
+         retval->children      = (bl_ast_node_t**)GC_MALLOC(sizeof(bl_ast_node_t*)*T->children_num);
       }
       
       int i=0;
@@ -86,7 +86,7 @@ bl_ast_node_t* bl_parse_sexp(char* sexp) {
 
 char* bl_ser_ast(bl_ast_node_t* ast) {
       char* retval = "";
-      switch(ast->node_type) {
+      switch(ast->node_val.type) {
          case BL_VAL_TYPE_NULL:
            retval = (char*)GC_MALLOC(sizeof(char)*5);
            snprintf(retval, 5, "None");

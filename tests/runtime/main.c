@@ -23,11 +23,11 @@ int test_sexp_parse_list() {
 
     ASSERT("child_count==3",child_count == 3)
 
-    ASSERT("node_type==BL_VAL_TYPE_LIST",ast->node_type == BL_VAL_TYPE_AST_LIST)
+    ASSERT("node_type==BL_VAL_TYPE_LIST",ast->node_val.type == BL_VAL_TYPE_AST_LIST)
 
-    ASSERT("children[0] is symbol",ast->children[0]->node_type == BL_VAL_TYPE_SYMBOL)
-    ASSERT("children[1] is int",   ast->children[1]->node_type == BL_VAL_TYPE_NUMBER)
-    ASSERT("children[2] is int",   ast->children[2]->node_type == BL_VAL_TYPE_NUMBER)
+    ASSERT("children[0] is symbol",ast->children[0]->node_val.type == BL_VAL_TYPE_SYMBOL)
+    ASSERT("children[1] is int",   ast->children[1]->node_val.type == BL_VAL_TYPE_NUMBER)
+    ASSERT("children[2] is int",   ast->children[2]->node_val.type == BL_VAL_TYPE_NUMBER)
 
     ASSERT("children[0] has value +", strcmp(ast->children[0]->node_val.s_val,"+")==0)
 
@@ -47,20 +47,20 @@ int test_ser_sexp() {
 
     ast->children = (bl_ast_node_t**)(GC_MALLOC(sizeof(bl_ast_node_t*)*3));
 
-    ast->node_type = BL_VAL_TYPE_AST_LIST;
+    ast->node_val.type = BL_VAL_TYPE_AST_LIST;
 
     ast->children[0] = (bl_ast_node_t*)GC_MALLOC(sizeof(bl_ast_node_t));
     ast->children[1] = (bl_ast_node_t*)GC_MALLOC(sizeof(bl_ast_node_t));
     ast->children[2] = (bl_ast_node_t*)GC_MALLOC(sizeof(bl_ast_node_t));
 
-    ast->children[0]->node_type         = BL_VAL_TYPE_SYMBOL;
+    ast->children[0]->node_val.type     = BL_VAL_TYPE_SYMBOL;
     ast->children[0]->node_val.s_val    = (char*)GC_MALLOC(sizeof(char)*2);
     ast->children[0]->node_val.s_val[0] = '+';
 
-    ast->children[1]->node_type         = BL_VAL_TYPE_NUMBER;
+    ast->children[1]->node_val.type     = BL_VAL_TYPE_NUMBER;
     ast->children[1]->node_val.i_val    = 1;
 
-    ast->children[2]->node_type         = BL_VAL_TYPE_NUMBER;
+    ast->children[2]->node_val.type     = BL_VAL_TYPE_NUMBER;
     ast->children[2]->node_val.i_val    = 2;
 
     char* sexp = bl_ser_ast(ast);
