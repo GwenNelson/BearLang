@@ -5,23 +5,32 @@
 #include <bearlang/types.h>
 #include <bearlang/sexp.h>
 
-#define TEST(desc,f) fprintf(stderr,"Testing %s\t\t",desc); if(f()==0) { passed_tests++; fprintf(stderr,"PASS\n");} else { failed_tests++; fprintf(stderr,"FAIL\n");}; total_tests++;
+#define TEST(desc,f) fprintf(stderr,"Testing %s:\t",desc); if(f()==0) { passed_tests++; fprintf(stderr,"PASS\n");} else { failed_tests++; fprintf(stderr,"FAIL\n");}; total_tests++;
 
-#define ASSERT(cond) if(! (cond)) { fprintf(stderr,"FAIL\nAssert failed\n"); return 1;}
+#define ASSERT(desc,cond) if(! (cond)) { fprintf(stderr,"Assert %s failed\t",desc); return 1;}
 
 int test_simple_sexp_list() {
     // this is a VERY basic test, we just want to make sure we get a correct list
     char* test_list = "(+ 1 2)";
 
     // first we parse to an AST
-    bl_ast_t* ast = bl_parse_sexp(test_list);
+    bl_ast_node_t* ast = bl_parse_sexp(test_list);
 
     // now we check the AST looks correct - it should consist of an expression containing the + symbol and 2 integers (1 and 2)
-    bl_ast_node_t*   root         = ast->root;
     bl_ast_node_t**  children     = ast->children;
     int              child_count  = ast->child_count;
 
-    ASSERT(child_count==3)
+    ASSERT("child_count==3",child_count == 3)
+
+    ASSERT("node_type==BL_VAL_TYPE_LIST",ast->node_type == BL_VAL_TYPE_LIST)
+
+    ASSERT("children[0] is symbol",ast->children[0]->node_type == BL_VAL_TYPE_SYMBOL)
+    ASSERT("children[1] is int",   ast->children[1]->node_type == BL_VAL_TYPE_INT)
+    ASSERT("children[2] is int",   ast->children[2]->node_type == BL_VAL_TYPE_INT)
+
+    ASSERT("children[1] has value 1", ast->children[1]->node_val.i_val == 1)
+    ASSERT("children[2] has value 2", ast->children[2]->node_val.i_val == 2)
+
 
     return 1;
 }
