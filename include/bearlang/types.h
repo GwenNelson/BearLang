@@ -3,13 +3,15 @@
 #include <stdint.h>
 
 typedef enum bl_val_type_t {
+        BL_VAL_TYPE_NULL,
         BL_VAL_TYPE_LIST,
         BL_VAL_TYPE_SYMBOL,
-        BL_VAL_TYPE_INT,
+        BL_VAL_TYPE_NUMBER,
 } bl_val_type_t;
 
 typedef union {
         struct { int64_t i_val; };
+        struct { char*   s_val; };
 } bl_val_t;
 
 typedef struct bl_ast_node_t bl_ast_node_t;

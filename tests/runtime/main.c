@@ -25,8 +25,8 @@ int test_simple_sexp_list() {
     ASSERT("node_type==BL_VAL_TYPE_LIST",ast->node_type == BL_VAL_TYPE_LIST)
 
     ASSERT("children[0] is symbol",ast->children[0]->node_type == BL_VAL_TYPE_SYMBOL)
-    ASSERT("children[1] is int",   ast->children[1]->node_type == BL_VAL_TYPE_INT)
-    ASSERT("children[2] is int",   ast->children[2]->node_type == BL_VAL_TYPE_INT)
+    ASSERT("children[1] is int",   ast->children[1]->node_type == BL_VAL_TYPE_NUMBER)
+    ASSERT("children[2] is int",   ast->children[2]->node_type == BL_VAL_TYPE_NUMBER)
 
     ASSERT("children[1] has value 1", ast->children[1]->node_val.i_val == 1)
     ASSERT("children[2] has value 2", ast->children[2]->node_val.i_val == 2)
