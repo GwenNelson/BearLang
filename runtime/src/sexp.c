@@ -46,13 +46,11 @@ bl_ast_node_t* mpc_to_bl(mpc_ast_t* T) {
 
       if(strcmp(T->tag,">") == 0) {
          retval->node_type   = BL_VAL_TYPE_LIST;
-         retval->child_count = T->children_num;
          retval->children    = (bl_ast_node_t**)GC_MALLOC(sizeof(bl_ast_node_t*)*T->children_num);
       }
 
       if(strstr(T->tag, "sexpr")) {
          retval->node_type   = BL_VAL_TYPE_LIST;
-         retval->child_count = T->children_num;
          retval->children    = (bl_ast_node_t**)GC_MALLOC(sizeof(bl_ast_node_t*)*T->children_num);
       }
       
@@ -66,7 +64,7 @@ bl_ast_node_t* mpc_to_bl(mpc_ast_t* T) {
           retval->children[c] = parsed;
           c++;
       }
-
+      retval->child_count = c;
       return retval;
 }
 
@@ -75,12 +73,8 @@ bl_ast_node_t* bl_parse_sexp(char* sexp) {
       bl_ast_node_t* retval = NULL;
       // TODO - come up with a proper error handling approach
       if(mpc_parse("input",sexp, Lispy, &r)) {
-         mpc_ast_print(r.output);
          mpc_ast_t* mpc_ast = r.output;
-         printf("Top tag: %s\n", mpc_ast->tag);
-         printf("Top contents: %s\n", mpc_ast->contents);
-         printf("Number of children: %i\n", mpc_ast->children_num); 
-         retval = mpc_to_bl(mpc_ast);
+         retval = mpc_to_bl(mpc_ast->children[1]);
          mpc_ast_delete(r.output);
       } else {
          mpc_err_print(r.error);

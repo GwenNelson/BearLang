@@ -32,7 +32,7 @@ int test_simple_sexp_list() {
     ASSERT("children[2] has value 2", ast->children[2]->node_val.i_val == 2)
 
 
-    return 1;
+    return 0;
 }
 
 
