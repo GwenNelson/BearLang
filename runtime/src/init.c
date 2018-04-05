@@ -4,4 +4,5 @@
 int bl_init() {
     GC_INIT();
     bl_init_parser();
+    return 0;
 }

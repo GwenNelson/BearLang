@@ -21,6 +21,7 @@ void bl_ctx_close(bl_val_t* ctx) {
 }
 
 bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
+   return expr;
 }
 
 bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
