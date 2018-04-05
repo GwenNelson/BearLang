@@ -7,7 +7,7 @@
 #include <bearlang/sexp.h>
 #include <bearlang/list_ops.h>
 
-#define TEST(desc,f) fprintf(stderr,"Testing %s: \t\t ",desc); if(f()==0) { passed_tests++; fprintf(stderr,"PASS\n");} else { failed_tests++; fprintf(stderr,"FAIL\n");}; total_tests++;
+#define TEST(desc,f) fprintf(stderr,"Testing: %s \t",desc); if(f()==0) { passed_tests++; fprintf(stderr,"PASS\n");} else { failed_tests++; fprintf(stderr,"FAIL\n");}; total_tests++;
 
 #define ASSERT(desc,cond) if(! (cond)) { fprintf(stderr,"Assert %s failed\t",desc); return 1;}
 
@@ -189,6 +189,14 @@ int test_ser_pure_sexp() {
     return 0;
 }
 
+int test_empty_ctx() {
+    return 1;
+}
+
+int test_child_ctx() {
+    return 1;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -196,15 +204,16 @@ int main(int argc, char** argv) {
 
     bl_init();
 
-    TEST("Simple s-expression parse to AST list",  test_sexp_parse_list)
-    TEST("Serialise an s-expression from AST",     test_ser_sexp)
-    TEST("Transform AST list into pure expression",test_ast_pure_sexp)
-    TEST("Serialise a pure expression",            test_ser_pure_sexp)
-    TEST("List ops: first, second and rest",       test_first_second_rest)
-    TEST("List ops: prepend to NULL",              test_prepend_null)
+    TEST("Simple s-expression parse to AST list      ", test_sexp_parse_list)
+    TEST("Serialise an s-expression from AST         ", test_ser_sexp)
+    TEST("Transform AST list into pure expression    ", test_ast_pure_sexp)
+    TEST("Serialise a pure expression                ", test_ser_pure_sexp)
+    TEST("List ops: first, second and rest           ", test_first_second_rest)
+    TEST("List ops: prepend to NULL                  ", test_prepend_null)
+    TEST("Create an empty context and get/set        ", test_empty_ctx)
+    TEST("Create a child context and lookup in parent", test_child_ctx)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
-
 
     if(failed_tests > 0) {
        return 1;
