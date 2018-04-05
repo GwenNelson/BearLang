@@ -226,6 +226,10 @@ int test_child_ctx() {
     return 0;
 }
 
+int test_simple_arithmetic() {
+    return 1;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -241,6 +245,7 @@ int main(int argc, char** argv) {
     TEST("List ops: prepend to NULL                  ", test_prepend_null)
     TEST("Create an empty context and get/set        ", test_empty_ctx)
     TEST("Create a child context and lookup in parent", test_child_ctx)
+    TEST("Simple arithmetic                          ", test_simple_arithmetic)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

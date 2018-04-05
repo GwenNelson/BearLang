@@ -21,6 +21,9 @@ void bl_ctx_close(bl_val_t* ctx) {
 }
 
 bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
+   switch(expr->type) {
+   }
+
    return expr;
 }
 
