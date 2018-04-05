@@ -92,7 +92,14 @@ int test_ast_pure_sexp() {
     items[4] = bl_list_second(bl_list_rest(bl_list_rest(bl_list_rest(pure_sexp))));               // should be 5
     items[5] = bl_list_second(bl_list_rest(bl_list_rest(bl_list_rest(bl_list_rest(pure_sexp))))); // should be 6
 
-    return 1;
+    ASSERT("items[0]",items[0]->i_val==1)
+    ASSERT("items[1]",items[1]->i_val==2)
+    ASSERT("items[2]",items[2]->i_val==3)
+    ASSERT("items[3]",items[3]->i_val==4)
+    ASSERT("items[4]",items[4]->i_val==5)
+    ASSERT("items[5]",items[5]->i_val==6)
+
+    return 0;
 }
 
 int test_first_second_rest() {

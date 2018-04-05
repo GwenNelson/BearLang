@@ -28,16 +28,12 @@ bl_val_t* bl_list_prepend(bl_val_t* L, bl_val_t* val) {
 
 bl_val_t* bl_list_append(bl_val_t* L, bl_val_t* val) {
    bl_val_t* retval = L;
-   while(bl_list_rest(L) != NULL) {
-     L = bl_list_rest(L);
-     if(bl_list_rest(L)==NULL) {
-         L->cdr = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-         L->cdr->type = BL_VAL_TYPE_CONS;
-         L->cdr->car  = val;
-         L->cdr->cdr  = NULL;
-         return L;
-      }
-      L = bl_list_rest(L);
+   while(L->cdr != NULL) {
+     L = L->cdr;
    }
+   L->cdr = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   L->cdr->type = BL_VAL_TYPE_CONS;
+   L->cdr->car  = val;
+   L->cdr->cdr  = NULL;
    return retval;
 }

@@ -124,9 +124,12 @@ bl_val_t* bl_read_ast(bl_ast_node_t* ast) {
               return NULL;
 	 break;
 	 case BL_VAL_TYPE_AST_LIST:
-              retval = NULL;
-	      int i=0;
-	      for(i=0; i < ast->child_count; i++) {
+              retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+              retval->type = BL_VAL_TYPE_CONS;
+              retval->car  = bl_read_ast(ast->children[0]);
+	      retval->cdr  = NULL;
+	      int i=1;
+	      for(i=1; i < ast->child_count; i++) {
                   retval = bl_list_append(retval, bl_read_ast(ast->children[i]));
 	      }
 	      return retval;
