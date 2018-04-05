@@ -176,6 +176,19 @@ int test_prepend_null() {
     return 0;
 }
 
+int test_ser_pure_sexp() {
+    char* test_list = "(1 2 3 4 5 6)";
+
+    bl_ast_node_t* ast = bl_parse_sexp(test_list);
+
+    bl_val_t* pure_sexp = bl_read_ast(ast);
+
+    char* ser_sexp = bl_ser_sexp(pure_sexp);
+
+    ASSERT("Serialise an S-expression works correctly", strcmp(test_list,ser_sexp)==0)
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -186,6 +199,7 @@ int main(int argc, char** argv) {
     TEST("Simple s-expression parse to AST list",  test_sexp_parse_list)
     TEST("Serialise an s-expression from AST",     test_ser_sexp)
     TEST("Transform AST list into pure expression",test_ast_pure_sexp)
+    TEST("Serialise a pure expression",            test_ser_pure_sexp)
     TEST("List ops: first, second and rest",       test_first_second_rest)
     TEST("List ops: prepend to NULL",              test_prepend_null)
 

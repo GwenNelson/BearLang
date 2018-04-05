@@ -116,6 +116,51 @@ char* bl_ser_ast(bl_ast_node_t* ast) {
       return retval;
 }
 
+char* bl_ser_sexp(bl_val_t* expr) {
+      char* retval="";
+      switch(expr->type) {
+         case BL_VAL_TYPE_NULL:
+           retval = (char*)GC_MALLOC(sizeof(char)*5);
+           snprintf(retval, 5, "None");
+         break;
+         case BL_VAL_TYPE_SYMBOL:
+           retval = (char*)GC_MALLOC(sizeof(char)*(strlen(expr->s_val)+1));
+           snprintf(retval,strlen(expr->s_val)+1,"%s",expr->s_val);
+         break;
+         case BL_VAL_TYPE_NUMBER:
+           retval = (char*)GC_MALLOC(sizeof(char)*10); // TODO - switch numbers to libgmp
+           snprintf(retval,10,"%d",expr->i_val);
+         break;
+	 case BL_VAL_TYPE_CONS:
+           retval = (char*)GC_MALLOC(sizeof(char)*3);
+	   retval[0]='(';
+           if((expr->car == NULL) && (expr->cdr == NULL)) {
+     	       snprintf(retval,4,"%s","()");
+	   } else {
+               bl_val_t* L=expr;
+	       while(L->cdr != NULL) {
+                  if(L->car != NULL) {
+                     char* newval = bl_ser_sexp(L->car);
+                     size_t newsize =  sizeof(char) * (strlen(retval)+strlen(newval)+4);
+                     retval = (char*)GC_realloc(retval, newsize);
+                     snprintf(retval,newsize,"%s%s ", retval, newval);
+		  }
+                  L = L->cdr;
+	       }
+         
+                  if(L->car != NULL) {
+                     char* newval = bl_ser_sexp(L->car);
+                     size_t newsize =  sizeof(char) * (strlen(retval)+strlen(newval)+4);
+                     retval = (char*)GC_realloc(retval, newsize);
+                     snprintf(retval,newsize,"%s%s)", retval, newval);
+		  }
+	   }
+
+         break;
+      }
+      return retval;
+}
+
 bl_val_t* bl_read_ast(bl_ast_node_t* ast) {
       
       if(ast==NULL) return NULL;

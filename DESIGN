@@ -1,3 +1,11 @@
+language design:
+   +,-,/,* operators etc
+   lambdas:
+       (fn (params...) body)
+   function definitions
+       (fun func_name (params ...) body)
+
+
 runtime lib:
    C-side data types
    parses s-expressions from strings
@@ -6,6 +14,16 @@ runtime lib:
 
    bearlang/common.h - stuff common to all library users (like init etc)
        bl_init()      - init the library ready for use, can be run multiple times
+
+   bearlang/ctx.h - contexts and evaluation
+       bl_ctx_new_std() - create a new stdlib context, should be used as parent of end user code, contains core functionality
+
+       bl_ctx_new()   - create a new context, optionally with a parent context
+       bl_ctx_close() - close a context
+       bl_ctx_eval()  - evaluate an expression within a context
+
+       bl_ctx_set()   - set the value of a symbol in a context
+       bl_ctx_get()   - lookup the value of a symbol in a context, if not found tries the parent, returns NULL on failure
 
    bearlang/types.h - type definitions etc
        bl_ast_t - struct that defines an AST
