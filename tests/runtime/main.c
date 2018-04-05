@@ -6,6 +6,7 @@
 #include <bearlang/types.h>
 #include <bearlang/sexp.h>
 #include <bearlang/list_ops.h>
+#include <bearlang/ctx.h>
 
 #define TEST(desc,f) fprintf(stderr,"Testing: %s \t",desc); if(f()==0) { passed_tests++; fprintf(stderr,"PASS\n");} else { failed_tests++; fprintf(stderr,"FAIL\n");}; total_tests++;
 
@@ -190,7 +191,22 @@ int test_ser_pure_sexp() {
 }
 
 int test_empty_ctx() {
-    return 1;
+    // first create the empty context
+    bl_val_t* empty_ctx = bl_ctx_new(NULL);
+
+    // now set a random-ish key to an interesting value
+    bl_val_t* our_item = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    our_item->type  = BL_VAL_TYPE_NUMBER;
+    our_item->i_val = 666;
+    bl_ctx_set(empty_ctx,"TheOneForYouAndMe", our_item);
+
+
+    // and now look it up and check it's the same
+    bl_val_t* retval = bl_ctx_get(empty_ctx,"TheOneForYouAndMe");
+
+    ASSERT("bl_ctx_get/set", (retval->type==BL_VAL_TYPE_NUMBER) && (retval->i_val == 666))
+
+    return 0;
 }
 
 int test_child_ctx() {
