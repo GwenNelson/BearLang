@@ -14,4 +14,11 @@ runtime lib:
        bl_parse_sexp() - returns an AST
        bl_ser_sexp()   - serialises an S-expression (from an AST)
 
-       
+       bl_read_ast()   - convert an AST into a pure expression
+
+   bearlang/list_ops.h - list operations, it is a lisp after all....
+       bl_first()   - returns the first item in a list (the car)
+       bl_second()  - returns the first item in the rest of the list (equivalent to bl_first(bl_rest(L)) )
+       bl_rest()    - returns the rest of the list
+       bl_append()  - appends to the end of a list
+       bl_prepend() - prepends to the start of a list

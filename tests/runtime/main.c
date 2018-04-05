@@ -5,6 +5,7 @@
 #include <bearlang/common.h>
 #include <bearlang/types.h>
 #include <bearlang/sexp.h>
+#include <bearlang/list_ops.h>
 
 #define TEST(desc,f) fprintf(stderr,"Testing %s: \t\t ",desc); if(f()==0) { passed_tests++; fprintf(stderr,"PASS\n");} else { failed_tests++; fprintf(stderr,"FAIL\n");}; total_tests++;
 
@@ -71,7 +72,76 @@ int test_ser_sexp() {
 }
 
 int test_ast_pure_sexp() {
+    // this test basically turns an AST into a pure expression and then checks it's all correct
+    char* test_list = "(1 2 3 4 5 6)";
+
+    // first parse into an AST
+    bl_ast_node_t* ast = bl_parse_sexp(test_list);
+
+    // now convert into a pure expression
+    bl_val_t* pure_sexp = bl_read_ast(ast);
+
+    // now check the pure expression is all correct
     return 1;
+}
+
+int test_first_second_rest() {
+    // this is a painfully trivial test
+
+    // first construct a list with 3 items: 4, 8, 87
+
+    // first cons cell
+    bl_val_t* L = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    L->type = BL_VAL_TYPE_CONS;
+
+    // first item
+    L->car = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    L->car->type  = BL_VAL_TYPE_NUMBER;
+    L->car->i_val = 4;
+
+    // next cons cell
+    L->cdr = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    L->cdr->type = BL_VAL_TYPE_CONS;
+    
+    // second item
+    L->cdr->car = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    L->cdr->car->type  = BL_VAL_TYPE_NUMBER;
+    L->cdr->car->i_val = 8;
+
+    // next cons cell
+    L->cdr->cdr = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    L->cdr->cdr->type = BL_VAL_TYPE_CONS;
+
+    // third item
+    L->cdr->cdr->car = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    L->cdr->cdr->car->type  = BL_VAL_TYPE_NUMBER;
+    L->cdr->cdr->car->i_val = 87;
+
+    // finally test the fucker
+
+    // first goes first
+    bl_val_t* first_val = bl_list_first(L);
+    ASSERT("bl_list_first() returns correct val type", first_val->type==BL_VAL_TYPE_NUMBER)
+    ASSERT("bl_list_first() returns correct i_val",    first_val->i_val==4)
+
+    // second goes second.....
+    bl_val_t* second_val = bl_list_second(L);
+    ASSERT("bl_list_second() returns correct val type", second_val->type==BL_VAL_TYPE_NUMBER)
+    ASSERT("bl_list_second() returns correct i_val",    second_val->i_val==8)
+
+    // then we do the rest, first checking that it returns a valid list
+    bl_val_t* rest = bl_list_rest(L);
+    ASSERT("bl_list_rest() returns a list correctly", rest->type=BL_VAL_TYPE_CONS)
+
+    // then we check the first of the rest, which should be the same as the second
+    ASSERT("bl_list_first(bl_list_rest(L)) == bl_list_second(L)", bl_list_first(rest)==second_val)
+
+    // and finally, let's check the second of the rest, which should be the third item
+    bl_val_t* third = bl_list_second(rest);
+    ASSERT("bl_list_second(rest) returns correct val type", third->type==BL_VAL_TYPE_NUMBER)
+    ASSERT("bl_list_second(rest) returns correct i_val",    third->i_val==87)
+    return 0;
+
 }
 
 int main(int argc, char** argv) {
@@ -84,6 +154,7 @@ int main(int argc, char** argv) {
     TEST("Simple s-expression parse to AST list",  test_sexp_parse_list)
     TEST("Serialise an s-expression from AST",     test_ser_sexp)
     TEST("Transform AST list into pure expression",test_ast_pure_sexp)
+    TEST("List ops: first, second and rest",       test_first_second_rest)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
