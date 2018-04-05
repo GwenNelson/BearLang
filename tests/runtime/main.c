@@ -70,6 +70,9 @@ int test_ser_sexp() {
     return 0;
 }
 
+int test_ast_pure_sexp() {
+    return 1;
+}
 
 int main(int argc, char** argv) {
     int passed_tests = 0;
@@ -78,8 +81,9 @@ int main(int argc, char** argv) {
 
     bl_init();
 
-    TEST("Simple s-expression parse to list",test_sexp_parse_list)
-    TEST("Serialise an s-expression",        test_ser_sexp)
+    TEST("Simple s-expression parse to AST list",  test_sexp_parse_list)
+    TEST("Serialise an s-expression from AST",     test_ser_sexp)
+    TEST("Transform AST list into pure expression",test_ast_pure_sexp)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

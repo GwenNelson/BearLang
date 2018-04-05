@@ -114,3 +114,7 @@ char* bl_ser_ast(bl_ast_node_t* ast) {
       }
       return retval;
 }
+
+bl_val_t* bl_read_ast(bl_ast_node_t* ast) {
+      return NULL;
+}
