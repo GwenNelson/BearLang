@@ -210,7 +210,20 @@ int test_empty_ctx() {
 }
 
 int test_child_ctx() {
-    return 1;
+    // create parent context and set something in it
+    bl_val_t* parent_ctx = bl_ctx_new(NULL);
+    bl_val_t* our_item   = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    our_item->type       = BL_VAL_TYPE_NUMBER;
+    our_item->i_val      = 666;
+    bl_ctx_set(parent_ctx,"TheOneForYouAndMe", our_item);
+
+    // create an empty child context and lookup the key in it
+    bl_val_t* child_ctx = bl_ctx_new(parent_ctx);
+
+    bl_val_t* looked_up = bl_ctx_get(child_ctx,"TheOneForYouAndMe");
+    ASSERT("bl_ctx_get with child ctx", (looked_up->type==BL_VAL_TYPE_NUMBER) && (looked_up->i_val==666))
+  
+    return 0;
 }
 
 int main(int argc, char** argv) {
