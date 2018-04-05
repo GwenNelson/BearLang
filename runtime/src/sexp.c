@@ -116,6 +116,25 @@ char* bl_ser_ast(bl_ast_node_t* ast) {
 }
 
 bl_val_t* bl_read_ast(bl_ast_node_t* ast) {
+      
       if(ast==NULL) return NULL;
-      return NULL;
+      bl_val_t* retval = NULL;
+      switch(ast->node_val.type) {
+         case BL_VAL_TYPE_NULL:
+              return NULL;
+	 break;
+	 case BL_VAL_TYPE_AST_LIST:
+              retval = NULL;
+	      int i=ast->child_count-1;
+	      for(i=ast->child_count-1; i > 0; i--) {
+                  retval = bl_list_prepend(retval, bl_read_ast(ast->children[i]));
+	      }
+	 break;
+	 case BL_VAL_TYPE_NUMBER:
+              retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+              retval->type  = BL_VAL_TYPE_NUMBER;
+	      retval->i_val = ast->node_val.i_val;
+	 break;
+      }
+      return retval;
 }

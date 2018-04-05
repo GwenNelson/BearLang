@@ -96,8 +96,6 @@ int test_ast_pure_sexp() {
 }
 
 int test_first_second_rest() {
-    // this is a painfully trivial test
-
     // first construct a list with 3 items: 4, 8, 87
 
     // first cons cell
@@ -154,6 +152,23 @@ int test_first_second_rest() {
 
 }
 
+int test_prepend_null() {
+    bl_val_t* empty      = NULL;
+    bl_val_t* first_item = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    first_item->type     = BL_VAL_TYPE_NUMBER;
+    first_item->i_val    = 666;
+
+    empty = bl_list_prepend(empty,first_item);
+
+
+    ASSERT("bl_list_prepend returns a valid cons cell", empty->type==BL_VAL_TYPE_CONS)
+
+    ASSERT("bl_list_prepend returns the correct val type for first item",       bl_list_first(empty)->type==BL_VAL_TYPE_NUMBER)
+    ASSERT("bl_list_prepend returns the correct val number for the first item", bl_list_first(empty)->i_val==666) // Hail Satan!
+
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -165,6 +180,7 @@ int main(int argc, char** argv) {
     TEST("Serialise an s-expression from AST",     test_ser_sexp)
     TEST("Transform AST list into pure expression",test_ast_pure_sexp)
     TEST("List ops: first, second and rest",       test_first_second_rest)
+    TEST("List ops: prepend to NULL",              test_prepend_null)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
