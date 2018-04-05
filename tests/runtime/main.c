@@ -82,6 +82,16 @@ int test_ast_pure_sexp() {
     bl_val_t* pure_sexp = bl_read_ast(ast);
 
     // now check the pure expression is all correct
+    bl_val_t** items = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*6);
+
+    // first load each item from the list, this will look messy as hell but also double as another test of the list ops
+    items[0] = bl_list_first(pure_sexp);                                                          // should be 1
+    items[1] = bl_list_second(pure_sexp);                                                         // should be 2
+    items[2] = bl_list_second(bl_list_rest(pure_sexp));                                           // should be 3
+    items[3] = bl_list_second(bl_list_rest(bl_list_rest(pure_sexp)));                             // should be 4
+    items[4] = bl_list_second(bl_list_rest(bl_list_rest(bl_list_rest(pure_sexp))));               // should be 5
+    items[5] = bl_list_second(bl_list_rest(bl_list_rest(bl_list_rest(bl_list_rest(pure_sexp))))); // should be 6
+
     return 1;
 }
 

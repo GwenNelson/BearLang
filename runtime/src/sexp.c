@@ -116,5 +116,6 @@ char* bl_ser_ast(bl_ast_node_t* ast) {
 }
 
 bl_val_t* bl_read_ast(bl_ast_node_t* ast) {
+      if(ast==NULL) return NULL;
       return NULL;
 }
