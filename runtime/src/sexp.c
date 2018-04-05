@@ -169,6 +169,13 @@ bl_val_t* bl_read_ast(bl_ast_node_t* ast) {
          case BL_VAL_TYPE_NULL:
               return NULL;
 	 break;
+	 case BL_VAL_TYPE_SYMBOL:
+              retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+              retval->type = BL_VAL_TYPE_SYMBOL;
+	      retval->s_val = (char*)GC_MALLOC(sizeof(char)*(strlen(ast->node_val.s_val)+1));
+	      snprintf(retval->s_val,strlen(ast->node_val.s_val)+1,"%s",ast->node_val.s_val);
+	      return retval;
+	 break;
 	 case BL_VAL_TYPE_AST_LIST:
               retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
               retval->type = BL_VAL_TYPE_CONS;
