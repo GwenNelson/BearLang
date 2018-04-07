@@ -27,9 +27,13 @@ bl_val_t* bl_list_prepend(bl_val_t* L, bl_val_t* val) {
 }
 
 bl_val_t* bl_list_append(bl_val_t* L, bl_val_t* val) {
+   if(L==NULL) {
+      return bl_list_prepend(L, val);
+   }
+   
    bl_val_t* retval = L;
    while(L->cdr != NULL) {
-     L = L->cdr;
+      L = L->cdr;
    }
    L->cdr = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
    L->cdr->type = BL_VAL_TYPE_CONS;

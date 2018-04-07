@@ -227,7 +227,15 @@ int test_child_ctx() {
 }
 
 int test_simple_arithmetic() {
-    return 1;
+    bl_val_t* ctx = bl_ctx_new_std();
+    char* sum_str = "(+ 2 3)";
+
+    bl_ast_node_t* ast  = bl_parse_sexp(sum_str);
+    bl_val_t* pure_sexp = bl_read_ast(ast);
+
+    bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
+    ASSERT("simple addition (+ 2 3)", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==5))
+    return 0;
 }
 
 int main(int argc, char** argv) {

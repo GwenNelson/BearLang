@@ -1,7 +1,7 @@
 #include <bearlang/common.h>
 #include <bearlang/types.h>
 #include <bearlang/ctx.h>
-
+#include <bearlang/list_ops.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -20,11 +20,55 @@ bl_val_t* bl_ctx_new(bl_val_t* parent) {
 void bl_ctx_close(bl_val_t* ctx) {
 }
 
+bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
+    if(expr->car == NULL) { // should never happen with a non-null cdr
+       return expr;
+    }
+    if(expr->car->type == BL_VAL_TYPE_SYMBOL) {
+       // TODO - move into environment instead of hardcoded
+       if(strncmp(expr->car->s_val,"+",1)==0) {
+          int retval=0;
+          bl_val_t* L = expr->cdr;
+	  while(L->cdr != NULL) {
+             if(L->car != NULL) {
+                retval += L->car->i_val;
+	     }
+             L = L->cdr;
+	  }
+          if(L->car != NULL) {
+             retval += L->car->i_val;
+	  }
+	  bl_val_t* ret = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+	  ret->type=BL_VAL_TYPE_NUMBER;
+	  ret->i_val = retval;
+	  return ret;
+       }
+    }
+}
+
 bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
-   switch(expr->type) {
+    bl_val_t* retval = NULL;
+    switch(expr->type) {
+      case BL_VAL_TYPE_CONS:
+           return bl_eval_cons(ctx, expr);
+   	      retval = NULL;
+           bl_val_t* L = expr;
+	   while(L->cdr != NULL) {
+              if(L->car != NULL) {
+                 retval = bl_list_append(retval, bl_ctx_eval(ctx, L->car));
+	      }
+	      L = L->cdr;
+	   }
+	   if(L->car != NULL) {
+              retval = bl_list_append(retval, bl_ctx_eval(ctx, L->car));
+	   }
+      break;
+      default:
+           retval = expr;
+      break;
    }
 
-   return expr;
+   return retval;
 }
 
 bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
