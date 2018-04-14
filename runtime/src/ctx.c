@@ -8,7 +8,29 @@
 #include <stdio.h>
 
 bl_val_t* bl_ctx_new_std() {
-   return NULL;
+   bl_val_t* retval = bl_ctx_new(NULL);
+
+   bl_val_t* builtin_oper_add = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* builtin_oper_sub = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* builtin_oper_mult = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* builtin_oper_div = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+
+   builtin_oper_add->type = BL_VAL_TYPE_OPER_NATIVE;
+   builtin_oper_sub->type = BL_VAL_TYPE_OPER_NATIVE;
+   builtin_oper_mult->type = BL_VAL_TYPE_OPER_NATIVE;
+   builtin_oper_div->type = BL_VAL_TYPE_OPER_NATIVE;
+
+   builtin_oper_add->code_ptr  = &bl_oper_add;
+   builtin_oper_sub->code_ptr  = &bl_oper_sub;
+   builtin_oper_mult->code_ptr = &bl_oper_mult;
+   builtin_oper_mult->code_ptr = &bl_oper_div;
+
+   bl_ctx_set(retval, "+", builtin_oper_add);
+   bl_ctx_set(retval, "-", builtin_oper_sub);
+   bl_ctx_set(retval, "/", builtin_oper_mult);
+   bl_ctx_set(retval, "*", builtin_oper_div);
+
+   return retval;
 }
 
 bl_val_t* bl_ctx_new(bl_val_t* parent) {
@@ -27,15 +49,9 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
        return expr;
     }
     if(expr->car->type == BL_VAL_TYPE_SYMBOL) {
-       // TODO - move into environment instead of hardcoded
-       if(strncmp(expr->car->s_val,"+",1)==0) {
-          return bl_oper_add(ctx, expr->cdr);
-       } else if (strncmp(expr->car->s_val,"-",1)==0) {
-          return bl_oper_sub(ctx, expr->cdr);
-       } else if (strncmp(expr->car->s_val,"*",1)==0) {
-          return bl_oper_mult(ctx, expr->cdr);
-       } else if (strncmp(expr->car->s_val,"/",1)==0) {
-          return bl_oper_div(ctx, expr->cdr);
+       bl_val_t* symval = bl_ctx_get(ctx, expr->car->s_val);
+       if(symval->type == BL_VAL_TYPE_OPER_NATIVE) {
+          return(symval->code_ptr(ctx, expr->cdr));
        }
     } else {
        bl_val_t* retval = NULL;
@@ -44,8 +60,10 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
           retval = bl_list_append(retval,bl_ctx_eval(ctx,i->car));
           i = i->cdr;
        }
+       if(i->car != NULL) {
+          retval = bl_list_append(retval,bl_ctx_eval(ctx,i->car));
+       }
 
-     	    // TODO - eval every element here
     }
 }
 

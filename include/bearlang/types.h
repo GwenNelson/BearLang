@@ -9,6 +9,7 @@ typedef enum bl_val_type_t {
         BL_VAL_TYPE_SYMBOL,
         BL_VAL_TYPE_NUMBER,
         BL_VAL_TYPE_CONS,
+        BL_VAL_TYPE_OPER_NATIVE,
 	BL_VAL_TYPE_CTX,
 } bl_val_type_t;
 
@@ -29,6 +30,7 @@ typedef struct bl_val_t {
                         bl_val_t* cdr; };
 	       struct { struct bl_hash_t *hash_val;
 	                bl_val_t* parent; };
+	       struct { bl_val_t* (*code_ptr)(bl_val_t*,bl_val_t*); };
         };
 } bl_val_t;
 
