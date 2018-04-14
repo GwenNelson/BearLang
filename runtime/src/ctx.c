@@ -1,5 +1,6 @@
 #include <bearlang/common.h>
 #include <bearlang/types.h>
+#include <bearlang/sexp.h>
 #include <bearlang/ctx.h>
 #include <bearlang/builtins.h>
 #include <bearlang/list_ops.h>
@@ -31,7 +32,14 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
           return bl_oper_add(ctx, expr->cdr);
        }
     } else {
-       // TODO - eval every element here
+       bl_val_t* retval = NULL;
+       bl_val_t* i = expr->car;
+       while(i->car != NULL) {
+          retval = bl_list_append(retval,bl_ctx_eval(ctx,i->car));
+          i = i->cdr;
+       }
+
+     	    // TODO - eval every element here
     }
 }
 
