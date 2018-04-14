@@ -10,25 +10,33 @@
 bl_val_t* bl_ctx_new_std() {
    bl_val_t* retval = bl_ctx_new(NULL);
 
-   bl_val_t* builtin_oper_add = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   bl_val_t* builtin_oper_sub = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* builtin_oper_add  = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* builtin_oper_sub  = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
    bl_val_t* builtin_oper_mult = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   bl_val_t* builtin_oper_div = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* builtin_oper_div  = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* builtin_oper_fn   = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* builtin_oper_set  = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
 
-   builtin_oper_add->type = BL_VAL_TYPE_OPER_NATIVE;
-   builtin_oper_sub->type = BL_VAL_TYPE_OPER_NATIVE;
+   builtin_oper_add->type  = BL_VAL_TYPE_OPER_NATIVE;
+   builtin_oper_sub->type  = BL_VAL_TYPE_OPER_NATIVE;
    builtin_oper_mult->type = BL_VAL_TYPE_OPER_NATIVE;
-   builtin_oper_div->type = BL_VAL_TYPE_OPER_NATIVE;
+   builtin_oper_div->type  = BL_VAL_TYPE_OPER_NATIVE;
+   builtin_oper_fn->type   = BL_VAL_TYPE_OPER_NATIVE;
+   builtin_oper_set->type  = BL_VAL_TYPE_OPER_NATIVE;
 
    builtin_oper_add->code_ptr  = &bl_oper_add;
    builtin_oper_sub->code_ptr  = &bl_oper_sub;
    builtin_oper_mult->code_ptr = &bl_oper_mult;
    builtin_oper_div->code_ptr  = &bl_oper_div;
+   builtin_oper_fn->code_ptr   = &bl_oper_fn;
+   builtin_oper_set->code_ptr  = &bl_oper_set;
 
-   bl_ctx_set(retval, "+", builtin_oper_add);
-   bl_ctx_set(retval, "-", builtin_oper_sub);
-   bl_ctx_set(retval, "*", builtin_oper_mult);
-   bl_ctx_set(retval, "/", builtin_oper_div);
+   bl_ctx_set(retval,  "+", builtin_oper_add);
+   bl_ctx_set(retval,  "-", builtin_oper_sub);
+   bl_ctx_set(retval,  "*", builtin_oper_mult);
+   bl_ctx_set(retval,  "/", builtin_oper_div);
+   bl_ctx_set(retval, "fn", builtin_oper_fn);
+   bl_ctx_set(retval,  "=", builtin_oper_set);
 
    return retval;
 }
@@ -50,8 +58,16 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
     }
     if(expr->car->type == BL_VAL_TYPE_SYMBOL) {
        bl_val_t* symval = bl_ctx_get(ctx, expr->car->s_val);
-       if(symval->type == BL_VAL_TYPE_OPER_NATIVE) {
+       switch(symval->type) {
+         case BL_VAL_TYPE_OPER_NATIVE:
           return(symval->code_ptr(ctx, expr->cdr));
+	 break;
+	 case BL_VAL_TYPE_FUNC_BL_RAW:
+          // TODO - implement function evaluation here
+	 break;
+	 default:
+          return bl_eval_cons(ctx, symval);
+	 break;
        }
     } else {
        bl_val_t* retval = NULL;
@@ -69,9 +85,14 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
 
 bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
     bl_val_t* retval = NULL;
+    bl_val_t* symval = NULL;
     switch(expr->type) {
       case BL_VAL_TYPE_CONS:
            return bl_eval_cons(ctx, expr);
+      break;
+      case BL_VAL_TYPE_SYMBOL:
+           symval = bl_ctx_get(ctx, expr->s_val);
+	   return symval;
       break;
       default:
            retval = expr;
