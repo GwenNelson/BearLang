@@ -251,6 +251,18 @@ int test_nested_addition() {
     return 0;
 }
 
+int test_sub_add() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    char* sum_str = "(- 5 (+ 1 2))";
+
+    bl_ast_node_t* ast  = bl_parse_sexp(sum_str);
+    bl_val_t* pure_sexp = bl_read_ast(ast);
+
+    bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
+    ASSERT("(- 5 (+ 1 2))", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==2))
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -268,6 +280,7 @@ int main(int argc, char** argv) {
     TEST("Create a child context and lookup in parent", test_child_ctx)
     TEST("Simple arithmetic (addition)               ", test_simple_arithmetic)
     TEST("Nested addition                            ", test_nested_addition)
+    TEST("Addition and subtraction in one expression ", test_sub_add)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
