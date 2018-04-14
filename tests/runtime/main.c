@@ -263,6 +263,30 @@ int test_sub_add() {
     return 0;
 }
 
+int test_mult() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    char* sum_str = "(* 3 2)";
+
+    bl_ast_node_t* ast  = bl_parse_sexp(sum_str);
+    bl_val_t* pure_sexp = bl_read_ast(ast);
+
+    bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
+    ASSERT("(* 3 2)", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==6))
+    return 0;
+}
+
+int test_div() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    char* sum_str = "(/ 12 4)";
+
+    bl_ast_node_t* ast  = bl_parse_sexp(sum_str);
+    bl_val_t* pure_sexp = bl_read_ast(ast);
+
+    bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
+    ASSERT("(/ 12 4)", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==3))
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -281,6 +305,8 @@ int main(int argc, char** argv) {
     TEST("Simple arithmetic (addition)               ", test_simple_arithmetic)
     TEST("Nested addition                            ", test_nested_addition)
     TEST("Addition and subtraction in one expression ", test_sub_add)
+    TEST("Multiplication                             ", test_mult)
+    TEST("Division                                   ", test_div)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

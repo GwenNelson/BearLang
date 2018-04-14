@@ -32,6 +32,10 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
           return bl_oper_add(ctx, expr->cdr);
        } else if (strncmp(expr->car->s_val,"-",1)==0) {
           return bl_oper_sub(ctx, expr->cdr);
+       } else if (strncmp(expr->car->s_val,"*",1)==0) {
+          return bl_oper_mult(ctx, expr->cdr);
+       } else if (strncmp(expr->car->s_val,"/",1)==0) {
+          return bl_oper_div(ctx, expr->cdr);
        }
     } else {
        bl_val_t* retval = NULL;
