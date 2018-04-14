@@ -23,12 +23,12 @@ bl_val_t* bl_ctx_new_std() {
    builtin_oper_add->code_ptr  = &bl_oper_add;
    builtin_oper_sub->code_ptr  = &bl_oper_sub;
    builtin_oper_mult->code_ptr = &bl_oper_mult;
-   builtin_oper_mult->code_ptr = &bl_oper_div;
+   builtin_oper_div->code_ptr  = &bl_oper_div;
 
    bl_ctx_set(retval, "+", builtin_oper_add);
    bl_ctx_set(retval, "-", builtin_oper_sub);
-   bl_ctx_set(retval, "/", builtin_oper_mult);
-   bl_ctx_set(retval, "*", builtin_oper_div);
+   bl_ctx_set(retval, "*", builtin_oper_mult);
+   bl_ctx_set(retval, "/", builtin_oper_div);
 
    return retval;
 }
