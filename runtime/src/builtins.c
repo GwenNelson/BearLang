@@ -52,7 +52,8 @@ bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* retval = bl_errif_invalid_len(params,2,2);
+   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
+   bl_val_t* retval = bl_errif_invalid_fixed_args(params,(const bl_val_type_t*)expected_types,2);
    if(retval != NULL) return retval;
 
    retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));

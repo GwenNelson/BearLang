@@ -21,22 +21,26 @@ typedef enum bl_val_type_t {
 } bl_val_type_t;
 
 typedef enum bl_err_type_t {
+	BL_ERR_UNKNOWN,            // Generic / unknown error
 	BL_ERR_PARSE,              // Failed to parse an s-expression
 	BL_ERR_INSUFFICIENT_ARGS,  // Not enough arguments were provided
         BL_ERR_TOOMANY_ARGS,       // Too many arguments were provided
+	BL_ERR_INVALID_ARGTYPE,    // Invalid argument type(s) was/were provided
 } bl_err_type_t;
+
+
+typedef struct bl_val_t bl_val_t;
 
 typedef struct bl_err_t {
 	bl_err_type_t type;
-	union {
-                // BL_ERR_INSUFFICIENT_ARGS
-		struct {uint64_t min_args;
-			uint64_t max_args;
-			uint64_t provided_args; };
-	};
-} bl_err_t;
 
-typedef struct bl_val_t bl_val_t;
+	uint64_t min_args;
+	uint64_t max_args;
+	uint64_t provided_args;
+
+	bl_val_type_t* expected_types; // expected argument types
+        bl_val_type_t* provided_types; // actually provided argument types (as bl_val_type_t array)
+} bl_err_t;
 
 struct bl_hash_t {
        char           key[32];
@@ -47,17 +51,37 @@ struct bl_hash_t {
 typedef struct bl_val_t {
         bl_val_type_t type;
         union {
-               struct { bl_err_t err_val; }; // BL_VAL_TYPE_ERROR
- 	       struct { int64_t i_val; }; // BL_VAL_TYPE_NUMBER
-               struct { char*   s_val; }; // BL_VAL_TYPE_SYMBOL | BL_VAL_TYPE_STRING
-               struct { bl_val_t* car;    // BL_VAL_TYPE_CONS
-                        bl_val_t* cdr; };
-	       struct { struct bl_hash_t *hash_val; // BL_VAL_TYPE_CTX
-	                bl_val_t* parent; };
-	       struct { bl_val_t* (*code_ptr)(bl_val_t*,bl_val_t*); }; // BL_VAL_TYPE_OPER_NATIVE
-	       struct { bl_val_t* bl_func_ptr;    // BL_VAL_TYPE_FUNC_BL_RAW
-		        bl_val_t* bl_funcargs_ptr; };
-	       struct { bl_val_t* (*func_ptr)(bl_val_t*,bl_val_t*); }; // BL_VAL_TYPE_FUNC_NATIVE
+
+		// BL_VAL_TYPE_ERROR
+		struct { bl_err_t err_val; };
+
+		// BL_VAL_TYPE_TYPE
+		struct { uint64_t       type_count;   // how many possible types this meta-type has (usually set to 1, but can be used to implement Maybe values by setting >1)
+		         bl_val_type_t* meta_type; }; // an array of types, or a pointer to a single type value
+
+		// BL_VAL_TYPE_NUMBER
+		struct { int64_t i_val; }; // BL_VAL_TYPE_NUMBER
+
+		// BL_VAL_TYPE_SYMBOL | BL_VAL_TYPE_STRING
+		struct { char*   s_val; };
+
+		// BL_VAL_TYPE_CONS
+		struct { bl_val_t* car;
+                         bl_val_t* cdr; };
+
+		// BL_VAL_TYPE_CTX
+		struct { struct bl_hash_t *hash_val;
+	                 bl_val_t* parent; };
+
+		// BL_VAL_TYPE_OPER_NATIVE
+		struct { bl_val_t* (*code_ptr)(bl_val_t*,bl_val_t*); };
+
+		// BL_VAL_TYPE_FUNC_BL_RAW
+		struct { bl_val_t* bl_func_ptr;
+		         bl_val_t* bl_funcargs_ptr; };
+
+		// BL_VAL_TYPE_FUNC_NATIVE
+		struct { bl_val_t* (*func_ptr)(bl_val_t*,bl_val_t*); };
         };
 } bl_val_t;
 
