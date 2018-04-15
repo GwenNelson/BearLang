@@ -1,4 +1,6 @@
 Fix all TODO comments in codebase
+Replace mpc with a custom higher-performing parser
+Add context/metadata to the AST
 Ensure 0 compiler warnings
 Make bl_ser_sexp return a string that can always be turned back into the original expression or a placeholder symbo
 Add builtin symbols (nil/None, #t, #f, *VERSION* etc etc)
