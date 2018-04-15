@@ -36,7 +36,10 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* retval = bl_errif_invalid_len(params,2,2);
+   if(retval != NULL) return retval;
+     
+   retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
 
    retval->type     = BL_VAL_TYPE_NUMBER;
 
@@ -44,13 +47,15 @@ bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
    // TODO: handle alternate data types in here and in oper_add() above
-   // TODO: add exceptions etc
    retval->i_val = first->i_val - second->i_val;
    return retval;
 }
 
 bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* retval = bl_errif_invalid_len(params,2,2);
+   if(retval != NULL) return retval;
+
+   retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
    retval->type     = BL_VAL_TYPE_NUMBER;
 
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
@@ -61,7 +66,10 @@ bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* retval = bl_errif_invalid_len(params,2,2);
+   if(retval != NULL) return retval;
+
+   retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
    retval->type     = BL_VAL_TYPE_NUMBER;
 
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
@@ -72,7 +80,10 @@ bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* retval = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* retval = bl_errif_invalid_len(params,2,2);
+   if(retval != NULL) return retval;
+     
+   retval = bl_ctx_eval(ctx,bl_list_second(params));
    bl_val_t* name   = bl_list_first(params); // TODO: Handle the case where this isn't a symbol
 
    bl_ctx_set(ctx, name->s_val, retval);
