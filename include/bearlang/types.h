@@ -8,7 +8,8 @@ typedef enum bl_val_type_t {
         BL_VAL_TYPE_AST_LIST,    // A list from the AST
         BL_VAL_TYPE_SYMBOL,      // A BearLang symbol
         BL_VAL_TYPE_NUMBER,      // A number
-        BL_VAL_TYPE_CONS,        // A cons cell (or a list)
+        BL_VAL_TYPE_STRING,      // A string
+	BL_VAL_TYPE_CONS,        // A cons cell (or a list)
         BL_VAL_TYPE_OPER_NATIVE, // A native-code operator
 	BL_VAL_TYPE_FUNC_BL,     // A BearLang-code function (uncompiled)
         BL_VAL_TYPE_FUNC_NATIVE, // A native-code function
@@ -35,8 +36,7 @@ typedef struct bl_val_t {
 	       struct { bl_val_t* (*code_ptr)(bl_val_t*,bl_val_t*); }; // BL_VAL_TYPE_OPER_NATIVE
 	       struct { bl_val_t* bl_func_ptr;    // BL_VAL_TYPE_FUNC_BL_RAW
 		        bl_val_t* bl_funcargs_ptr; };
-	       struct { bl_val_t* (*func_ptr)(bl_val_t*,bl_val_t*); // BL_VAL_TYPE_FUNC_NATIVE
-		        bl_val_t* bl_native_funcargs_ptr; };
+	       struct { bl_val_t* (*func_ptr)(bl_val_t*,bl_val_t*); }; // BL_VAL_TYPE_FUNC_NATIVE
         };
 } bl_val_t;
 

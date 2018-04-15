@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 mpc_parser_t* Number;
+mpc_parser_t* String;
 mpc_parser_t* Symbol;
 mpc_parser_t* Sexpr;
 mpc_parser_t* Expr;
@@ -13,6 +14,7 @@ mpc_parser_t* Lispy;
 
 void bl_init_parser() {
      Number = mpc_new("number");
+     String = mpc_new("string");
      Symbol = mpc_new("symbol");
      Sexpr  = mpc_new("sexpr");
      Expr   = mpc_new("expr");
@@ -21,12 +23,13 @@ void bl_init_parser() {
      mpca_lang(MPCA_LANG_DEFAULT,
       "                                            \
         number : /-?[0-9]+/ ;                      \
-        symbol : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/; \
+        string  : /\"(\\\\.|[^\"])*\"/ ;           \
+	symbol : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/; \
         sexpr  : '(' <expr>* ')' ;                 \
-        expr   : <number> | <symbol> | <sexpr> ;   \
+        expr   : <number> | <string> | <symbol> | <sexpr> ;   \
         lispy  : /^/ <expr>* /$/ ;                 \
       ",
-      Number, Symbol, Sexpr, Expr, Lispy);
+      Number, String, Symbol, Sexpr, Expr, Lispy);
 }
 
 bl_ast_node_t* mpc_to_bl(mpc_ast_t* T) {
@@ -37,6 +40,15 @@ bl_ast_node_t* mpc_to_bl(mpc_ast_t* T) {
          retval->node_val.i_val = atoi(T->contents);
          return retval;
       }
+
+      if(strstr(T->tag,"string")) {
+         int content_len = strlen(T->contents);
+	 retval->node_val.type  = BL_VAL_TYPE_STRING;
+	 retval->node_val.s_val = (char*)GC_MALLOC(content_len+1);
+	 snprintf(retval->node_val.s_val,content_len-1,"%s",T->contents+1);
+	 return retval;
+      }
+
       if(strstr(T->tag,"symbol")) {
          int content_len = strlen(T->contents);
          retval->node_val.type      = BL_VAL_TYPE_SYMBOL;
@@ -108,6 +120,10 @@ char* bl_ser_ast(bl_ast_node_t* ast) {
            retval = (char*)GC_MALLOC(sizeof(char)*(strlen(ast->node_val.s_val)+1));
            snprintf(retval,strlen(ast->node_val.s_val)+1,"%s",ast->node_val.s_val);
          break;
+         case BL_VAL_TYPE_STRING:
+           retval = (char*)GC_MALLOC(sizeof(char)*(strlen(ast->node_val.s_val)+1));
+           snprintf(retval,strlen(ast->node_val.s_val)+3,"\"%s\"",ast->node_val.s_val);
+         break;
          case BL_VAL_TYPE_NUMBER:
            retval = (char*)GC_MALLOC(sizeof(char)*10); // TODO - switch numbers to libgmp
            snprintf(retval,10,"%d",ast->node_val.i_val);
@@ -117,6 +133,7 @@ char* bl_ser_ast(bl_ast_node_t* ast) {
 }
 
 char* bl_ser_sexp(bl_val_t* expr) {
+      if(expr == NULL) return "";
       char* retval="";
       switch(expr->type) {
          case BL_VAL_TYPE_NULL:
@@ -126,6 +143,10 @@ char* bl_ser_sexp(bl_val_t* expr) {
          case BL_VAL_TYPE_SYMBOL:
            retval = (char*)GC_MALLOC(sizeof(char)*(strlen(expr->s_val)+1));
            snprintf(retval,strlen(expr->s_val)+1,"%s",expr->s_val);
+         break;
+         case BL_VAL_TYPE_STRING:
+           retval = (char*)GC_MALLOC(sizeof(char)*(strlen(expr->s_val)+1));
+           snprintf(retval,strlen(expr->s_val)+3,"\"%s\"",expr->s_val);
          break;
          case BL_VAL_TYPE_NUMBER:
            retval = (char*)GC_MALLOC(sizeof(char)*10); // TODO - switch numbers to libgmp
@@ -171,6 +192,13 @@ bl_val_t* bl_read_ast(bl_ast_node_t* ast) {
 	 case BL_VAL_TYPE_SYMBOL:
               retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
               retval->type = BL_VAL_TYPE_SYMBOL;
+	      retval->s_val = (char*)GC_MALLOC(sizeof(char)*(strlen(ast->node_val.s_val)+1));
+	      snprintf(retval->s_val,strlen(ast->node_val.s_val)+1,"%s",ast->node_val.s_val);
+	      return retval;
+	 break;
+	 case BL_VAL_TYPE_STRING:
+              retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+              retval->type = BL_VAL_TYPE_STRING;
 	      retval->s_val = (char*)GC_MALLOC(sizeof(char)*(strlen(ast->node_val.s_val)+1));
 	      snprintf(retval->s_val,strlen(ast->node_val.s_val)+1,"%s",ast->node_val.s_val);
 	      return retval;

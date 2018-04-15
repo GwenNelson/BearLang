@@ -73,16 +73,26 @@ bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {
    return retval;
 }
 
-bl_val_t* bl_func_print(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* i = params;
+bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* i;
+   bl_val_t* s;
+   i = params;
    while(i->cdr != NULL) {
-      if(i->cdr != NULL) {
-    	   printf("%s", bl_ser_sexp(i->car));
+      if(i->car != NULL) {
+	 if(i->car->type == BL_VAL_TYPE_STRING) {
+            printf("%s",s->s_val);
+	 } else {
+     	    printf("%s", bl_ser_sexp(bl_ctx_eval(ctx,i->car)));
+	 }
       }
       i = i->cdr;
    }
    if(i->car != NULL) {
-      printf("%s", bl_ser_sexp(i->car));
+      if(i->car->type == BL_VAL_TYPE_STRING) {
+         printf("%s", i->car->s_val);
+      } else {
+  	 printf("%s", bl_ser_sexp(bl_ctx_eval(ctx,i->car)));
+      }
    }
-
+   return NULL;
 }
