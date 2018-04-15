@@ -1,11 +1,11 @@
 Fix all TODO comments in codebase
+Add context/traceback stuff to error type
 Handle floats and bignum - dynamically choose type of number at runtime
 Misc lisp primitives
 Make builtin operators work with other data types (concat strings with + operator etc)
 Custom operators - like functions, but params aren't evaluated, instead passed as a simple list
 Macros - like custom operators, but return expressions to be evaluated at compile time
 String input
-Add error handling
 Tail call optimisation
 FFI / Interop
 Standard lib + import path
