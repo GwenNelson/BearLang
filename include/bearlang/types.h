@@ -18,6 +18,7 @@ typedef enum bl_val_type_t {
 	BL_VAL_TYPE_FUNC_BL,     // A BearLang-code function (uncompiled)
         BL_VAL_TYPE_FUNC_NATIVE, // A native-code function
 	BL_VAL_TYPE_CTX,         // A context
+	BL_VAL_TYPE_ANY,         // Any type (only used for error handling etc)
 } bl_val_type_t;
 
 typedef enum bl_err_type_t {

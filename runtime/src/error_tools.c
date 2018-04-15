@@ -1,5 +1,8 @@
+#include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
+
 
 #include <bearlang/common.h>
 #include <bearlang/list_ops.h>
@@ -46,7 +49,12 @@ bl_val_t* bl_errif_invalid_fixed_args(bl_val_t* params, const bl_val_type_t* exp
       bl_val_t* list_iter = params;
       bool is_good        = true;
       for(i=0; i < args_len; i++) {
-          if(expected_types[i] != list_iter->car->type) is_good=false;
+          is_good=false;
+          if(expected_types[i] != list_iter->car->type) {
+            if(expected_types[i] != BL_VAL_TYPE_ANY) { 
+	       is_good=false;
+	    }
+	  } 
           list_iter = list_iter->cdr;
       }
 
@@ -59,7 +67,7 @@ bl_val_t* bl_errif_invalid_fixed_args(bl_val_t* params, const bl_val_type_t* exp
       retval->err_val.min_args       = args_len;
       retval->err_val.max_args       = args_len;
 
-      retval->err_val.expected_types = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t*)*args_len);
+      retval->err_val.expected_types = (bl_val_type_t*)GC_MALLOC(sizeof(bl_val_type_t*)*args_len);
       retval->err_val.provided_args  = args_len; // if this isn't true, the above bl_errif_invalid_len will have returned already
       retval->err_val.provided_types = (bl_val_type_t*)GC_MALLOC(sizeof(bl_val_type_t)*args_len);
       
@@ -73,7 +81,7 @@ bl_val_t* bl_errif_invalid_fixed_args(bl_val_t* params, const bl_val_type_t* exp
       return retval;
 }
 
-const char* bl_ser_type(bl_val_type_t t) {
+char* bl_ser_type(bl_val_type_t t) {
       switch(t) {
          case BL_VAL_TYPE_NULL:
 	      return "NULL";
@@ -108,6 +116,9 @@ const char* bl_ser_type(bl_val_type_t t) {
 	 case BL_VAL_TYPE_CTX:
 	      return "CONTEXT";
 	 break;
+	 case BL_VAL_TYPE_ANY:
+	      return "ANY";
+	 break;
       }
 }
 
@@ -141,7 +152,7 @@ char* bl_errmsg(bl_val_t* E) {
 	  break;
 	  case BL_ERR_INVALID_ARGTYPE:
                snprintf(retval,1023,"Invalid arguments, expected %s but got %s", bl_ser_types(E->err_val.provided_args,E->err_val.expected_types),
-			                                                         bl_ser_types(E->err_val.provided_args,E->err_val.provided_types));
+			                                                      bl_ser_types(E->err_val.provided_args,E->err_val.provided_types));
 	  break;
       }
       return retval;

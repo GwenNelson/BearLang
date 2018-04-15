@@ -36,7 +36,8 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* retval = bl_errif_invalid_len(params,2,2);
+   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
+   bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
      
    retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
@@ -46,14 +47,13 @@ bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   // TODO: handle alternate data types in here and in oper_add() above
    retval->i_val = first->i_val - second->i_val;
    return retval;
 }
 
 bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) {
    bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
-   bl_val_t* retval = bl_errif_invalid_fixed_args(params,(const bl_val_type_t*)expected_types,2);
+   bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
 
    retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
@@ -67,7 +67,11 @@ bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* retval = bl_errif_invalid_len(params,2,2);
+   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
+   bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
+   if(retval != NULL) return retval;
+
+   retval = bl_errif_invalid_len(params,2,2);
    if(retval != NULL) return retval;
 
    retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
@@ -81,7 +85,8 @@ bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* retval = bl_errif_invalid_len(params,2,2);
+   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_SYMBOL,BL_VAL_TYPE_ANY};
+   bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
      
    retval = bl_ctx_eval(ctx,bl_list_second(params));
