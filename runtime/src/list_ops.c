@@ -41,3 +41,14 @@ bl_val_t* bl_list_append(bl_val_t* L, bl_val_t* val) {
    L->cdr->cdr  = NULL;
    return retval;
 }
+
+uint64_t bl_list_len(bl_val_t* L) {
+   uint64_t retval = 0;
+   if(L==NULL) return 0;
+   bl_val_t* i = L;
+   while(L->cdr != NULL) {
+      retval++;
+      L = L->cdr;
+   }
+   return retval;
+}

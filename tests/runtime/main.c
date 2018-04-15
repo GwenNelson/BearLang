@@ -326,6 +326,28 @@ int test_simple_func() {
     return 0;
 }
 
+int test_list_len() {
+    char* empty_list = "()";
+    bl_ast_node_t* ast = bl_parse_sexp(empty_list);
+    bl_val_t*     sexp = bl_read_ast(ast);
+    uint64_t empty_len = bl_list_len(sexp);
+    ASSERT("length of ()==0",empty_len==0)
+
+    char* single_item_list = "(1337)";
+    ast  = bl_parse_sexp(single_item_list);
+    sexp  = bl_read_ast(ast);
+    uint64_t single_len = bl_list_len(sexp);
+    ASSERT("length of (1337)==1",single_len==1)
+
+    char* multi_item_list = "(1337 42 666)";
+    ast  = bl_parse_sexp(multi_item_list);
+    sexp  = bl_read_ast(ast);
+    uint64_t multi_len = bl_list_len(sexp);
+    ASSERT("length of (1337 42 666)==3",multi_len==3)
+
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -339,6 +361,7 @@ int main(int argc, char** argv) {
     TEST("Serialise a pure expression                ", test_ser_pure_sexp)
     TEST("List ops: first, second and rest           ", test_first_second_rest)
     TEST("List ops: prepend to NULL                  ", test_prepend_null)
+    TEST("List ops: get list length                  ", test_list_len)
     TEST("Create an empty context and get/set        ", test_empty_ctx)
     TEST("Create a child context and lookup in parent", test_child_ctx)
     TEST("Simple arithmetic (addition)               ", test_simple_arithmetic)
