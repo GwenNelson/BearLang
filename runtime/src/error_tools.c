@@ -37,3 +37,21 @@ bl_val_t* bl_errif_invalid_len(bl_val_t* L, uint64_t min, uint64_t max) {
      }
      return retval;
 }
+
+char* bl_errmsg(bl_val_t* E) {
+      // TODO - nested errors - return an error if E is not an error ;)
+
+      char* retval = (char*)GC_MALLOC(sizeof(char)*1024);
+      switch(E->err_val.type) {
+          case BL_ERR_PARSE:
+               snprintf(retval,1023,"Could not parse: %s", "TODO: implement this");
+	  break;
+	  case BL_ERR_INSUFFICIENT_ARGS:
+               snprintf(retval,1023,"Insufficient arguments, expected at least %llu, received %llu", E->err_val.min_args, E->err_val.provided_args);
+	  break;
+	  case BL_ERR_TOOMANY_ARGS:
+               snprintf(retval,1023,"Too many arguments, expected no more than %llu, received %llu", E->err_val.max_args, E->err_val.provided_args);
+	  break;
+      }
+      return retval;
+}
