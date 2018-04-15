@@ -159,11 +159,11 @@ function(SETUP_TARGET_FOR_COVERAGE)
         COMMAND ${Coverage_EXECUTABLE}
 
         # Capturing lcov counters and generating report
-        COMMAND ${LCOV_PATH} --directory . --capture --output-file ${Coverage_NAME}.info
+        COMMAND ${LCOV_PATH} --directory . --rc lcov_branch_coverage=1 --capture --output-file ${Coverage_NAME}.info
         # add baseline counters
-        COMMAND ${LCOV_PATH} -a ${Coverage_NAME}.base -a ${Coverage_NAME}.info --output-file ${Coverage_NAME}.total
-        COMMAND ${LCOV_PATH} --remove ${Coverage_NAME}.total ${COVERAGE_EXCLUDES} --output-file ${PROJECT_BINARY_DIR}/${Coverage_NAME}.info.cleaned
-        COMMAND ${GENHTML_PATH} -o ${Coverage_NAME} ${PROJECT_BINARY_DIR}/${Coverage_NAME}.info.cleaned
+        COMMAND ${LCOV_PATH} -a ${Coverage_NAME}.base --rc lcov_branch_coverage=1 -a ${Coverage_NAME}.info --output-file ${Coverage_NAME}.total
+        COMMAND ${LCOV_PATH} --rc lcov_branch_coverage=1 --remove ${Coverage_NAME}.total ${COVERAGE_EXCLUDES} --output-file ${PROJECT_BINARY_DIR}/${Coverage_NAME}.info.cleaned
+        COMMAND ${GENHTML_PATH} --branch-coverage -o ${Coverage_NAME} ${PROJECT_BINARY_DIR}/${Coverage_NAME}.info.cleaned
         COMMAND ${CMAKE_COMMAND} -E remove ${Coverage_NAME}.base ${Coverage_NAME}.total ${PROJECT_BINARY_DIR}/${Coverage_NAME}.info.cleaned
 
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
