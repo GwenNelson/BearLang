@@ -126,8 +126,11 @@ char* bl_ser_ast(bl_ast_node_t* ast) {
          break;
          case BL_VAL_TYPE_NUMBER:
            retval = (char*)GC_MALLOC(sizeof(char)*10); // TODO - switch numbers to libgmp
-           snprintf(retval,10,"%d",ast->node_val.i_val);
+           snprintf(retval,10,"%llu",ast->node_val.i_val);
          break;
+	 default:
+
+	 break;
       }
       return retval;
 }
@@ -140,6 +143,10 @@ char* bl_ser_sexp(bl_val_t* expr) {
            retval = (char*)GC_MALLOC(sizeof(char)*5);
            snprintf(retval, 5, "None");
          break;
+	 case BL_VAL_TYPE_ERROR:
+           retval = (char*)GC_MALLOC(sizeof(char)*5);
+	   snprintf(retval, 5, "ERROR");
+	 break;
          case BL_VAL_TYPE_SYMBOL:
            retval = (char*)GC_MALLOC(sizeof(char)*(strlen(expr->s_val)+1));
            snprintf(retval,strlen(expr->s_val)+1,"%s",expr->s_val);
@@ -150,7 +157,7 @@ char* bl_ser_sexp(bl_val_t* expr) {
          break;
          case BL_VAL_TYPE_NUMBER:
            retval = (char*)GC_MALLOC(sizeof(char)*10); // TODO - switch numbers to libgmp
-           snprintf(retval,10,"%d",expr->i_val);
+           snprintf(retval,10,"%llu",expr->i_val);
          break;
 	 case BL_VAL_TYPE_CONS:
            retval = (char*)GC_MALLOC(sizeof(char)*3);

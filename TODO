@@ -1,4 +1,7 @@
 Fix all TODO comments in codebase
+Ensure 0 compiler warnings
+Make bl_ser_sexp return a string that can always be turned back into the original expression or a placeholder symbo
+Add builtin symbols (nil/None, #t, #f, *VERSION* etc etc)
 Ensure 100% code coverage of runtime lib
 Test runtime lib with all possible error conditions for all params
 Add context/traceback stuff to error type
