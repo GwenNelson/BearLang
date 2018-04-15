@@ -5,6 +5,7 @@ Add builtin symbols (nil/None, #t, #f, *VERSION* etc etc)
 Ensure 100% code coverage of runtime lib
 Test runtime lib with all possible error conditions for all params
 Add context/traceback stuff to error type
+Add throw/raise/catch (piggyback on top of error type)
 Handle floats and bignum - dynamically choose type of number at runtime
 Misc lisp primitives
 Make builtin operators work with other data types (concat strings with + operator etc)
