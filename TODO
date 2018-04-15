@@ -1,0 +1,19 @@
+Handle floats and bignum - dynamically choose type of number at runtime
+Misc lisp primitives
+Make builtin operators work with other data types (concat strings with + operator etc)
+Custom operators - like functions, but params aren't evaluated, instead passed as a simple list
+Macros - like custom operators, but return expressions to be evaluated at compile time
+String input
+Add error handling
+Tail call optimisation
+FFI / Interop
+Standard lib + import path
+Basic modules support
+  Native code extension modules
+     Dynamic lib with special symbols
+  .bl modules
+Compiler
+  Emit LLVM IR or C
+  Compile code down to extension modules
+  Compile code down to executable native lib
+  Compile code down to executable binary
