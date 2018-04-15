@@ -15,6 +15,7 @@ bl_val_t* bl_ctx_new_std() {
    bl_val_t* builtin_oper_mult  = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
    bl_val_t* builtin_oper_div   = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
    bl_val_t* builtin_oper_set   = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* builtin_oper_fn    = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
    bl_val_t* builtin_oper_print = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
 
    builtin_oper_add->type   = BL_VAL_TYPE_OPER_NATIVE;
@@ -22,6 +23,7 @@ bl_val_t* bl_ctx_new_std() {
    builtin_oper_mult->type  = BL_VAL_TYPE_OPER_NATIVE;
    builtin_oper_div->type   = BL_VAL_TYPE_OPER_NATIVE;
    builtin_oper_set->type   = BL_VAL_TYPE_OPER_NATIVE;
+   builtin_oper_fn->type    = BL_VAL_TYPE_OPER_NATIVE;
    builtin_oper_print->type = BL_VAL_TYPE_OPER_NATIVE;
 
    builtin_oper_add->code_ptr   = &bl_oper_add;
@@ -29,6 +31,7 @@ bl_val_t* bl_ctx_new_std() {
    builtin_oper_mult->code_ptr  = &bl_oper_mult;
    builtin_oper_div->code_ptr   = &bl_oper_div;
    builtin_oper_set->code_ptr   = &bl_oper_set;
+   builtin_oper_fn->code_ptr    = &bl_oper_fn;
    builtin_oper_print->func_ptr = &bl_oper_print;
 
    bl_ctx_set(retval,     "+", builtin_oper_add);
@@ -36,6 +39,7 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval,     "*", builtin_oper_mult);
    bl_ctx_set(retval,     "/", builtin_oper_div);
    bl_ctx_set(retval,     "=", builtin_oper_set);
+   bl_ctx_set(retval,    "fn", builtin_oper_fn);
    bl_ctx_set(retval, "print", builtin_oper_print);
 
    return retval;
@@ -53,6 +57,37 @@ void bl_ctx_close(bl_val_t* ctx) {
     GC_FREE(ctx);
 }
 
+bl_val_t* bl_eval_blfunc(bl_val_t* ctx, bl_val_t* f, bl_val_t* params) {
+    bl_val_t* retval   = NULL;
+    bl_val_t* closure  = bl_ctx_new(ctx);
+    bl_val_t* argsk_i  = f->bl_funcargs_ptr;
+    bl_val_t* argsv_i  = params;
+    while(argsk_i->cdr != NULL) {
+       if(argsk_i->car != NULL) {
+     	    bl_ctx_set(closure, argsk_i->car->s_val, bl_ctx_eval(ctx,argsv_i->car));
+       }
+       argsk_i = argsk_i -> cdr;
+       argsv_i = argsv_i -> cdr;
+    }
+    if(argsk_i->car != NULL) {
+       bl_ctx_set(closure, argsk_i->car->s_val, bl_ctx_eval(ctx,argsv_i->car));
+    }
+
+    return bl_ctx_eval(closure, f->bl_func_ptr);
+/*    bl_val_t* i = f->func_ptr;
+    while(i-> cdr != NULL) {
+       if(i-> car != NULL) {
+          retval = bl_ctx_eval(closure,i->car);
+       }
+       i = i->cdr;
+    }
+    if(i->car != NULL) {
+       retval = bl_ctx_eval(closure,i->car);
+    }
+    return retval;*/
+
+}
+
 bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
     if(expr->car == NULL) { // should never happen with a non-null cdr
        return expr;
@@ -64,11 +99,15 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
           return symval->code_ptr(ctx, expr->cdr);
 	 break;
 
+         case BL_VAL_TYPE_FUNC_BL:
+          return bl_eval_blfunc(ctx,symval,expr->cdr);
+	 break;
+
 	 default:
           return bl_eval_cons(ctx, symval);
 	 break;
        }
-    } else if (expr != NULL) {
+    } else {
        bl_val_t* retval = NULL;
        bl_val_t* i = expr;
        while(i->cdr != NULL) {
@@ -80,20 +119,21 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
        if(i->car != NULL) {
           retval = bl_list_append(retval,bl_ctx_eval(ctx,i->car));
        }
-
+       return retval;
     }
 }
 
 bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
+    
     bl_val_t* retval = NULL;
     bl_val_t* symval = NULL;
     switch(expr->type) {
       case BL_VAL_TYPE_CONS:
-           return bl_eval_cons(ctx, expr);
+           retval = bl_eval_cons(ctx, expr);
       break;
       case BL_VAL_TYPE_SYMBOL:
            symval = bl_ctx_get(ctx, expr->s_val);
-	   return bl_ctx_eval(ctx,symval);
+	   retval = bl_ctx_eval(ctx,symval);
       break;
       default:
            retval = expr;

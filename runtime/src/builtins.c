@@ -96,3 +96,11 @@ bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
    }
    return NULL;
 }
+
+bl_val_t* bl_oper_fn(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* retval        = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   retval->type            = BL_VAL_TYPE_FUNC_BL;
+   retval->bl_funcargs_ptr = bl_list_first(params);
+   retval->bl_func_ptr     = bl_list_second(params);
+   return retval;
+}

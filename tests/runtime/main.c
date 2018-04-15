@@ -308,6 +308,24 @@ int test_set_oper() {
     return 0;
 }
 
+int test_simple_func() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    char* defun_str = "(= test (fn (a b) (- (+ a b) 1)))";
+    bl_ast_node_t* ast = bl_parse_sexp(defun_str);
+    bl_val_t*      pure_sexp = bl_read_ast(ast);
+    
+    bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
+
+    char* test_str = "(test 2 2)";
+    ast       = bl_parse_sexp(test_str);
+    pure_sexp = bl_read_ast(ast);
+
+    result = bl_ctx_eval(ctx,pure_sexp);
+
+    ASSERT("Calling (= test (fn (a b) (- (+ a b) 1))) with (2 2)", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==3))
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -329,6 +347,7 @@ int main(int argc, char** argv) {
     TEST("Multiplication                             ", test_mult)
     TEST("Division                                   ", test_div)
     TEST("Set operator                               ", test_set_oper)
+    TEST("Simple function                            ", test_simple_func)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
