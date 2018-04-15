@@ -1,3 +1,4 @@
+Fix all TODO comments in codebase
 Handle floats and bignum - dynamically choose type of number at runtime
 Misc lisp primitives
 Make builtin operators work with other data types (concat strings with + operator etc)
