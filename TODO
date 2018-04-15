@@ -1,4 +1,6 @@
 Fix all TODO comments in codebase
+Ensure 100% code coverage of runtime lib
+Test runtime lib with all possible error conditions for all params
 Add context/traceback stuff to error type
 Handle floats and bignum - dynamically choose type of number at runtime
 Misc lisp primitives
