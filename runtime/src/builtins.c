@@ -64,16 +64,8 @@ bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) {
    return retval;
 }
 
-bl_val_t* bl_oper_fn(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   retval->type     = BL_VAL_TYPE_FUNC_BL_RAW;
-   retval->args_ptr = bl_list_first(params);
-   retval->func_ptr = bl_list_second(params);
-   return retval;
-}
-
 bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* retval = bl_list_second(params);
+   bl_val_t* retval = bl_ctx_eval(ctx,bl_list_second(params));
    bl_val_t* name   = bl_list_first(params); // TODO: Handle the case where this isn't a symbol
 
    bl_ctx_set(ctx, name->s_val, retval);
