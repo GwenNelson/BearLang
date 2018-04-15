@@ -26,7 +26,6 @@ bl_val_t* bl_ctx_new_std() {
    builtin_oper_sub->code_ptr  = &bl_oper_sub;
    builtin_oper_mult->code_ptr = &bl_oper_mult;
    builtin_oper_div->code_ptr  = &bl_oper_div;
-   builtin_oper_fn->code_ptr   = &bl_oper_fn;
    builtin_oper_set->code_ptr  = &bl_oper_set;
 
    bl_ctx_set(retval,  "+", builtin_oper_add);
