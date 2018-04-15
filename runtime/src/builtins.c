@@ -3,6 +3,8 @@
 #include <bearlang/builtins.h>
 #include <bearlang/sexp.h>
 #include <bearlang/ctx.h>
+#include <bearlang/types.h>
+#include <bearlang/error_tools.h>
 
 #include <stdio.h>
 
@@ -10,7 +12,10 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 
    bl_val_t* L=params;
 
-   bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* retval = bl_errif_invalid_len(L,2,BL_LONGEST_LIST);
+   if(retval != NULL) return retval;
+
+   retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
    retval->type  = BL_VAL_TYPE_NUMBER;
    retval->i_val = 0;
 
@@ -32,6 +37,7 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 
 bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+
    retval->type     = BL_VAL_TYPE_NUMBER;
 
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));

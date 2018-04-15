@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <bearlang/uthash.h>
 
+#define BL_LONGEST_LIST 0xFFFFFFFFFFFFFFFF
+
 typedef enum bl_val_type_t {
         BL_VAL_TYPE_NULL,        // The None or NULL type
         BL_VAL_TYPE_ERROR,       // Error / exception - if this is returned anywhere, something went wrong
@@ -21,15 +23,16 @@ typedef enum bl_val_type_t {
 typedef enum bl_err_type_t {
 	BL_ERR_PARSE,              // Failed to parse an s-expression
 	BL_ERR_INSUFFICIENT_ARGS,  // Not enough arguments were provided
+        BL_ERR_TOOMANY_ARGS,       // Too many arguments were provided
 } bl_err_type_t;
 
 typedef struct bl_err_t {
 	bl_err_type_t type;
 	union {
                 // BL_ERR_INSUFFICIENT_ARGS
-		struct {uint16_t min_args;
-			uint16_t max_args;
-			uint16_t provided_args; };
+		struct {uint64_t min_args;
+			uint64_t max_args;
+			uint64_t provided_args; };
 	};
 } bl_err_t;
 

@@ -47,8 +47,9 @@ uint64_t bl_list_len(bl_val_t* L) {
    if(L==NULL) return 0;
    bl_val_t* i = L;
    while(L->cdr != NULL) {
-      retval++;
+      if(L->car != NULL) retval++;
       L = L->cdr;
    }
+   if(L->car != NULL) retval++;
    return retval;
 }
