@@ -33,8 +33,10 @@ typedef struct bl_val_t {
 	       struct { struct bl_hash_t *hash_val; // BL_VAL_TYPE_CTX
 	                bl_val_t* parent; };
 	       struct { bl_val_t* (*code_ptr)(bl_val_t*,bl_val_t*); }; // BL_VAL_TYPE_OPER_NATIVE
-	       struct { bl_val_t* func_ptr;    // BL_VAL_TYPE_FUNC_BL_RAW
-		        bl_val_t* args_ptr; };
+	       struct { bl_val_t* bl_func_ptr;    // BL_VAL_TYPE_FUNC_BL_RAW
+		        bl_val_t* bl_funcargs_ptr; };
+	       struct { bl_val_t* (*func_ptr)(bl_val_t*,bl_val_t*); // BL_VAL_TYPE_FUNC_NATIVE
+		        bl_val_t* bl_native_funcargs_ptr; };
         };
 } bl_val_t;
 
