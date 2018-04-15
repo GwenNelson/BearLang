@@ -66,9 +66,11 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
     } else if (expr != NULL) {
        bl_val_t* retval = NULL;
        bl_val_t* i = expr;
-       while(i->car != NULL) {
-          retval = bl_list_append(retval,bl_ctx_eval(ctx,i->car));
-          i = i->cdr;
+       while(i->cdr != NULL) {
+          if(i->car != NULL) {
+     	    retval = bl_list_append(retval,bl_ctx_eval(ctx,i->car));
+          }
+     	  i = i->cdr;
        }
        if(i->car != NULL) {
           retval = bl_list_append(retval,bl_ctx_eval(ctx,i->car));

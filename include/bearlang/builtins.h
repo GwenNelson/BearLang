@@ -9,3 +9,5 @@ bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params);
 
 bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params);
+
+bl_val_t* bl_func_print(bl_val_t* ctx, bl_val_t* params);

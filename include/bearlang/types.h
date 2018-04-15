@@ -10,7 +10,8 @@ typedef enum bl_val_type_t {
         BL_VAL_TYPE_NUMBER,      // A number
         BL_VAL_TYPE_CONS,        // A cons cell (or a list)
         BL_VAL_TYPE_OPER_NATIVE, // A native-code operator
-	BL_VAL_TYPE_FUNC_BL_RAW, // A BearLang-code function (uncompiled)
+	BL_VAL_TYPE_FUNC_BL,     // A BearLang-code function (uncompiled)
+        BL_VAL_TYPE_FUNC_NATIVE, // A native-code function
 	BL_VAL_TYPE_CTX,         // A context
 } bl_val_type_t;
 

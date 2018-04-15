@@ -147,13 +147,12 @@ char* bl_ser_sexp(bl_val_t* expr) {
 		  }
                   L = L->cdr;
 	       }
-         
-                  if(L->car != NULL) {
-                     char* newval = bl_ser_sexp(L->car);
-                     size_t newsize =  sizeof(char) * (strlen(retval)+strlen(newval)+4);
-                     retval = (char*)GC_realloc(retval, newsize);
-                     snprintf(retval,newsize,"%s%s)", retval, newval);
-		  }
+               if(L->car != NULL) {
+                  char* newval = bl_ser_sexp(L->car);
+                  size_t newsize =  sizeof(char) * (strlen(retval)+strlen(newval)+4);
+                  retval = (char*)GC_realloc(retval, newsize);
+                  snprintf(retval,newsize,"%s%s)", retval, newval);
+	       }
 	   }
 
          break;

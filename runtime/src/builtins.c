@@ -1,6 +1,7 @@
 #include <bearlang/common.h>
 #include <bearlang/list_ops.h>
 #include <bearlang/builtins.h>
+#include <bearlang/sexp.h>
 #include <bearlang/ctx.h>
 
 #include <stdio.h>
@@ -70,4 +71,18 @@ bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {
 
    bl_ctx_set(ctx, name->s_val, retval);
    return retval;
+}
+
+bl_val_t* bl_func_print(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* i = params;
+   while(i->cdr != NULL) {
+      if(i->cdr != NULL) {
+    	   printf("%s", bl_ser_sexp(i->car));
+      }
+      i = i->cdr;
+   }
+   if(i->car != NULL) {
+      printf("%s", bl_ser_sexp(i->car));
+   }
+
 }
