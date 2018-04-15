@@ -49,7 +49,6 @@ bl_val_t* bl_errif_invalid_fixed_args(bl_val_t* params, const bl_val_type_t* exp
       bl_val_t* list_iter = params;
       bool is_good        = true;
       for(i=0; i < args_len; i++) {
-          is_good=false;
           if(expected_types[i] != list_iter->car->type) {
             if(expected_types[i] != BL_VAL_TYPE_ANY) { 
 	       is_good=false;

@@ -36,6 +36,7 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) {
+   params = bl_ctx_eval(ctx,params);
    bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
@@ -44,8 +45,8 @@ bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) {
 
    retval->type     = BL_VAL_TYPE_NUMBER;
 
-   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
-   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* first  = bl_list_first(params);
+   bl_val_t* second = bl_list_second(params);
 
    retval->i_val = first->i_val - second->i_val;
    return retval;
