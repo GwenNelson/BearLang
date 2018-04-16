@@ -7,29 +7,32 @@
 
 mpc_parser_t* Number;
 mpc_parser_t* String;
+mpc_parser_t* Comment;
 mpc_parser_t* Symbol;
 mpc_parser_t* Sexpr;
 mpc_parser_t* Expr;
 mpc_parser_t* Lispy;
 
 void bl_init_parser() {
-     Number = mpc_new("number");
-     String = mpc_new("string");
-     Symbol = mpc_new("symbol");
-     Sexpr  = mpc_new("sexpr");
-     Expr   = mpc_new("expr");
-     Lispy  = mpc_new("lispy");
+     Number  = mpc_new("number");
+     String  = mpc_new("string");
+     Comment = mpc_new("comment");
+     Symbol  = mpc_new("symbol");
+     Sexpr   = mpc_new("sexpr");
+     Expr    = mpc_new("expr");
+     Lispy   = mpc_new("lispy");
 
      mpca_lang(MPCA_LANG_DEFAULT,
       "                                            \
         number : /-?[0-9]+/ ;                      \
-        string  : /\"(\\\\.|[^\"])*\"/ ;           \
 	symbol : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/; \
+	string  : /\"(\\\\.|[^\"])*\"/ ;           \
+        comment : /;[^\\r\\n]*/ ;                    \
         sexpr  : '(' <expr>* ')' ;                 \
-        expr   : <number> | <string> | <symbol> | <sexpr> ;   \
+        expr   : <number> | <symbol> | <string> | <comment> | <sexpr> ;   \
         lispy  : /^/ <expr>* /$/ ;                 \
       ",
-      Number, String, Symbol, Sexpr, Expr, Lispy);
+      Number, Symbol, String, Comment, Sexpr, Expr, Lispy);
 }
 
 bl_ast_node_t* mpc_to_bl(mpc_ast_t* T) {
@@ -73,6 +76,7 @@ bl_ast_node_t* mpc_to_bl(mpc_ast_t* T) {
           if (strcmp(T->children[i]->contents, "(") == 0) { continue; }
           if (strcmp(T->children[i]->contents, ")") == 0) { continue; }
           if (strcmp(T->children[i]->tag,  "regex") == 0) { continue; }
+	  if (strstr(T->children[i]->tag, "comment")) { continue; }
           bl_ast_node_t* parsed = mpc_to_bl(T->children[i]);
           retval->children[c] = parsed;
           c++;
