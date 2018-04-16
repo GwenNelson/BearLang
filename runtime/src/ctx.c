@@ -20,8 +20,11 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval,    "fn", bl_mk_native_oper(&bl_oper_fn));
    bl_ctx_set(retval,   "fun", bl_mk_native_oper(&bl_oper_fun));
    bl_ctx_set(retval,    "eq", bl_mk_native_oper(&bl_oper_eq));
+   bl_ctx_set(retval,    "==", bl_mk_native_oper(&bl_oper_eq));
    bl_ctx_set(retval, "print", bl_mk_native_oper(&bl_oper_print));
 
+   bl_ctx_set(retval, "#t", bl_mk_bool(true));
+   bl_ctx_set(retval, "#f", bl_mk_bool(false));
    return retval;
 }
 

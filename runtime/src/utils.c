@@ -36,3 +36,13 @@ bl_val_t* bl_mk_native_oper(void* func_ptr) {
    retval->code_ptr = func_ptr;
    return retval;
 }
+
+bl_val_t* bl_mk_bool(bool b) {
+   bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_BOOL);
+   if(b) {
+     retval->i_val = 1;
+   } else {
+     retval->i_val = 0;
+   }
+   return retval;
+}
