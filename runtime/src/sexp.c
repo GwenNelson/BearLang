@@ -37,6 +37,7 @@ void bl_init_parser() {
 
 bl_ast_node_t* mpc_to_bl(mpc_ast_t* T) {
       bl_ast_node_t* retval = (bl_ast_node_t*)GC_MALLOC(sizeof(bl_ast_node_t));
+      char* s = NULL;
 
       if(strstr(T->tag,"number")) {
          retval->node_val.type      = BL_VAL_TYPE_NUMBER;
@@ -49,6 +50,7 @@ bl_ast_node_t* mpc_to_bl(mpc_ast_t* T) {
 	 retval->node_val.type  = BL_VAL_TYPE_STRING;
 	 retval->node_val.s_val = (char*)GC_MALLOC(content_len+1);
 	 snprintf(retval->node_val.s_val,content_len-1,"%s",T->contents+1);
+         retval->node_val.s_val = mpcf_unescape(retval->node_val.s_val);
 	 return retval;
       }
 

@@ -1,3 +1,24 @@
+#include <gc.h>
+
+void* MPC_ALLOC(size_t x) {
+      return GC_MALLOC(x);
+}
+
+void* MPC_REALLOC(void* ptr, size_t size) {
+      return GC_REALLOC(ptr, size);
+}
+
+void* MPC_CALLOC(size_t size, size_t count) {
+      return GC_MALLOC(size*count);
+}
+
+void MPC_FREE(void* x) {}
+
+#define malloc MPC_ALLOC
+#define free MPC_FREE
+#define realloc MPC_REALLOC
+#define calloc MPC_CALLOC
+
 #include <bearlang/mpc.h>
 
 /*
@@ -2387,7 +2408,6 @@ mpc_val_t *mpcf_escape(mpc_val_t *x) {
 
 mpc_val_t *mpcf_unescape(mpc_val_t *x) {
   mpc_val_t *y = mpcf_unescape_new(x, mpc_escape_input_c, mpc_escape_output_c);
-  free(x);
   return y;
 }
 

@@ -1,3 +1,4 @@
+#include <gc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -605,6 +606,7 @@ int test_list_opers() {
 }
 
 int main(int argc, char** argv) {
+    GC_INIT();
     int passed_tests = 0;
     int failed_tests = 0;
     int total_tests  = 0;
