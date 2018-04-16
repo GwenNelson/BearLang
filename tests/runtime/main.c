@@ -515,13 +515,71 @@ int test_multiexpr_if() {
 int test_and_oper() {
     bl_val_t* ctx = bl_ctx_new_std();
 
-    char* and_str = "(and True True)";
-    bl_ast_node_t* ast = bl_parse_sexp(and_str);
-    bl_val_t*      exp = bl_read_ast(ast);
+    char* tt_str = "(and True True)";
+    char* ff_str = "(and False False)";
+    char* tf_str = "(and True False)";
 
-    bl_val_t* result = bl_ctx_eval(ctx,exp);
+    bl_val_t* tt_result = bl_ctx_eval(ctx,bl_read_ast(bl_parse_sexp(tt_str)));
+    bl_val_t* ff_result = bl_ctx_eval(ctx,bl_read_ast(bl_parse_sexp(ff_str)));
+    bl_val_t* tf_result = bl_ctx_eval(ctx,bl_read_ast(bl_parse_sexp(tf_str)));
 
-    ASSERT("(and True True) returns True", result->i_val==1)
+    ASSERT("(and True True) returns True",    tt_result->i_val==1)
+    ASSERT("(and False False) returns False", ff_result->i_val==0)
+    ASSERT("(and True False) returns False",  tf_result->i_val==0)
+
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_not_oper() {
+    bl_val_t* ctx = bl_ctx_new_std();
+
+    char* t_str = "(not False)";
+    char* f_str = "(not True)";
+
+    bl_val_t* t_result = bl_ctx_eval(ctx,bl_read_ast(bl_parse_sexp(t_str)));
+    bl_val_t* f_result = bl_ctx_eval(ctx,bl_read_ast(bl_parse_sexp(f_str)));
+
+    ASSERT("(not False) returns True", t_result->i_val==1)
+    ASSERT("(not True) returns False", f_result->i_val==0)
+
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_or_oper() {
+    bl_val_t* ctx = bl_ctx_new_std();
+
+    char* tt_str = "(or True True)";
+    char* ff_str = "(or False False)";
+    char* tf_str = "(or True False)";
+
+    bl_val_t* tt_result = bl_ctx_eval(ctx,bl_read_ast(bl_parse_sexp(tt_str)));
+    bl_val_t* ff_result = bl_ctx_eval(ctx,bl_read_ast(bl_parse_sexp(ff_str)));
+    bl_val_t* tf_result = bl_ctx_eval(ctx,bl_read_ast(bl_parse_sexp(tf_str)));
+
+    ASSERT("(or True True) returns True",    tt_result->i_val==1)
+    ASSERT("(or False False) returns False", ff_result->i_val==0)
+    ASSERT("(or True False) returns False",  tf_result->i_val==1)
+
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_xor_oper() {
+    bl_val_t* ctx = bl_ctx_new_std();
+
+    char* tt_str = "(xor True True)";
+    char* ff_str = "(xor False False)";
+    char* tf_str = "(xor True False)";
+
+    bl_val_t* tt_result = bl_ctx_eval(ctx,bl_read_ast(bl_parse_sexp(tt_str)));
+    bl_val_t* ff_result = bl_ctx_eval(ctx,bl_read_ast(bl_parse_sexp(ff_str)));
+    bl_val_t* tf_result = bl_ctx_eval(ctx,bl_read_ast(bl_parse_sexp(tf_str)));
+
+    ASSERT("(xor True True) returns True",    tt_result->i_val==0)
+    ASSERT("(xor False False) returns False", ff_result->i_val==0)
+    ASSERT("(xor True False) returns False",  tf_result->i_val==1)
 
     bl_ctx_close(ctx);
     return 0;
@@ -557,6 +615,9 @@ int main(int argc, char** argv) {
     TEST("simple if statement                        ", test_simple_if)
     TEST("multi-expression if statement (do oper)    ", test_multiexpr_if)
     TEST("and operator                               ", test_and_oper)
+    TEST("not operator                               ", test_not_oper)
+    TEST("or operator                                ", test_or_oper)
+    TEST("xor operator                               ", test_or_oper)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
