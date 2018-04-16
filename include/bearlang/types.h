@@ -56,10 +56,6 @@ typedef struct bl_val_t {
 		// BL_VAL_TYPE_ERROR
 		struct { bl_err_t err_val; };
 
-		// BL_VAL_TYPE_TYPE
-		struct { uint64_t       type_count;   // how many possible types this meta-type has (usually set to 1, but can be used to implement Maybe values by setting >1)
-		         bl_val_type_t* meta_type; }; // an array of types, or a pointer to a single type value
-
 		// BL_VAL_TYPE_NUMBER
 		struct { int64_t i_val; }; // BL_VAL_TYPE_NUMBER
 
