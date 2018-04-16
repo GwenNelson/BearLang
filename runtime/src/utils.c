@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 bl_val_t* bl_mk_val(bl_val_type_t type) {
    bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
@@ -39,7 +40,7 @@ bl_val_t* bl_mk_native_oper(void* func_ptr) {
 
 bl_val_t* bl_mk_bool(bool b) {
    bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_BOOL);
-   if(b) {
+   if(b==true) {
      retval->i_val = 1;
    } else {
      retval->i_val = 0;

@@ -161,11 +161,11 @@ char* bl_ser_sexp(bl_val_t* expr) {
            snprintf(retval,10,"%llu",expr->i_val);
          break;
 	 case BL_VAL_TYPE_BOOL:
-           retval = (char*)GC_MALLOC(sizeof(char)*2);
+           retval = (char*)GC_MALLOC(sizeof(char)*10);
            if(expr->i_val == 1) {
-              snprintf(retval,2,"#t");
+              snprintf(retval,10,"True");
 	   } else {
-              snprintf(retval,2,"#f");
+              snprintf(retval,10,"False");
 	   }
 	 break;
          case BL_VAL_TYPE_FUNC_BL:

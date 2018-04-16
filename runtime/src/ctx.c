@@ -24,8 +24,12 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval,    "if", bl_mk_native_oper(&bl_oper_if));
    bl_ctx_set(retval,    "do", bl_mk_native_oper(&bl_oper_do));
    bl_ctx_set(retval, "print", bl_mk_native_oper(&bl_oper_print));
+   bl_ctx_set(retval,   "and", bl_mk_native_oper(&bl_oper_and));
+   bl_ctx_set(retval,   "not", bl_mk_native_oper(&bl_oper_not));
+   bl_ctx_set(retval,    "or", bl_mk_native_oper(&bl_oper_or));
+   bl_ctx_set(retval,   "xor", bl_mk_native_oper(&bl_oper_xor));
 
-   bl_ctx_set(retval, "True", bl_mk_bool(true));
+   bl_ctx_set(retval, "True",  bl_mk_bool(true));
    bl_ctx_set(retval, "False", bl_mk_bool(false));
    return retval;
 }

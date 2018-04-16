@@ -5,6 +5,7 @@
 #include <bearlang/ctx.h>
 #include <bearlang/types.h>
 #include <bearlang/error_tools.h>
+#include <bearlang/utils.h>
 
 #include <stdio.h>
 
@@ -99,12 +100,11 @@ bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {
 
 bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* i;
-   bl_val_t* s;
    i = params;
    while(i->cdr != NULL) {
       if(i->car != NULL) {
 	 if(i->car->type == BL_VAL_TYPE_STRING) {
-            printf("%s",s->s_val);
+            printf("%s",i->car->s_val);
 	 } else {
      	    printf("%s", bl_ser_sexp(bl_ctx_eval(ctx,i->car)));
 	 }
@@ -179,4 +179,35 @@ bl_val_t* bl_oper_do(bl_val_t* ctx, bl_val_t* params) {
        retval = bl_ctx_eval(ctx,i->car);
     }
     return retval; 
+}
+
+bl_val_t* bl_oper_and(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+
+   if((first->i_val == 1) && (second->i_val == 1)) return bl_mk_bool(true);
+   return bl_mk_bool(false);
+}
+
+bl_val_t* bl_oper_not(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
+
+   if((first->i_val == 1)) return bl_mk_bool(false);
+   return bl_mk_bool(true);
+}
+
+bl_val_t* bl_oper_or(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+
+   if((first->i_val == 1) || (second->i_val == 1)) return bl_mk_bool(true);
+   return bl_mk_bool(false);
+}
+
+bl_val_t* bl_oper_xor(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+
+   if((first->i_val == 1) ^ (second->i_val == 1)) return bl_mk_bool(true);
+   return bl_mk_bool(false);
 }

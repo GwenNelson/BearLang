@@ -512,6 +512,21 @@ int test_multiexpr_if() {
     return 0;
 }
 
+int test_and_oper() {
+    bl_val_t* ctx = bl_ctx_new_std();
+
+    char* and_str = "(and True True)";
+    bl_ast_node_t* ast = bl_parse_sexp(and_str);
+    bl_val_t*      exp = bl_read_ast(ast);
+
+    bl_val_t* result = bl_ctx_eval(ctx,exp);
+
+    ASSERT("(and True True) returns True", result->i_val==1)
+
+    bl_ctx_close(ctx);
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -541,6 +556,7 @@ int main(int argc, char** argv) {
     TEST("fun operator                               ", test_fun_oper)
     TEST("simple if statement                        ", test_simple_if)
     TEST("multi-expression if statement (do oper)    ", test_multiexpr_if)
+    TEST("and operator                               ", test_and_oper)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
