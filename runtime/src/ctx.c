@@ -17,6 +17,8 @@ bl_val_t* bl_ctx_new_std() {
    bl_val_t* builtin_oper_div   = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
    bl_val_t* builtin_oper_set   = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
    bl_val_t* builtin_oper_fn    = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* builtin_oper_fun   = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   bl_val_t* builtin_oper_eq    = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
    bl_val_t* builtin_oper_print = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
 
    builtin_oper_add->type   = BL_VAL_TYPE_OPER_NATIVE;
@@ -25,6 +27,8 @@ bl_val_t* bl_ctx_new_std() {
    builtin_oper_div->type   = BL_VAL_TYPE_OPER_NATIVE;
    builtin_oper_set->type   = BL_VAL_TYPE_OPER_NATIVE;
    builtin_oper_fn->type    = BL_VAL_TYPE_OPER_NATIVE;
+   builtin_oper_fun->type   = BL_VAL_TYPE_OPER_NATIVE;
+   builtin_oper_eq->type    = BL_VAL_TYPE_OPER_NATIVE;
    builtin_oper_print->type = BL_VAL_TYPE_OPER_NATIVE;
 
    builtin_oper_add->code_ptr   = &bl_oper_add;
@@ -33,6 +37,8 @@ bl_val_t* bl_ctx_new_std() {
    builtin_oper_div->code_ptr   = &bl_oper_div;
    builtin_oper_set->code_ptr   = &bl_oper_set;
    builtin_oper_fn->code_ptr    = &bl_oper_fn;
+   builtin_oper_fun->code_ptr   = &bl_oper_fun;
+   builtin_oper_eq->code_ptr    = &bl_oper_eq;
    builtin_oper_print->func_ptr = &bl_oper_print;
 
    bl_ctx_set(retval,     "+", builtin_oper_add);
@@ -41,6 +47,8 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval,     "/", builtin_oper_div);
    bl_ctx_set(retval,     "=", builtin_oper_set);
    bl_ctx_set(retval,    "fn", builtin_oper_fn);
+   bl_ctx_set(retval,   "fun", builtin_oper_fun);
+   bl_ctx_set(retval,    "eq", builtin_oper_eq);
    bl_ctx_set(retval, "print", builtin_oper_print);
 
    return retval;

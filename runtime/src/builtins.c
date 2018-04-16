@@ -139,3 +139,18 @@ bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) {
    bl_ctx_set(ctx, name->s_val, retval);
    return retval;
 }
+
+bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* first  = bl_list_first(params);
+   bl_val_t* second = bl_list_second(params);
+
+   // TODO: make this work for none-integers
+   bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   retval->type     = BL_VAL_TYPE_BOOL;
+   if(first->i_val == second->i_val) {
+      retval->i_val = 1;
+   } else {
+      retval->i_val = 0;
+   }
+   return retval;
+}

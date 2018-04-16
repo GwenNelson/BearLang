@@ -12,3 +12,5 @@ bl_val_t* bl_oper_fun   (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_fn    (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_set   (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_print (bl_val_t* ctx, bl_val_t* params);
+
+bl_val_t* bl_oper_eq    (bl_val_t* ctx, bl_val_t* params);

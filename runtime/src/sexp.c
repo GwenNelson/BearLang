@@ -160,6 +160,14 @@ char* bl_ser_sexp(bl_val_t* expr) {
            retval = (char*)GC_MALLOC(sizeof(char)*10); // TODO - switch numbers to libgmp
            snprintf(retval,10,"%llu",expr->i_val);
          break;
+	 case BL_VAL_TYPE_BOOL:
+           retval = (char*)GC_MALLOC(sizeof(char)*2);
+           if(expr->i_val == 1) {
+              snprintf(retval,2,"#t");
+	   } else {
+              snprintf(retval,2,"#f");
+	   }
+	 break;
          case BL_VAL_TYPE_FUNC_BL:
            // TODO - dynamically figure out the length of the string here
            retval = (char*)GC_MALLOC(1024);

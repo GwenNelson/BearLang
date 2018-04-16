@@ -423,6 +423,28 @@ int test_list_len() {
     return 0;
 }
 
+int test_eq_oper() {
+    bl_val_t* ctx = bl_ctx_new_std();
+
+    char* is_eq_str  = "(eq 2 2)";
+    char* not_eq_str = "(eq 2 3)";
+
+    bl_ast_node_t* equal_ast = bl_parse_sexp(is_eq_str);
+    bl_val_t*      equal_exp = bl_read_ast(equal_ast);
+    
+    bl_ast_node_t* not_equal_ast = bl_parse_sexp(not_eq_str);
+    bl_val_t*      not_equal_exp = bl_read_ast(not_equal_ast);
+
+    bl_val_t* is_eq_result  = bl_ctx_eval(ctx,equal_exp);
+    bl_val_t* not_eq_result = bl_ctx_eval(ctx,not_equal_exp);
+
+    ASSERT("(eq 2 2) is #t", is_eq_result->i_val == 1)
+    ASSERT("(eq 2 3) is #f", not_eq_result->i_val == 0)
+
+    bl_ctx_close(ctx);
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -448,6 +470,7 @@ int main(int argc, char** argv) {
     TEST("Set operator                               ", test_set_oper)
     TEST("Simple function                            ", test_simple_func)
     TEST("Multi-expression function                  ", test_multiexpr_func)
+    TEST("Equality operator                          ", test_eq_oper)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
