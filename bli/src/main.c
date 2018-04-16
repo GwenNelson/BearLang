@@ -1,3 +1,4 @@
+#include <gc.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,6 +25,7 @@ void run_file(char* filename) {
 }
 
 int main(int argc, char** argv) {
+    GC_INIT();
     bl_init();
 
     if(argc==2) {
@@ -44,6 +46,9 @@ int main(int argc, char** argv) {
         bl_val_t*      result = bl_ctx_eval(REPL_CTX, expr);
         char*          errmsg = "";
 	switch(result->type) {
+           case BL_VAL_TYPE_NULL:
+              printf("\n");
+	   break;
            case BL_VAL_TYPE_ERROR:
               errmsg = bl_errmsg(result);
        	      printf("Error occurred:\n%s\n", errmsg);
@@ -52,6 +57,7 @@ int main(int argc, char** argv) {
               printf("%s\n",bl_ser_sexp(result));
 	   break;
 	}
+        GC_gcollect();
     }
     return 0;
 }

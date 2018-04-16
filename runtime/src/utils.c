@@ -14,6 +14,10 @@ bl_val_t* bl_mk_val(bl_val_type_t type) {
    return retval;
 }
 
+bl_val_t* bl_mk_null() {
+   return bl_mk_val(BL_VAL_TYPE_NULL);
+}
+
 bl_val_t* bl_mk_symbol(char* sym) {
    bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_SYMBOL);
    size_t count     = strlen(sym)*sizeof(char);

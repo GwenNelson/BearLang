@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+bl_val_t* bl_mk_null();
 bl_val_t* bl_mk_val(bl_val_type_t type);
 bl_val_t* bl_mk_symbol(char* sym);
 bl_val_t* bl_mk_number(uint64_t n);

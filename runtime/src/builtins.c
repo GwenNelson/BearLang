@@ -118,7 +118,7 @@ bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
   	 printf("%s", bl_ser_sexp(bl_ctx_eval(ctx,i->car)));
       }
    }
-   return bl_mk_number(0);
+   return bl_mk_null();
 }
 
 bl_val_t* bl_oper_fn(bl_val_t* ctx, bl_val_t* params) {
