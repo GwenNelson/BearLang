@@ -164,13 +164,27 @@ char* bl_ser_sexp(bl_val_t* expr) {
       char* retval="";
       char* s="";
       switch(expr->type) {
-         case BL_VAL_TYPE_NULL:
+         case BL_VAL_TYPE_ANY:
+           retval = (char*)GC_MALLOC(sizeof(char)*6);
+	   snprintf(retval,5,"<any>");
+	 break;
+         case BL_VAL_TYPE_FUNC_NATIVE:
+           retval = (char*)GC_MALLOC(sizeof(char)*64);
+	   snprintf(retval,32,"<nativefunction>");
+         case BL_VAL_TYPE_AST_LIST:
+           retval = (char*)GC_MALLOC(sizeof(char)*10);
+	   snprintf(retval,10,"<astlist>");
+	 break;
+	 case BL_VAL_TYPE_NULL:
            retval = (char*)GC_MALLOC(sizeof(char)*5);
            snprintf(retval, 5, "None");
          break;
+	 case BL_VAL_TYPE_CTX:
+	   retval = (char*)GC_MALLOC(sizeof(char)*5);
+	   snprintf(retval,5,"<ctx>");
 	 case BL_VAL_TYPE_ERROR:
            retval = (char*)GC_MALLOC(sizeof(char)*6);
-	   snprintf(retval, 6, "ERROR");
+	   snprintf(retval, 6, "<error>");
 	 break;
          case BL_VAL_TYPE_SYMBOL:
            retval = (char*)GC_MALLOC(sizeof(char)*(strlen(expr->s_val)+1));
@@ -268,6 +282,9 @@ bl_val_t* bl_read_ast(bl_ast_node_t* ast) {
               retval->type  = BL_VAL_TYPE_NUMBER;
 	      retval->i_val = ast->node_val.i_val;
 	      return retval;
+	 break;
+	 default:
+	      retval = NULL; // TODO - throw an error here or something
 	 break;
       }
       return retval;
