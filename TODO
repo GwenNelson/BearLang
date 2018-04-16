@@ -1,3 +1,5 @@
+Add BearLang tests (as in, test suite written in BearLang instead of just plain C)
+Add argc/argv global symbols in bli
 Fix all TODO comments in codebase
 Replace mpc with a custom higher-performing parser
 Add context/metadata to the AST
