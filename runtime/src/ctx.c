@@ -68,7 +68,7 @@ bl_val_t* bl_eval_blfunc(bl_val_t* ctx, bl_val_t* f, bl_val_t* params) {
        bl_ctx_set(closure, argsk_i->car->s_val, bl_ctx_eval(ctx,argsv_i->car));
     }
 
-    bl_val_t* i = f->func_ptr;
+    bl_val_t* i = f->bl_func_ptr;
     while(i-> cdr != NULL) {
        if(i-> car != NULL) {
           retval = bl_ctx_eval(closure,i->car);
@@ -123,7 +123,7 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
 }
 
 bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
-    bl_val_t* retval = NULL;
+    bl_val_t* retval = bl_mk_null();
     bl_val_t* symval = NULL;
     switch(expr->type) {
       case BL_VAL_TYPE_CONS:

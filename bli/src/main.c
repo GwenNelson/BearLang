@@ -18,10 +18,10 @@ void run_file(char* filename) {
      FILE* fd = fopen(filename,"r");
      bl_val_t* retval = bl_eval_file(FILE_CTX, filename, fd);
      fclose(fd);
-/*     if(retval->type == BL_VAL_TYPE_ERROR) {
+     if(retval->type == BL_VAL_TYPE_ERROR) {
         char* errmsg = bl_errmsg(retval);
 	fprintf(stderr,"Error occurred in %s: %s\n", filename, errmsg);
-     }*/
+     }
 }
 
 int main(int argc, char** argv) {
