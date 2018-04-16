@@ -138,6 +138,7 @@ char* bl_ser_ast(bl_ast_node_t* ast) {
 char* bl_ser_sexp(bl_val_t* expr) {
       if(expr == NULL) return "";
       char* retval="";
+      char* s="";
       switch(expr->type) {
          case BL_VAL_TYPE_NULL:
            retval = (char*)GC_MALLOC(sizeof(char)*5);
@@ -159,6 +160,15 @@ char* bl_ser_sexp(bl_val_t* expr) {
            retval = (char*)GC_MALLOC(sizeof(char)*10); // TODO - switch numbers to libgmp
            snprintf(retval,10,"%llu",expr->i_val);
          break;
+         case BL_VAL_TYPE_FUNC_BL:
+           // TODO - dynamically figure out the length of the string here
+           retval = (char*)GC_MALLOC(1024);
+	   snprintf(retval,1024,"(fn %s %s)",expr->bl_funcargs_ptr, expr->bl_func_ptr);
+	 break;
+         case BL_VAL_TYPE_OPER_NATIVE:
+           retval = (char*)GC_MALLOC(sizeof(char)*4);
+	   snprintf(retval,4,"OPER");
+	 break;
 	 case BL_VAL_TYPE_CONS:
            retval = (char*)GC_MALLOC(sizeof(char)*3);
 	   retval[0]='(';

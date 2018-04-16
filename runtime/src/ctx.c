@@ -73,7 +73,6 @@ bl_val_t* bl_eval_blfunc(bl_val_t* ctx, bl_val_t* f, bl_val_t* params) {
        bl_ctx_set(closure, argsk_i->car->s_val, bl_ctx_eval(ctx,argsv_i->car));
     }
 
-//    return bl_ctx_eval(closure, f->bl_func_ptr);
     bl_val_t* i = f->func_ptr;
     while(i-> cdr != NULL) {
        if(i-> car != NULL) {
@@ -89,22 +88,22 @@ bl_val_t* bl_eval_blfunc(bl_val_t* ctx, bl_val_t* f, bl_val_t* params) {
 }
 
 bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
+    bl_val_t* retval = NULL;
     if(expr->car == NULL) { // should never happen with a non-null cdr
-       return expr;
     }
     if(expr->car->type == BL_VAL_TYPE_SYMBOL) {
        bl_val_t* symval = bl_ctx_get(ctx, expr->car->s_val);
        switch(symval->type) {
          case BL_VAL_TYPE_OPER_NATIVE:
-          return symval->code_ptr(ctx, expr->cdr);
+          retval = symval->code_ptr(ctx, expr->cdr);
 	 break;
 
          case BL_VAL_TYPE_FUNC_BL:
-          return bl_eval_blfunc(ctx,symval,expr->cdr);
+          retval = bl_eval_blfunc(ctx,symval,expr->cdr);
 	 break;
 
 	 default:
-          return bl_eval_cons(ctx, symval);
+          retval = bl_ctx_eval(ctx, symval);
 	 break;
        }
     } else {
@@ -121,10 +120,10 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
        }
        return retval;
     }
+    return retval;
 }
 
 bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
-    
     bl_val_t* retval = NULL;
     bl_val_t* symval = NULL;
     switch(expr->type) {
@@ -139,7 +138,6 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
            retval = expr;
       break;
    }
-
    return retval;
 }
 
@@ -148,7 +146,7 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
    struct bl_hash_t* val = NULL;
    HASH_FIND_STR(ht, key, val);
    if(!val) {
-      if(ctx->parent) {
+      if(ctx->parent != NULL) {
 	 return bl_ctx_get(ctx->parent, key);
       } else {
          return NULL;
