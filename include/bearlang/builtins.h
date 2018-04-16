@@ -15,3 +15,5 @@ bl_val_t* bl_oper_print (bl_val_t* ctx, bl_val_t* params);
 
 bl_val_t* bl_oper_eq    (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_if    (bl_val_t* ctx, bl_val_t* params);
+
+bl_val_t* bl_oper_do    (bl_val_t* ctx, bl_val_t* params);

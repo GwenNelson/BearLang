@@ -488,6 +488,30 @@ int test_simple_if() {
     return 0;
 }
 
+int test_multiexpr_if() {
+    bl_val_t* ctx = bl_ctx_new_std();
+
+    char* true_if_str  = "(if True (do (= x 2)\
+	                               (+ x 1))\
+				       42)";
+    char* false_if_str = "(if False 1337 69)";
+
+    bl_ast_node_t* true_ast = bl_parse_sexp(true_if_str);
+    bl_val_t*      true_exp = bl_read_ast(true_ast);
+    
+    bl_ast_node_t* false_ast = bl_parse_sexp(false_if_str);
+    bl_val_t*      false_exp = bl_read_ast(false_ast);
+
+    bl_val_t* true_if_result  = bl_ctx_eval(ctx,true_exp);
+    bl_val_t* false_if_result = bl_ctx_eval(ctx,false_exp);
+
+    ASSERT("(if True (do (= x 2) (+ x 1) 42) returns 3", true_if_result->i_val==3)
+    ASSERT("(if False 1337 69) returns 69", false_if_result->i_val==69)
+
+    bl_ctx_close(ctx);
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -516,6 +540,7 @@ int main(int argc, char** argv) {
     TEST("Equality operator                          ", test_eq_oper)
     TEST("fun operator                               ", test_fun_oper)
     TEST("simple if statement                        ", test_simple_if)
+    TEST("multi-expression if statement (do oper)    ", test_multiexpr_if)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

@@ -165,3 +165,18 @@ bl_val_t* bl_oper_if(bl_val_t* ctx, bl_val_t* params) {
       return bl_ctx_eval(ctx, else_action);
    }
 }
+
+bl_val_t* bl_oper_do(bl_val_t* ctx, bl_val_t* params) {
+    bl_val_t* retval = NULL;
+    bl_val_t* i = params;
+    while(i-> cdr != NULL) {
+       if(i-> car != NULL) {
+          retval = bl_ctx_eval(ctx,i->car);
+       }
+       i = i->cdr;
+    }
+    if(i->car != NULL) {
+       retval = bl_ctx_eval(ctx,i->car);
+    }
+    return retval; 
+}
