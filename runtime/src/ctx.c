@@ -108,6 +108,8 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
           eval_all = true;
 	 break;
        }
+    } else {
+       eval_all = true;
     } 
     if(eval_all==true) {    
        bl_val_t* retval = NULL;

@@ -343,7 +343,6 @@ int test_multiexpr_func() {
     pure_sexp = bl_read_ast(ast);
 
     result = bl_ctx_eval(ctx,pure_sexp);
-    printf("RESULT: %s\n", bl_errmsg(result));
     ASSERT("Calling (= test (fn (a b) (- (+ a b) 1))) with (2 2)", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==3))
     return 0;
 }

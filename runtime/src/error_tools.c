@@ -26,6 +26,8 @@ bl_val_t* bl_errif_invalid_len(bl_val_t* L, uint64_t min, uint64_t max) {
      uint64_t L_len = bl_list_len(L);
      if((L_len >= min) && (L_len <= max)) return NULL;
 
+     if(L_len == min == max) return NULL;
+
      bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
      retval->type     = BL_VAL_TYPE_ERROR;
 
@@ -35,7 +37,7 @@ bl_val_t* bl_errif_invalid_len(bl_val_t* L, uint64_t min, uint64_t max) {
 
      if(L_len < min) {
 	retval->err_val.type = BL_ERR_INSUFFICIENT_ARGS;
-     } else {
+     } else if (L_len > max) {
         retval->err_val.type = BL_ERR_TOOMANY_ARGS;
      }
      return retval;
