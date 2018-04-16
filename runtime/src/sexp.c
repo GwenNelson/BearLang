@@ -87,7 +87,8 @@ bl_ast_node_t* bl_parse_sexp(char* sexp) {
       // TODO - come up with a proper error handling approach
       if(mpc_parse("input",sexp, Lispy, &r)) {
          mpc_ast_t* mpc_ast = r.output;
-         retval = mpc_to_bl(mpc_ast->children[1]);
+         
+	 retval = mpc_to_bl(mpc_ast->children[1]);
          mpc_ast_delete(r.output);
       } else {
          mpc_err_print(r.error);
