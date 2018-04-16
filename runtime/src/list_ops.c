@@ -18,6 +18,10 @@ bl_val_t* bl_list_rest(bl_val_t* L) {
    return L->cdr;
 }
 
+bl_val_t* bl_list_third(bl_val_t* L) {
+   return bl_list_second(bl_list_rest(L));
+}
+
 bl_val_t* bl_list_prepend(bl_val_t* L, bl_val_t* val) {
    bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
    retval->type = BL_VAL_TYPE_CONS;

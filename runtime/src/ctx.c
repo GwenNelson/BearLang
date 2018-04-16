@@ -73,8 +73,8 @@ bl_val_t* bl_eval_blfunc(bl_val_t* ctx, bl_val_t* f, bl_val_t* params) {
        bl_ctx_set(closure, argsk_i->car->s_val, bl_ctx_eval(ctx,argsv_i->car));
     }
 
-    return bl_ctx_eval(closure, f->bl_func_ptr);
-/*    bl_val_t* i = f->func_ptr;
+//    return bl_ctx_eval(closure, f->bl_func_ptr);
+    bl_val_t* i = f->func_ptr;
     while(i-> cdr != NULL) {
        if(i-> car != NULL) {
           retval = bl_ctx_eval(closure,i->car);
@@ -84,7 +84,7 @@ bl_val_t* bl_eval_blfunc(bl_val_t* ctx, bl_val_t* f, bl_val_t* params) {
     if(i->car != NULL) {
        retval = bl_ctx_eval(closure,i->car);
     }
-    return retval;*/
+    return retval;
 
 }
 
