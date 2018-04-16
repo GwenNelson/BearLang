@@ -62,12 +62,7 @@ bl_ast_node_t* mpc_to_bl(mpc_ast_t* T) {
          return retval;
       }
 
-      if(strcmp(T->tag,">") == 0) {
-         retval->node_val.type = BL_VAL_TYPE_AST_LIST;
-         retval->children      = (bl_ast_node_t**)GC_MALLOC(sizeof(bl_ast_node_t*)*T->children_num);
-      }
-
-      if(strstr(T->tag, "sexpr")) {
+      if((strcmp(T->tag,">") == 0) || strstr(T->tag, "sexpr")) {
          retval->node_val.type = BL_VAL_TYPE_AST_LIST;
          retval->children      = (bl_ast_node_t**)GC_MALLOC(sizeof(bl_ast_node_t*)*T->children_num);
       }

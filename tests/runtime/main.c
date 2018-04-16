@@ -605,6 +605,13 @@ int test_list_opers() {
     return 0;
 }
 
+int test_parse_string() {
+    char* test_str = "\"Hello world\"";
+    bl_val_t* parsed = bl_read_ast(bl_parse_sexp(test_str));
+    ASSERT("String parsed OK", strstr(parsed->s_val,"Hello world"))
+    return 0;
+}
+
 int main(int argc, char** argv) {
     GC_INIT();
     int passed_tests = 0;
@@ -640,6 +647,7 @@ int main(int argc, char** argv) {
     TEST("or operator                                ", test_or_oper)
     TEST("xor operator                               ", test_or_oper)
     TEST("list operators                             ", test_list_opers)
+    TEST("parse a string                             ", test_parse_string)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
