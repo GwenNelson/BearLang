@@ -195,7 +195,7 @@ char* bl_ser_sexp(bl_val_t* expr) {
          case BL_VAL_TYPE_FUNC_BL:
            // TODO - dynamically figure out the length of the string here
            retval = (char*)GC_MALLOC(1024);
-	   snprintf(retval,1024,"(fn %s %s)",expr->bl_funcargs_ptr, expr->bl_func_ptr);
+	   snprintf(retval,1024,"(fn %s %s)",bl_ser_sexp(expr->bl_funcargs_ptr), bl_ser_sexp(expr->bl_func_ptr));
 	 break;
          case BL_VAL_TYPE_OPER_NATIVE:
            retval = (char*)GC_MALLOC(sizeof(char)*4);

@@ -192,7 +192,7 @@ bl_val_t* bl_oper_and(bl_val_t* ctx, bl_val_t* params) {
 bl_val_t* bl_oper_not(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
 
-   if((first->i_val == 1)) return bl_mk_bool(false);
+   if(first->i_val == 1) return bl_mk_bool(false);
    return bl_mk_bool(true);
 }
 

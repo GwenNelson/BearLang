@@ -99,6 +99,9 @@ char* bl_ser_type(bl_val_type_t t) {
 	 case BL_VAL_TYPE_NUMBER:
 	      return "NUMBER";
 	 break;
+	 case BL_VAL_TYPE_BOOL:
+              return "BOOL";
+	 break;
 	 case BL_VAL_TYPE_STRING:
 	      return "STRING";
 	 break;
@@ -120,6 +123,7 @@ char* bl_ser_type(bl_val_type_t t) {
 	 case BL_VAL_TYPE_ANY:
 	      return "ANY";
 	 break;
+
       }
 }
 
@@ -142,6 +146,9 @@ char* bl_errmsg(bl_val_t* E) {
 
       char* retval = (char*)GC_MALLOC(sizeof(char)*1024);
       switch(E->err_val.type) {
+          case BL_ERR_UNKNOWN:
+               snprintf(retval,1023,"Unknown error!");
+	  break;
           case BL_ERR_PARSE:
                snprintf(retval,1023,"Could not parse: %s", "TODO: implement this");
 	  break;
