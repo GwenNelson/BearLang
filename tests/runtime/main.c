@@ -6,6 +6,7 @@
 #include <bearlang/types.h>
 #include <bearlang/sexp.h>
 #include <bearlang/list_ops.h>
+#include <bearlang/error_tools.h>
 #include <bearlang/ctx.h>
 
 #define TEST(desc,f) fprintf(stderr,"Testing: %s \t",desc); if(f()==0) { passed_tests++; fprintf(stderr,"PASS\n");} else { failed_tests++; fprintf(stderr,"FAIL\n");}; total_tests++;
@@ -342,7 +343,7 @@ int test_multiexpr_func() {
     pure_sexp = bl_read_ast(ast);
 
     result = bl_ctx_eval(ctx,pure_sexp);
-
+    printf("RESULT: %s\n", bl_errmsg(result));
     ASSERT("Calling (= test (fn (a b) (- (+ a b) 1))) with (2 2)", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==3))
     return 0;
 }

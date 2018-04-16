@@ -6,6 +6,7 @@
 #include <bearlang/list_ops.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 bl_val_t* bl_ctx_new_std() {
    bl_val_t* retval = bl_ctx_new(NULL);
@@ -91,6 +92,7 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
     bl_val_t* retval = NULL;
     if(expr->car == NULL) { // should never happen with a non-null cdr
     }
+    bool eval_all = false;
     if(expr->car->type == BL_VAL_TYPE_SYMBOL) {
        bl_val_t* symval = bl_ctx_get(ctx, expr->car->s_val);
        switch(symval->type) {
@@ -103,10 +105,11 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
 	 break;
 
 	 default:
-          retval = bl_ctx_eval(ctx, symval);
+          eval_all = true;
 	 break;
        }
-    } else {
+    } 
+    if(eval_all==true) {    
        bl_val_t* retval = NULL;
        bl_val_t* i = expr;
        while(i->cdr != NULL) {
