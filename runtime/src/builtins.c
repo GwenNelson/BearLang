@@ -141,8 +141,8 @@ bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* first  = bl_list_first(params);
-   bl_val_t* second = bl_list_second(params);
+   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
    // TODO: make this work for none-integers
    bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
@@ -153,4 +153,15 @@ bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) {
       retval->i_val = 0;
    }
    return retval;
+}
+
+bl_val_t* bl_oper_if(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* cond        = bl_ctx_eval(ctx,bl_list_first(params));
+   bl_val_t* then_action = bl_list_second(params);
+   bl_val_t* else_action = bl_list_third(params);
+   if(cond->i_val == 1) {
+      return bl_ctx_eval(ctx, then_action); 
+   } else {
+      return bl_ctx_eval(ctx, else_action);
+   }
 }
