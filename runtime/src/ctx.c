@@ -28,6 +28,12 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval,   "not", bl_mk_native_oper(&bl_oper_not));
    bl_ctx_set(retval,    "or", bl_mk_native_oper(&bl_oper_or));
    bl_ctx_set(retval,   "xor", bl_mk_native_oper(&bl_oper_xor));
+   bl_ctx_set(retval, "first", bl_mk_native_oper(&bl_oper_first));
+   bl_ctx_set(retval,"second", bl_mk_native_oper(&bl_oper_second));
+   bl_ctx_set(retval, "third", bl_mk_native_oper(&bl_oper_third));
+   bl_ctx_set(retval,  "rest", bl_mk_native_oper(&bl_oper_rest));
+   bl_ctx_set(retval,   "car", bl_mk_native_oper(&bl_oper_first));
+   bl_ctx_set(retval,   "cdr", bl_mk_native_oper(&bl_oper_rest));
 
    bl_ctx_set(retval, "True",  bl_mk_bool(true));
    bl_ctx_set(retval, "False", bl_mk_bool(false));

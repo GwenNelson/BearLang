@@ -585,6 +585,25 @@ int test_xor_oper() {
     return 0;
 }
 
+int test_list_opers() {
+    bl_val_t* ctx = bl_ctx_new_std();
+
+    char* first_str  = "(first 1 2 3 4 5)";
+    char* second_str = "(second 1 2 3 4 5)";
+    char* third_str  = "(third 1 2 3 4 5)";
+
+    bl_val_t* first_result  = bl_ctx_eval(ctx,bl_read_ast(bl_parse_sexp(first_str)));
+    bl_val_t* second_result = bl_ctx_eval(ctx,bl_read_ast(bl_parse_sexp(second_str)));
+    bl_val_t* third_result  = bl_ctx_eval(ctx,bl_read_ast(bl_parse_sexp(third_str)));
+
+    ASSERT("(first 1 2 3 4 5)  returns 1", first_result->i_val==1)
+    ASSERT("(second 1 2 3 4 5) returns 2", second_result->i_val==2)
+    ASSERT("(third 1 2 3 4 5)  returns 3", third_result->i_val==3)
+
+    bl_ctx_close(ctx);
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -618,6 +637,7 @@ int main(int argc, char** argv) {
     TEST("not operator                               ", test_not_oper)
     TEST("or operator                                ", test_or_oper)
     TEST("xor operator                               ", test_or_oper)
+    TEST("list operators                             ", test_list_opers)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

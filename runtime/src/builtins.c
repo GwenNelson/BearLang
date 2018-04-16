@@ -211,3 +211,23 @@ bl_val_t* bl_oper_xor(bl_val_t* ctx, bl_val_t* params) {
    if((first->i_val == 1) ^ (second->i_val == 1)) return bl_mk_bool(true);
    return bl_mk_bool(false);
 }
+
+bl_val_t* bl_oper_first(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* retval = bl_list_first(params);
+   return retval;
+}
+
+bl_val_t* bl_oper_second(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* retval = bl_list_second(params);
+   return retval;
+}
+
+bl_val_t* bl_oper_third(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* retval = bl_list_third(params);
+   return retval;
+}
+
+bl_val_t* bl_oper_rest(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* retval = bl_list_rest(params);
+   return retval;
+}
