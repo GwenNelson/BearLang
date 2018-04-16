@@ -161,6 +161,42 @@ int test_first_second_rest() {
 
 }
 
+int test_third() {
+    // first construct a list with 3 items: 4, 8, 87
+
+    // first cons cell
+    bl_val_t* L = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    L->type = BL_VAL_TYPE_CONS;
+
+    // first item
+    L->car = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    L->car->type  = BL_VAL_TYPE_NUMBER;
+    L->car->i_val = 4;
+
+    // next cons cell
+    L->cdr = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    L->cdr->type = BL_VAL_TYPE_CONS;
+    
+    // second item
+    L->cdr->car = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    L->cdr->car->type  = BL_VAL_TYPE_NUMBER;
+    L->cdr->car->i_val = 8;
+
+    // next cons cell
+    L->cdr->cdr = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    L->cdr->cdr->type = BL_VAL_TYPE_CONS;
+
+    // third item
+    L->cdr->cdr->car = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+    L->cdr->cdr->car->type  = BL_VAL_TYPE_NUMBER;
+    L->cdr->cdr->car->i_val = 87;
+
+    bl_val_t* third_val = bl_list_third(L);
+    ASSERT("bl_list_third(L) returns correct val_type", third_val->type == BL_VAL_TYPE_NUMBER)
+    ASSERT("bl_list_third(L) returns correct i_val",    third_val->i_val == 87)
+    return 0;
+}
+
 int test_prepend_null() {
     bl_val_t* empty      = NULL;
     bl_val_t* first_item = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
@@ -207,6 +243,7 @@ int test_empty_ctx() {
 
     ASSERT("bl_ctx_get/set", (retval->type==BL_VAL_TYPE_NUMBER) && (retval->i_val == 666))
 
+    bl_ctx_close(empty_ctx);
     return 0;
 }
 
@@ -224,6 +261,8 @@ int test_child_ctx() {
     bl_val_t* looked_up = bl_ctx_get(child_ctx,"TheOneForYouAndMe");
     ASSERT("bl_ctx_get with child ctx", (looked_up->type==BL_VAL_TYPE_NUMBER) && (looked_up->i_val==666))
   
+    bl_ctx_close(child_ctx);
+    bl_ctx_close(parent_ctx);
     return 0;
 }
 
@@ -236,6 +275,8 @@ int test_simple_arithmetic() {
 
     bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
     ASSERT("simple addition (+ 2 3)", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==5))
+
+    bl_ctx_close(ctx);
     return 0;
 }
 
@@ -249,6 +290,8 @@ int test_nested_addition() {
 
     bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
     ASSERT("(+ 1 1 (+ 2 1))", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==5))
+
+    bl_ctx_close(ctx);
     return 0;
 }
 
@@ -261,6 +304,7 @@ int test_sub_add() {
 
     bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
     ASSERT("(- 5 (+ 1 2))", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==2))
+    bl_ctx_close(ctx);
     return 0;
 }
 
@@ -273,6 +317,8 @@ int test_mult() {
 
     bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
     ASSERT("(* 3 2)", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==6))
+
+    bl_ctx_close(ctx);
     return 0;
 }
 
@@ -285,6 +331,8 @@ int test_div() {
 
     bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
     ASSERT("(/ 12 4)", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==3))
+    
+    bl_ctx_close(ctx);
     return 0;
 }
 
@@ -306,6 +354,8 @@ int test_set_oper() {
     result = bl_ctx_eval(ctx,pure_sexp);
 
     ASSERT("(= test 2) (+ test 3)", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==5))
+
+    bl_ctx_close(ctx);
     return 0;
 }
 
@@ -324,6 +374,8 @@ int test_simple_func() {
     result = bl_ctx_eval(ctx,pure_sexp);
 
     ASSERT("Calling (= test (fn (a b) (- (+ a b) 1))) with (2 2)", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==3))
+
+    bl_ctx_close(ctx);
     return 0;
 }
 
@@ -344,6 +396,8 @@ int test_multiexpr_func() {
 
     result = bl_ctx_eval(ctx,pure_sexp);
     ASSERT("Calling (= test (fn (a b) (- (+ a b) 1))) with (2 2)", (result->type==BL_VAL_TYPE_NUMBER) && (result->i_val==3))
+
+    bl_ctx_close(ctx);
     return 0;
 }
 
@@ -381,6 +435,7 @@ int main(int argc, char** argv) {
     TEST("Transform AST list into pure expression    ", test_ast_pure_sexp)
     TEST("Serialise a pure expression                ", test_ser_pure_sexp)
     TEST("List ops: first, second and rest           ", test_first_second_rest)
+    TEST("List ops: third                            ", test_third)
     TEST("List ops: prepend to NULL                  ", test_prepend_null)
     TEST("List ops: get list length                  ", test_list_len)
     TEST("Create an empty context and get/set        ", test_empty_ctx)

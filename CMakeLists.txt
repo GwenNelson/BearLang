@@ -29,6 +29,8 @@ target_link_libraries(test_blruntime blruntime)
 add_test(NAME blruntime
          COMMAND test_blruntime)
 
+set(COVERAGE_EXCLUDES "tests/*" "runtime/src/mpc.c")
+
 SETUP_TARGET_FOR_COVERAGE(NAME test_coverage
                           EXECUTABLE test_blruntime
                           DEPENDENCIES test_blruntime)
