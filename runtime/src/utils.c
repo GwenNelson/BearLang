@@ -52,21 +52,9 @@ bl_val_t* bl_mk_bool(bool b) {
    return retval;
 }
 
-extern mpc_parser_t* Lispy;
 bl_val_t* bl_eval_file(bl_val_t* ctx, char* filename, FILE* fd) {
-  // TODO - move some of this crap into sexp.c 
-  mpc_result_t r;
-  bl_ast_node_t* file_ast = NULL;
-  bl_val_t* retval = NULL;
-  int i=0;
-
-  if(mpc_parse_file(filename, fd, Lispy, &r)) {
-     mpc_ast_t* mpc_ast = r.output;
-     retval = bl_ctx_eval(ctx, bl_read_ast(mpc_to_bl(mpc_ast)));
-     mpc_ast_delete(r.output);
-  } else {
-     mpc_err_print(r.error);
-     mpc_err_delete(r.error);
-  }
-  return retval;
+   bl_ast_node_t* ast = bl_parse_file(filename, fd);
+   bl_val_t*     sexp = bl_read_ast(ast);
+   bl_val_t*   retval = bl_ctx_eval(ctx, sexp);
+   return retval;
 }

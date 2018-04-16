@@ -98,6 +98,23 @@ bl_ast_node_t* bl_parse_sexp(char* sexp) {
       return retval;
 }
 
+bl_ast_node_t* bl_parse_file(char* filename, FILE* fd) {
+      mpc_result_t   r;
+      bl_ast_node_t* retval = NULL;
+      if(mpc_parse_file(filename, fd,Lispy, &r)) {
+         mpc_ast_t* mpc_ast = r.output;
+         
+	 retval = mpc_to_bl(mpc_ast);
+         mpc_ast_delete(r.output);
+      } else {
+         mpc_err_print(r.error);
+         mpc_err_delete(r.error);
+         
+      }
+      return retval;
+
+}
+
 char* bl_ser_ast(bl_ast_node_t* ast) {
       char* retval = "";
       switch(ast->node_val.type) {

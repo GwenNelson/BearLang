@@ -4,11 +4,10 @@
 #include <bearlang/common.h>
 #include <bearlang/mpc.h>
 
-bl_ast_node_t* mpc_to_bl(mpc_ast_t* T);
-
 void bl_init_parser(); // prepare the parser for use, called by bl_init()
 
 bl_ast_node_t* bl_parse_sexp(char* sexp);      // turn a string into an AST
+bl_ast_node_t* bl_parse_file(char* filename, FILE* fd);        // read from a file and turn it into an AST
 char*          bl_ser_ast(bl_ast_node_t* ast); // turn an AST back into a string
 
 char*          bl_ser_sexp(bl_val_t* expr); // turn a pure expression into a string
