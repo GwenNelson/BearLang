@@ -1,0 +1,10 @@
+; this file contains a set of functions that are used to generate HTML
+
+; generally speaking, each function/oper returns either a big list or a bunch of strings
+
+(fun xml-tag (tag-name contents)
+                       (+ (+ "<" tag-name ">")
+                          contents
+			  (+ "</" tag-name ">")))
+
+(print (xml-tag "html" ""))

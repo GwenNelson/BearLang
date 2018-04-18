@@ -203,7 +203,7 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
 
 bl_val_t* bl_ctx_set(bl_val_t* ctx, char* key, bl_val_t* val) {
    if(ctx->parent != NULL) {
-      if(ctx->write_to_parent) ctx = ctx->parent;
+//      if(ctx->write_to_parent) ctx = ctx->parent;
    }
    struct bl_hash_t* ht_val = (struct bl_hash_t*)GC_MALLOC(sizeof(struct bl_hash_t));
    snprintf(ht_val->key,32,"%s",key);
