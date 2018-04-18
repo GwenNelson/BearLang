@@ -4,7 +4,10 @@
 
 (fun xml-tag (tag-name contents)
                        (+ (+ "<" tag-name ">")
-                          contents
+			   contents
 			  (+ "</" tag-name ">")))
 
-(print (xml-tag "html" ""))
+(= X (xml-tag "body" "hello"))
+
+(print X)
+

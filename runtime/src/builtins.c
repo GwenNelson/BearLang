@@ -21,8 +21,7 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
    if(first->type == BL_VAL_TYPE_NUMBER) {
       retval = bl_mk_number(0);
    } else {
-      retval = bl_mk_str("");
-      retval->s_val = GC_MALLOC(strlen(bl_ser_sexp(first)));
+      retval = bl_mk_str(bl_ser_naked_sexp(first));
    }
 
    bl_val_t* x = NULL;
@@ -36,9 +35,9 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
              retval->i_val += x->i_val;
 	   } else {
              s = bl_ser_naked_sexp(x);
-	     c = strlen(s) + strlen(retval->s_val) + 4;
+	     c = strlen(s) + strlen(retval->s_val);
              retval->s_val = GC_REALLOC(retval->s_val, c);
-	     strncat(retval->s_val,s,c);
+	     strcat(retval->s_val,s);
 	   }
 	}
 	L = L->cdr;
@@ -120,8 +119,7 @@ bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* i;
-   i = params;
+   bl_val_t* i = params;
    while(i->cdr != NULL) {
       if(i->car != NULL) {
 	 if(i->car->type == BL_VAL_TYPE_STRING) {

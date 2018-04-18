@@ -5,6 +5,7 @@
 #include <bearlang/builtins.h>
 #include <bearlang/list_ops.h>
 #include <bearlang/utils.h>
+#include <bearlang/error_tools.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -164,6 +165,7 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
 
 bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
     bl_val_t* retval = bl_mk_null();
+    if(expr == NULL) return retval;
     bl_val_t* symval = NULL;
     switch(expr->type) {
       case BL_VAL_TYPE_CONS:
@@ -187,8 +189,8 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
    if(!val) {
       if(ctx->parent != NULL) {
 	 bl_val_t* V = bl_ctx_get(ctx->parent, key);
-	 if(V) return V;
-	 if(ctx->secondary) { 
+	 if(V != NULL) return V;
+	 if(ctx->secondary != NULL) { 
            return bl_ctx_get(ctx->secondary, key);
 	 } else {
            return NULL;
@@ -203,7 +205,7 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
 
 bl_val_t* bl_ctx_set(bl_val_t* ctx, char* key, bl_val_t* val) {
    if(ctx->parent != NULL) {
-//      if(ctx->write_to_parent) ctx = ctx->parent;
+      if(ctx->write_to_parent) ctx = ctx->parent;
    }
    struct bl_hash_t* ht_val = (struct bl_hash_t*)GC_MALLOC(sizeof(struct bl_hash_t));
    snprintf(ht_val->key,32,"%s",key);

@@ -33,7 +33,7 @@ bl_val_t* bl_mk_number(uint64_t n) {
 }
 
 bl_val_t* bl_mk_str(char* s) {
-   bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_SYMBOL);
+   bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_STRING);
    size_t count     = strlen(s)*sizeof(char);
    retval->s_val    = (char*)GC_MALLOC(count);
    snprintf(retval->s_val,count,"%s",s);
