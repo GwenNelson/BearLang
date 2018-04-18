@@ -16,22 +16,43 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* retval = bl_errif_invalid_len(L,2,BL_LONGEST_LIST);
    if(retval != NULL) return retval;
 
-   retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   retval->type  = BL_VAL_TYPE_NUMBER;
-   retval->i_val = 0;
+   bl_val_t* first = bl_list_first(params);
+
+   if(first->type == BL_VAL_TYPE_NUMBER) {
+      retval = bl_mk_number(0);
+   } else {
+      retval = bl_mk_str("");
+      retval->s_val = GC_MALLOC(strlen(bl_ser_sexp(first)));
+   }
 
    bl_val_t* x = NULL;
+   char*     s = NULL;
+   size_t    c = 0;
 
    while(L->cdr != NULL) {
         if(L->car != NULL) {
            x = bl_ctx_eval(ctx,L->car);
-	   retval->i_val += x->i_val;
+           if(retval->type == BL_VAL_TYPE_NUMBER) {
+             retval->i_val += x->i_val;
+	   } else {
+             s = bl_ser_naked_sexp(x);
+	     c = strlen(s) + strlen(retval->s_val) + 4;
+             retval->s_val = GC_REALLOC(retval->s_val, c);
+	     strncat(retval->s_val,s,c);
+	   }
 	}
 	L = L->cdr;
    }
    if(L->car != NULL) {
-      x = bl_ctx_eval(ctx,L->car);
-      retval->i_val += x->i_val;
+        x = bl_ctx_eval(ctx,L->car);
+	   if(retval->type == BL_VAL_TYPE_NUMBER) {
+             retval->i_val += x->i_val;
+	   } else {
+             s = bl_ser_naked_sexp(x);
+	     c = strlen(s) + strlen(retval->s_val) + 4;
+             retval->s_val = GC_REALLOC(retval->s_val, c);
+	     strncat(retval->s_val,s,c);
+	   }
    }
    return retval;
 }
@@ -240,5 +261,14 @@ bl_val_t* bl_oper_third(bl_val_t* ctx, bl_val_t* params) {
 
 bl_val_t* bl_oper_rest(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* retval = bl_list_rest(params);
+   return retval;
+}
+
+bl_val_t* bl_oper_include(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* filename = bl_list_first(params);
+
+   FILE* fd         = fopen(filename->s_val,"r");
+   bl_val_t* retval = bl_eval_file(ctx, filename->s_val, fd);
+   fclose(fd);
    return retval;
 }
