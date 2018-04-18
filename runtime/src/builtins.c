@@ -21,12 +21,13 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
    if(first->type == BL_VAL_TYPE_NUMBER) {
       retval = bl_mk_number(0);
    } else {
-      retval = bl_mk_str(bl_ser_naked_sexp(first));
+      retval = bl_mk_str("");
    }
 
    bl_val_t* x = NULL;
    char*     s = NULL;
    size_t    c = 0;
+   char*     buf = NULL;
 
    while(L->cdr != NULL) {
         if(L->car != NULL) {
@@ -35,9 +36,10 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
              retval->i_val += x->i_val;
 	   } else {
              s = bl_ser_naked_sexp(x);
-	     c = strlen(s) + strlen(retval->s_val);
-             retval->s_val = GC_REALLOC(retval->s_val, c);
-	     strcat(retval->s_val,s);
+	     c = strlen(s) + strlen(retval->s_val)+5;
+             buf = GC_MALLOC(c);
+             snprintf(buf,c,"%s%s", retval->s_val,s);
+	     retval->s_val = buf; 
 	   }
 	}
 	L = L->cdr;
@@ -48,9 +50,10 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
              retval->i_val += x->i_val;
 	   } else {
              s = bl_ser_naked_sexp(x);
-	     c = strlen(s) + strlen(retval->s_val) + 4;
-             retval->s_val = GC_REALLOC(retval->s_val, c);
-	     strncat(retval->s_val,s,c);
+	     c = strlen(s) + strlen(retval->s_val)+5;
+             buf = GC_MALLOC(c);
+             snprintf(buf,c,"%s%s", retval->s_val,s);
+	     retval->s_val = buf; 
 	   }
    }
    return retval;
@@ -125,7 +128,7 @@ bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
 	 if(i->car->type == BL_VAL_TYPE_STRING) {
             printf("%s",i->car->s_val);
 	 } else {
-     	    printf("%s", bl_ser_sexp(bl_ctx_eval(ctx,i->car)));
+     	    printf("%s", bl_ser_naked_sexp(bl_ctx_eval(ctx,i->car)));
 	 }
       }
       i = i->cdr;
@@ -134,7 +137,7 @@ bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
       if(i->car->type == BL_VAL_TYPE_STRING) {
          printf("%s", i->car->s_val);
       } else {
-  	 printf("%s", bl_ser_sexp(bl_ctx_eval(ctx,i->car)));
+  	 printf("%s", bl_ser_naked_sexp(bl_ctx_eval(ctx,i->car)));
       }
    }
    return bl_mk_null();

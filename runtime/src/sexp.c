@@ -245,7 +245,7 @@ char* bl_ser_naked_sexp(bl_val_t* expr) {
          retval++;
 	 retval[strlen(retval)-1]='\0';
       }
-      return retval;
+      return retval++;
 }
 
 bl_val_t* bl_read_ast(bl_ast_node_t* ast) {
