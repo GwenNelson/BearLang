@@ -16,6 +16,7 @@ typedef enum bl_val_type_t {
         BL_VAL_TYPE_STRING,      // A string
 	BL_VAL_TYPE_CONS,        // A cons cell (or a list)
         BL_VAL_TYPE_OPER_NATIVE, // A native-code operator
+	BL_VAL_TYPE_OPER_BL,     // A BearLang-code operator
 	BL_VAL_TYPE_FUNC_BL,     // A BearLang-code function (uncompiled)
         BL_VAL_TYPE_FUNC_NATIVE, // A native-code function
 	BL_VAL_TYPE_CTX,         // A context
@@ -69,12 +70,18 @@ typedef struct bl_val_t {
 
 		// BL_VAL_TYPE_CTX
 		struct { struct bl_hash_t *hash_val;
-	                 bl_val_t* parent; };
+	                 bl_val_t* parent;
+	                 bl_val_t* secondary;
+	                 bool write_to_parent; };
 
 		// BL_VAL_TYPE_OPER_NATIVE
 		struct { bl_val_t* (*code_ptr)(bl_val_t*,bl_val_t*); };
 
-		// BL_VAL_TYPE_FUNC_BL_RAW
+		// BL_VAL_TYPE_OPER_BL
+		struct { bl_val_t* bl_oper_ptr; 
+		         bl_val_t* bl_operargs_ptr; };
+
+		// BL_VAL_TYPE_FUNC_BL
 		struct { bl_val_t* bl_func_ptr;
 		         bl_val_t* bl_funcargs_ptr; };
 
