@@ -9,6 +9,7 @@
 #include <bearlang/list_ops.h>
 #include <bearlang/error_tools.h>
 #include <bearlang/ctx.h>
+#include <bearlang/parser.h>
 
 #define TEST(desc,f) fprintf(stderr,"Testing: %s \t",desc); if(f()==0) { passed_tests++; fprintf(stderr,"PASS\n");} else { failed_tests++; fprintf(stderr,"FAIL\n");}; total_tests++;
 
@@ -612,6 +613,21 @@ int test_parse_string() {
     return 0;
 }
 
+int test_new_parser() {
+    char* test_num_str      = "123";
+    char* test_sym_str      = "*";
+    char* test_othersym_str = "iamasymbol";
+
+    bl_val_t* num_val      = bl_parse_term(test_num_str);
+    bl_val_t* sym_val      = bl_parse_term(test_sym_str);
+    bl_val_t* othersym_val = bl_parse_term(test_othersym_str);
+
+    ASSERT("Numbers",       (num_val->type      == BL_VAL_TYPE_NUMBER) && (num_val->i_val==123))
+    ASSERT("Symbol *",      (sym_val->type      == BL_VAL_TYPE_SYMBOL) && (strcmp(sym_val->s_val,"*")))
+    ASSERT("Normal symbol", (othersym_val->type == BL_VAL_TYPE_SYMBOL) && (strcmp(othersym_val->s_val,"iamasymbol")))
+    return 0;
+}
+
 int main(int argc, char** argv) {
     GC_INIT();
     int passed_tests = 0;
@@ -647,7 +663,8 @@ int main(int argc, char** argv) {
     TEST("or operator                                ", test_or_oper)
     TEST("xor operator                               ", test_or_oper)
     TEST("list operators                             ", test_list_opers)
-    TEST("parse a string                             ", test_parse_string)
+    TEST("parse a string via MPC                     ", test_parse_string)
+    TEST("parse various things via new parser        ", test_new_parser)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
