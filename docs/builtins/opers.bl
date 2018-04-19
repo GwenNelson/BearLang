@@ -1,5 +1,27 @@
 (subsub "Basic mathematical operators" (
 	(XML:p ("
-	The 4 basic mathematical operators behave mostly as you'd expect, the parameters are numbers, and they return numbers"))
+	The 4 basic mathematical operators behave mostly as you'd expect, the parameters are numbers, and they return numbers, in most cases.
+	An exception to this rule is the + operator, which can optionally return strings."))
+
+	(XML:p ("For example:"))
+
+	(codesample "\n(+ 2 3)\n")
+
+	(XML:p ("Will yield:"))
+
+	(codesample (
+		(+ 2 3)
+	))
+
+	(XML:p "And ")
+
+	(codesample "(+ \"Hello \" \"world\")")
+
+	(XML:p ("Will yield:"))
+
+	(codesample 
+		(+ "Hello " "world")
+	)
 
 	))
+

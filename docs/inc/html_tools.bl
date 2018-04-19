@@ -56,9 +56,8 @@
 				  (+ sections))))))
 
 (fun codesample (code) (+ "<blockquote><pre>"
-			   (+ code)
+			  (+ code)
 			  "</pre></blockquote>"))
-
 
 (if (eq *MAINFILE* "html_tools.bl")
 	(do (= testpage (document "Test document" (

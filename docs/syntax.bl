@@ -16,13 +16,15 @@
 	symbol on either side of the name. See below for an example:
 	"))
 
+	(codesample "*VERSION*")
+
 	(XML:p ("is currently set to:"))
 
-	(codesample (*VERSION*))
+	(codesample *VERSION*)
 
 	))
 
-(subsection "Builtin opers" (+
-    (include "./builtins/opers.bl")))
+(subsection "Builtin opers" 
+    (include "./builtins/opers.bl"))
 
 
