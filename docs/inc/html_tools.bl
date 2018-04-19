@@ -36,11 +36,12 @@
 
 
 
-(= testpage (document "Test document" (
-             (section "Section 1" (
-                      "Hello, I am the contents of section 1"
+(if (eq *MAINFILE* "html_tools.bl")
+	(do (= testpage (document "Test document" (
+               (section "Section 1" (
+                        "Hello, I am the contents of section 1"
 				   ))
-	     (section "Section 2" (
-		      "Hello, I am the contents of section 2")))))
-
-(print testpage)
+               (section "Section 2" (
+	                "Hello, I am the contents of section 2")))))
+               (print testpage))
+	)
