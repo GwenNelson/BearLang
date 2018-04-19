@@ -13,6 +13,8 @@
 bl_val_t* bl_ctx_new_std() {
    bl_val_t* retval = bl_ctx_new(NULL);
 
+   bl_ctx_set(retval,"*VERSION*", bl_mk_str("0.WHATEVER")); // TODO - change this and use a real versioning system
+
    bl_ctx_set(retval,       "+", bl_mk_native_oper(&bl_oper_add));
    bl_ctx_set(retval,       "-", bl_mk_native_oper(&bl_oper_sub));
    bl_ctx_set(retval,       "*", bl_mk_native_oper(&bl_oper_mult));

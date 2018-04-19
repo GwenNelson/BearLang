@@ -27,6 +27,8 @@
 
 (fun XML:p  (contents) (xml-tag "p" (+ contents)))
 
+(fun XML:pre (contents) (xml-tag "pre" (+ contents)))
+
 (fun XML:a (href contents) (xml-tag "a" contents))
 
 (fun XML:anchor (anchor-name) (+ "<a name=" anchor-name "/>"))
@@ -46,6 +48,10 @@
 		      (XML:head (XML:title doctitle))
 		      (XML:body ( (XML:h1 doctitle)
 				  (+ sections))))))
+
+(fun codesample (code) (+ "<blockquote><pre>"
+			   (+ code)
+			  "</pre></blockquote>"))
 
 
 (if (eq *MAINFILE* "html_tools.bl")
