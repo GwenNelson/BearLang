@@ -186,7 +186,7 @@ char* bl_ser_sexp(bl_val_t* expr) {
            snprintf(retval,strlen(expr->s_val)+1,"%s",expr->s_val);
          break;
          case BL_VAL_TYPE_STRING:
-           retval = (char*)GC_MALLOC(sizeof(char)*(strlen(expr->s_val)+1));
+           retval = (char*)GC_MALLOC(sizeof(char)*(strlen(expr->s_val)+3));
            snprintf(retval,strlen(expr->s_val)+3,"\"%s\"",expr->s_val);
          break;
          case BL_VAL_TYPE_NUMBER:

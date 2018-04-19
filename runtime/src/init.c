@@ -1,3 +1,4 @@
+#define GC_DEBUG 1
 #include <bearlang/common.h>
 #include <bearlang/sexp.h>
 
