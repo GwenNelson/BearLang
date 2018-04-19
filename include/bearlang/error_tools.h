@@ -24,4 +24,7 @@ bl_val_t* bl_errif_invalid_fixed_args(bl_val_t* params, const bl_val_type_t* exp
 // designed for interactive/realtime use
 char* bl_errmsg(bl_val_t* E);
 
+// return a symbol not found error for the specified symbol
+bl_val_t* bl_err_symnotfound(char* sym);
+
 char* bl_ser_type(bl_val_type_t t);

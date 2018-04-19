@@ -128,6 +128,7 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
     bool eval_all = false;
     if(expr->car->type == BL_VAL_TYPE_SYMBOL) {
        bl_val_t* symval = bl_ctx_get(ctx, expr->car->s_val);
+       if(symval == NULL) return bl_err_symnotfound(expr->car->s_val);
        switch(symval->type) {
          case BL_VAL_TYPE_OPER_NATIVE:
           retval = symval->code_ptr(ctx, expr->cdr);
@@ -175,7 +176,11 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
       break;
       case BL_VAL_TYPE_SYMBOL:
            symval = bl_ctx_get(ctx, expr->s_val);
-	   retval = bl_ctx_eval(ctx,symval);
+           if(symval == NULL) {
+              retval = bl_err_symnotfound(expr->s_val);
+	   } else {
+              retval = bl_ctx_eval(ctx,symval);
+	   }
       break;
       default:
            retval = expr;

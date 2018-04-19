@@ -20,9 +20,9 @@
 
 	(codesample (*VERSION*))
 
-
 	))
 
-
+(subsection "Builtin opers" (+
+    (include "./builtins/opers.bl")))
 
 

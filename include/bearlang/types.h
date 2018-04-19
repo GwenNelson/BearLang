@@ -29,6 +29,7 @@ typedef enum bl_err_type_t {
 	BL_ERR_INSUFFICIENT_ARGS,  // Not enough arguments were provided
         BL_ERR_TOOMANY_ARGS,       // Too many arguments were provided
 	BL_ERR_INVALID_ARGTYPE,    // Invalid argument type(s) was/were provided
+	BL_ERR_SYMBOL_NOTFOUND,
 } bl_err_type_t;
 
 
@@ -43,6 +44,8 @@ typedef struct bl_err_t {
 
 	bl_val_type_t* expected_types; // expected argument types
         bl_val_type_t* provided_types; // actually provided argument types (as bl_val_type_t array)
+	
+	char* symbol_name; // only set if relevant to the error
 } bl_err_t;
 
 struct bl_hash_t {

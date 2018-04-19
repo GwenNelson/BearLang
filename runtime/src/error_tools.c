@@ -82,6 +82,17 @@ bl_val_t* bl_errif_invalid_fixed_args(bl_val_t* params, const bl_val_type_t* exp
       return retval;
 }
 
+bl_val_t* bl_err_symnotfound(char* sym) {
+      bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+      retval->type     = BL_VAL_TYPE_ERROR;
+
+      retval->err_val.type = BL_ERR_SYMBOL_NOTFOUND;
+      retval->err_val.symbol_name = (char*)GC_MALLOC(sizeof(char)*(strlen(sym)+1));
+
+      snprintf(retval->err_val.symbol_name,strlen(sym)+1,"%s",sym);
+      return retval;
+}
+
 char* bl_ser_type(bl_val_type_t t) {
       switch(t) {
          case BL_VAL_TYPE_NULL:
@@ -161,6 +172,9 @@ char* bl_errmsg(bl_val_t* E) {
 	  case BL_ERR_INVALID_ARGTYPE:
                snprintf(retval,1023,"Invalid arguments, expected %s but got %s", bl_ser_types(E->err_val.provided_args,E->err_val.expected_types),
 			                                                      bl_ser_types(E->err_val.provided_args,E->err_val.provided_types));
+	  break;
+	  case BL_ERR_SYMBOL_NOTFOUND:
+	       snprintf(retval,1023,"Symbol %s not found in current environment or any parent environment", E->err_val.symbol_name);
 	  break;
       }
       return retval;

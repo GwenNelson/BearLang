@@ -25,6 +25,8 @@
 
 (fun XML:h3 (contents) (xml-tag "h3" contents))
 
+(fun XML:h4 (contents) (xml-tag "h4" contents))
+
 (fun XML:p  (contents) (xml-tag "p" (+ contents)))
 
 (fun XML:pre (contents) (xml-tag "pre" (+ contents)))
@@ -36,6 +38,10 @@
 (fun subsection (subsection-title subsection-content)
               (+ (XML:h3 subsection-title)
 		 (+ subsection-content)))
+
+(fun subsub (subsub-title subsub-content)
+              (+ (XML:h4 subsub-title)
+		 (+ subsub-content)))
 
 (fun section (section-title section-anchor section-content)
               (+ (XML:hr)
