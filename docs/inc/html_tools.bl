@@ -4,7 +4,7 @@
 
 (fun xml-tag (tag-name tag-contents)
                        (+ (+ "<" tag-name ">")
-			   tag-contents
+			   (+ tag-contents)
 			  (+ "</" tag-name ">")))
 
 (fun XML:html (contents) (xml-tag "html" (+ contents)))
@@ -17,11 +17,11 @@
 
 (fun XML:h1 (contents) (xml-tag "h1" contents))
 
-(= document (XML:html
+(= document (XML:html ( 
 	       (XML:head
 		   (XML:title "BearLang documentation"))
 	       (XML:body
-		   (XML:h1 "BearLang documentation"))))
+		   (XML:h1 "BearLang documentation")))))
 
 (print document)
 
