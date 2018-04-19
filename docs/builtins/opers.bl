@@ -1,0 +1,5 @@
+(subsub "Basic mathematical operators" (
+	(XML:p ("
+	The 4 basic mathematical operators behave mostly as you'd expect, the parameters are numbers, and they return numbers"))
+
+	))
