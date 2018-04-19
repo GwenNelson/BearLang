@@ -17,13 +17,30 @@
 
 (fun XML:h1 (contents) (xml-tag "h1" contents))
 
-(= document (XML:html ( 
-	       (XML:head
-		   (XML:title "BearLang documentation"))
-	       (XML:body
-		   (XML:h1 "BearLang documentation")))))
+(fun XML:hr () "<hr/>")
 
-(print document)
+(fun XML:h2 (contents) (xml-tag "h2" contents))
+
+(fun XML:p  (contents) (xml-tag "p" (+ contents)))
+
+(fun section (section-title section-content)
+              (+ (XML:hr)
+		 (XML:h2 section-title)
+                 (XML:p (+ section-content))))
+
+(fun document (doctitle sections)
+                 (XML:html (
+		      (XML:head (XML:title doctitle))
+		      (XML:body ( (XML:h1 doctitle)
+				  (+ sections))))))
 
 
 
+(= testpage (document "Test document" (
+             (section "Section 1" (
+                      "Hello, I am the contents of section 1"
+				   ))
+	     (section "Section 2" (
+		      "Hello, I am the contents of section 2")))))
+
+(print testpage)
