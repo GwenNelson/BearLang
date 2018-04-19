@@ -19,14 +19,27 @@
 
 (fun XML:hr () "<hr/>")
 
+(fun XML:br () "<br/>")
+
 (fun XML:h2 (contents) (xml-tag "h2" contents))
+
+(fun XML:h3 (contents) (xml-tag "h3" contents))
 
 (fun XML:p  (contents) (xml-tag "p" (+ contents)))
 
-(fun section (section-title section-content)
+(fun XML:a (href contents) (xml-tag "a" contents))
+
+(fun XML:anchor (anchor-name) (+ "<a name=" anchor-name "/>"))
+
+(fun subsection (subsection-title subsection-content)
+              (+ (XML:h3 subsection-title)
+		 (+ subsection-content)))
+
+(fun section (section-title section-anchor section-content)
               (+ (XML:hr)
+                 (XML:anchor section-anchor)
 		 (XML:h2 section-title)
-                 (XML:p (+ section-content))))
+                   (+ section-content)))
 
 (fun document (doctitle sections)
                  (XML:html (
@@ -35,13 +48,14 @@
 				  (+ sections))))))
 
 
-
 (if (eq *MAINFILE* "html_tools.bl")
 	(do (= testpage (document "Test document" (
-               (section "Section 1" (
-                        "Hello, I am the contents of section 1"
+               (section "section1" "Section 1" (
+                        (XML:p "Hello, I am the contents of section 1")
+			(subsection "subsection 1.1" (
+		             (XML:p "Hello, I am the contents of 1.1")))
 				   ))
-               (section "Section 2" (
+               (section "section2" "Section 2" (
 	                "Hello, I am the contents of section 2")))))
                (print testpage))
 	)

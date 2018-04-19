@@ -5,6 +5,11 @@
 
 (include "./inc/html_tools.bl")
 
+(= syntax (XML:p "BearLang uses classic lisp-like s-expression syntax, every program is a list of s-expressions."))
 
+(= sections ((section "Introduction" "intro" (include "./intro.bl"))
+	     (section "Basic syntax" "syntax" syntax)))
 
+(= html (document "BearLang documentation" sections))
 
+(print html)

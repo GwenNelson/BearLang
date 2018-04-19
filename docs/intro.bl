@@ -1,0 +1,7 @@
+(XML:p "BearLang is a modern lisp designed for ease of use and interoperability with C code and \"real world\" applications.")
+
+(XML:p "As an example, this documentation is mostly auto-generated from BearLang scripts itself")
+
+(XML:p ("That makes it easy to demonstrate the functionality of various aspects of the language, for example here is the result of (car (1 2) 3):"
+        (XML:br)
+	(car (1 2) 3)))
