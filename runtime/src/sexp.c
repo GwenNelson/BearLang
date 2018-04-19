@@ -25,7 +25,7 @@ void bl_init_parser() {
      mpca_lang(MPCA_LANG_DEFAULT,
       "                                            \
         number : /-?[0-9]+/ ;                      \
-	symbol : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/; \
+	symbol : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&:]+/; \
 	string  : /\"(\\\\.|[^\"])*\"/ ;           \
         comment : /;[^\\r\\n]*/ ;                    \
         sexpr  : '(' <expr>* ')' ;                 \

@@ -18,6 +18,12 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 
    bl_val_t* first = bl_ctx_eval(ctx,bl_list_first(params));
 
+   if((first->type == BL_VAL_TYPE_CONS) && (bl_list_len(params)==1)) {
+      params = first;
+      first  = bl_list_first(params);
+   }
+
+
    if(first->type == BL_VAL_TYPE_NUMBER) {
       retval = bl_mk_number(0);
    } else {
@@ -29,11 +35,13 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
    size_t    c = 0;
    char*     buf = NULL;
 
+   L = params;
+
    while(L->cdr != NULL) {
         if(L->car != NULL) {
            x = bl_ctx_eval(ctx,L->car);
-           if(retval->type == BL_VAL_TYPE_NUMBER) {
-             retval->i_val += x->i_val;
+	   if(retval->type == BL_VAL_TYPE_NUMBER) {
+ 	     retval->i_val += x->i_val;
 	   } else {
              s = bl_ser_naked_sexp(x);
 	     c = strlen(s) + strlen(retval->s_val)+5;
