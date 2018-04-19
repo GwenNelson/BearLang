@@ -5,3 +5,12 @@
 
 (include "./inc/html_tools.bl")
 
+(= doc_title "BearLang documentation")
+
+(= doc_contents (+ (document_header doc_title)
+		   ""
+		   ))
+
+(print (document "BearLang documentation" doc_contents))
+
+

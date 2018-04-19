@@ -2,12 +2,17 @@
 
 ; generally speaking, each function/oper returns either a big list or a bunch of strings
 
-(fun xml-tag (tag-name contents)
+(fun xml-tag (tag-name tag-contents)
                        (+ (+ "<" tag-name ">")
-			   contents
+			   tag-contents
 			  (+ "</" tag-name ">")))
 
-(= X (xml-tag "body" "hello"))
+(fun XML:html (contents) (xml-tag "html" contents))
 
-(print X)
+(fun XML:head (contents) (xml-tag "head" contents))
+
+(fun XML:title (contents) (xml-tag "title" contents))
+
+
+
 
