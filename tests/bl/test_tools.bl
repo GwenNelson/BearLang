@@ -1,8 +1,8 @@
 ; this file contains the tools for running automated tests
 
-(= TESTS_PASSED 0)
-(= TESTS_FAILED 0)
-(= TESTS_RUN    0)
+(oper RESET-TESTS () 
+      (= TESTS_PASSED 0)
+      (= TESTS_FAILED 0))
 
 (oper TEST (testname testfunc)
       (= TESTING testfunc)
@@ -24,13 +24,15 @@
       (if (TESTING) (PASSTEST)
                     (FAILTEST))
 
-      (if (not (isset TESTS_RUN))
-	       (= TESTS_RUN 1)
-               (= (+ TESTS_RUN 1)))
       )
 
+(oper BEGIN-TEST (test-desc tests) 
+      (RESET-TESTS)
+      (print test-desc "\n")
+      (do tests))
 
 (fun TEST-SUMMARY ()
-     (print TESTS_RUN     " Tests run,")
+     (print "\n")
+     (print (+ TESTS_PASSED TESTS_FAILED) " Tests run,")
      (print TESTS_PASSED  " passed,")
-     (print TESTS_FAILED  " failed\n"))
+     (print TESTS_FAILED  " failed\n\n"))

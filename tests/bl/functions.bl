@@ -1,0 +1,16 @@
+(BEGIN-TEST "Function tests" (
+	(TEST "Simple nested function          " (fn () 
+	     (fun my-nested (a b) (+ a b))
+	     (eq (my-nested 2 3) 5)
+	     ))
+
+	(TEST "Nested function calling function" (fn ()
+	     (fun my-nested-a (a b) (+ a b))
+	     (fun my-nested-b (x) (- x 1))
+	     (eq (my-nested-b (my-nested-a 2 3)) 4)))
+
+	))
+
+
+
+(TEST-SUMMARY)
