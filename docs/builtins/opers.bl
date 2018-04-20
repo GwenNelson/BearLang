@@ -83,6 +83,10 @@
 		"The universe is right, because 2 is still 2"
 	))
 
+	(XML:p ("
+	The do oper operates like a function body - that is, all expressions are evaluated, but only the last one is the return value.
+	"))
+
 	))
 
 (subsub "Functions and custom opers" (
