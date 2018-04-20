@@ -300,3 +300,9 @@ bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) {
    return bl_mk_bool(true);
 }
 
+
+bl_val_t* bl_oper_serexp (bl_val_t* ctx, bl_val_t* params) {
+   if(bl_list_len(params)==1) params = bl_list_first(params);
+   bl_val_t* retval = bl_mk_str(bl_ser_sexp(params));
+   return retval;
+}

@@ -36,7 +36,7 @@ void bl_init_parser() {
 }
 
 bl_ast_node_t* mpc_to_bl(mpc_ast_t* T) {
-      bl_ast_node_t* retval = (bl_ast_node_t*)GC_MALLOC(sizeof(bl_ast_node_t));
+	bl_ast_node_t* retval = (bl_ast_node_t*)GC_MALLOC(sizeof(bl_ast_node_t));
       char* s = NULL;
 
       if(strstr(T->tag,"number")) {
@@ -171,22 +171,22 @@ char* bl_ser_sexp(bl_val_t* expr) {
 	   snprintf(retval,10,"<astlist>");
 	 break;
 	 case BL_VAL_TYPE_NULL:
-           retval = (char*)GC_MALLOC(sizeof(char)*5);
+           retval = (char*)GC_MALLOC(sizeof(char)*6);
            snprintf(retval, 5, "None");
          break;
 	 case BL_VAL_TYPE_CTX:
-	   retval = (char*)GC_MALLOC(sizeof(char)*5);
+	   retval = (char*)GC_MALLOC(sizeof(char)*6);
 	   snprintf(retval,5,"<ctx>");
 	 case BL_VAL_TYPE_ERROR:
-           retval = (char*)GC_MALLOC(sizeof(char)*6);
-	   snprintf(retval, 6, "<error>");
+           retval = (char*)GC_MALLOC(sizeof(char)*10);
+	   snprintf(retval, 9, "<error>");
 	 break;
          case BL_VAL_TYPE_SYMBOL:
-           retval = (char*)GC_MALLOC(sizeof(char)*(strlen(expr->s_val)+1));
+           retval = (char*)GC_MALLOC(sizeof(char)*(strlen(expr->s_val)+2));
            snprintf(retval,strlen(expr->s_val)+1,"%s",expr->s_val);
          break;
          case BL_VAL_TYPE_STRING:
-           retval = (char*)GC_MALLOC(sizeof(char)*(strlen(expr->s_val)+3));
+           retval = (char*)GC_MALLOC(sizeof(char)*(strlen(expr->s_val)+5));
            snprintf(retval,strlen(expr->s_val)+3,"\"%s\"",expr->s_val);
          break;
          case BL_VAL_TYPE_NUMBER:
@@ -207,11 +207,11 @@ char* bl_ser_sexp(bl_val_t* expr) {
 	   snprintf(retval,1024,"(fn %s %s)",bl_ser_sexp(expr->bl_funcargs_ptr), bl_ser_sexp(expr->bl_func_ptr));
 	 break;
          case BL_VAL_TYPE_OPER_NATIVE:
-           retval = (char*)GC_MALLOC(sizeof(char)*4);
-	   snprintf(retval,4,"OPER");
+           retval = (char*)GC_MALLOC(sizeof(char)*10);
+	   snprintf(retval,5,"OPER");
 	 break;
 	 case BL_VAL_TYPE_CONS:
-           retval = (char*)GC_MALLOC(sizeof(char)*3);
+           retval = (char*)GC_MALLOC(sizeof(char)*1024);
 	   retval[0]='(';
            if((expr->car == NULL) && (expr->cdr == NULL)) {
      	       snprintf(retval,4,"%s","()");
@@ -220,17 +220,13 @@ char* bl_ser_sexp(bl_val_t* expr) {
 	       while(L->cdr != NULL) {
                   if(L->car != NULL) {
                      char* newval = bl_ser_sexp(L->car);
-                     size_t newsize =  sizeof(char) * (strlen(retval)+strlen(newval)+4);
-                     retval = (char*)GC_realloc(retval, newsize);
-                     snprintf(retval,newsize,"%s%s ", retval, newval);
+                     snprintf(retval,1024,"%s%s ", retval, newval);
 		  }
                   L = L->cdr;
 	       }
                if(L->car != NULL) {
                   char* newval = bl_ser_sexp(L->car);
-                  size_t newsize =  sizeof(char) * (strlen(retval)+strlen(newval)+4);
-                  retval = (char*)GC_realloc(retval, newsize);
-                  snprintf(retval,newsize,"%s%s)", retval, newval);
+                  snprintf(retval,1024,"%s%s)", retval, newval);
 	       }
 	   }
 

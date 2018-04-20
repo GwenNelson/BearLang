@@ -5,25 +5,25 @@
 
 	(XML:p ("For example:"))
 
-	(codesample "\n(+ 2 3)\n")
-
-	(XML:p ("Will yield:"))
-
 	(codesample (
+		">>> (+ 2 3)\n"
 		(+ 2 3)
 	))
 
 	(XML:p "And ")
 
-	(codesample "(+ \"Hello \" \"world\")")
-
-	(XML:p ("Will yield:"))
-
-	(codesample 
+	(codesample (
+		">>> (+ \"Hello \" \"world\")\n"
 		(+ "Hello " "world")
-	)
+	))
 
-	(XML:p (""))
+	(XML:p ("
+	With the exception of the + operator, all the mathematical opers take 2 parameters. See below for some examples:"))
 
+	(codesample (
+             ">>> (+ 2 2)\n"
+	     (+ 2 2)
+	))
+	
 	))
 

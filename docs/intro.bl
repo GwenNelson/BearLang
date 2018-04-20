@@ -18,13 +18,16 @@
 
 (subsection "About this documentation" (
 	(XML:p ("
-	The source code for this documentation is under docs/, the generated HTML output should not be directly edited by hand, but rather the scripts under docs/ should be edited.
+	The source code for this documentation is under docs/, the generated HTML output should not be directly edited by hand, but rather the scripts under docs/ should be edited.<br/>
 	After doing so, running \"bli gen_docs.pl &gt;bearlang_docs.html\" or similar will regenerate the documentation."))
 
 	(XML:p ("
-	When code samples are shown in this documentation, they will be enclosed in &lt;pre&gt; tags like so:"))
+	When code samples are shown in this documentation, they will be enclosed in &lt;pre&gt; tags and made to look like REPL output like so:"))
 
-	(codesample  "\n(fun myfunc (a b c) (+ a (- b c)))\n")
+	(codesample  (
+		">>> (fun myfunc (a b c) (+ a (- b c)))\n"
+		(fun myfunc (a b c) (+ a (- b c)))
+	))
 
 	(XML:p ("At some point these scripts will output to other suitable formats, for now they just spit out HTML."))
 	
