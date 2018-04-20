@@ -290,3 +290,11 @@ bl_val_t* bl_oper_include(bl_val_t* ctx, bl_val_t* params) {
    fclose(fd);
    return retval;
 }
+
+bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* sym    = bl_list_first(params);
+   bl_val_t* symval = bl_ctx_get(ctx, sym->s_val);
+   if(symval == NULL) return bl_mk_bool(false);
+   return bl_mk_bool(true);
+}
+

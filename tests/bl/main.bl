@@ -1,0 +1,13 @@
+(include "test_tools.bl")
+
+(fun always-pass () True)
+
+(fun always-fail () False)
+
+(TEST always-pass)
+(TEST always-fail)
+
+(if (always-fail) (print "TRUE!\n")
+                  (print "FAIL!\n"))
+
+(print "Ran " TESTS_RUN " tests, " TESTS_PASSED " passed\n")

@@ -39,6 +39,7 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval,     "car", bl_mk_native_oper(&bl_oper_first));
    bl_ctx_set(retval,     "cdr", bl_mk_native_oper(&bl_oper_rest));
    bl_ctx_set(retval, "include", bl_mk_native_oper(&bl_oper_include));
+   bl_ctx_set(retval,   "isset", bl_mk_native_oper(&bl_oper_isset));
 
    bl_ctx_set(retval, "True",  bl_mk_bool(true));
    bl_ctx_set(retval, "False", bl_mk_bool(false));

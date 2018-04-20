@@ -1,0 +1,9 @@
+; this file contains the tools for running automated tests
+
+(oper TEST (testfunc) 
+      (if (and (testfunc) (isset TESTS_PASSED)) (= TESTS_PASSED (+ TESTS_PASSED 1))
+                                                (= TESTS_PASSED 1))
+		       
+      (if (isset TESTS_RUN) (= TESTS_RUN (+ TESTS_RUN 1))
+	                    (= TESTS_RUN 1))
+      )
