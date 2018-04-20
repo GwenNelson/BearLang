@@ -1,7 +1,12 @@
 ; this file contains the tools for running automated tests
 
-(oper TEST (testfunc testname)
-      (print "Testing " testname)
+(= TESTS_PASSED 0)
+(= TESTS_FAILED 0)
+(= TESTS_RUN    0)
+
+(oper TEST (testname testfunc)
+      (= TESTING testfunc)
+      (print "\tTesting " testname)
 
       (oper PASSTEST () 
             (if (not (isset TESTS_PASSED))
@@ -15,13 +20,15 @@
 		     (= TESTS_FAILED (+ TESTS_FAILED 1)))
 	    (print " FAIL\n"))
       
-      (if (eval testfunc) (PASSTEST)
-                          (FAILTEST))
+
+      (if (TESTING) (PASSTEST)
+                    (FAILTEST))
 
       (if (not (isset TESTS_RUN))
 	       (= TESTS_RUN 1)
                (= (+ TESTS_RUN 1)))
       )
+
 
 (fun TEST-SUMMARY ()
      (print TESTS_RUN     " Tests run,")

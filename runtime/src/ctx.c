@@ -40,7 +40,6 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval,     "cdr", bl_mk_native_oper(&bl_oper_rest));
    bl_ctx_set(retval, "include", bl_mk_native_oper(&bl_oper_include));
    bl_ctx_set(retval,   "isset", bl_mk_native_oper(&bl_oper_isset));
-   bl_ctx_set(retval,    "eval", bl_mk_native_oper(&bl_oper_eval));
 
    bl_ctx_set(retval, "True",  bl_mk_bool(true));
    bl_ctx_set(retval, "False", bl_mk_bool(false));
@@ -94,20 +93,19 @@ bl_val_t* bl_eval_blfunc(bl_val_t* ctx, bl_val_t* f, bl_val_t* params) {
 bl_val_t* bl_eval_bloper(bl_val_t* ctx, bl_val_t* oper, bl_val_t* params) {
     bl_val_t* retval   = NULL;
     bl_val_t* closure  = bl_ctx_new(ctx);
-    bl_val_t* lexical_closure  = bl_ctx_new(NULL);
-    closure->secondary = lexical_closure;
     closure->write_to_parent = true;
+
     bl_val_t* argsk_i  = oper->bl_operargs_ptr;
     bl_val_t* argsv_i  = params;
     while(argsk_i->cdr != NULL) {
        if(argsk_i->car != NULL) {
-     	    bl_ctx_set(lexical_closure, argsk_i->car->s_val, argsv_i->car);
+     	    bl_ctx_set(closure, argsk_i->car->s_val, argsv_i->car);
        }
        argsk_i = argsk_i -> cdr;
        argsv_i = argsv_i -> cdr;
     }
     if(argsk_i->car != NULL) {
-       bl_ctx_set(lexical_closure, argsk_i->car->s_val, argsv_i->car);
+       bl_ctx_set(closure, argsk_i->car->s_val, argsv_i->car);
     }
 
     bl_val_t* i = oper->bl_oper_ptr;
@@ -124,12 +122,15 @@ bl_val_t* bl_eval_bloper(bl_val_t* ctx, bl_val_t* oper, bl_val_t* params) {
 }
 
 bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
+
     bl_val_t* retval = NULL;
-    if(expr->car == NULL) { // should never happen with a non-null cdr
-    }
     bool eval_all = false;
     if(expr->car->type == BL_VAL_TYPE_SYMBOL) {
-       bl_val_t* symval = bl_ctx_get(ctx, expr->car->s_val);
+       if(strcmp(expr->car->s_val,"eval")==0) {
+          return bl_eval_cons(ctx,bl_list_first(expr->cdr));
+       }
+     	    bl_val_t* symval = bl_ctx_get(ctx, expr->car->s_val);
+       
        if(symval == NULL) return bl_err_symnotfound(expr->car->s_val);
        switch(symval->type) {
          case BL_VAL_TYPE_OPER_NATIVE:
@@ -192,6 +193,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 }
 
 bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
+
    struct bl_hash_t* ht = ctx->hash_val;
    struct bl_hash_t* val = NULL;
    HASH_FIND_STR(ht, key, val);

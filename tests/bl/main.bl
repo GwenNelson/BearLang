@@ -1,9 +1,4 @@
 (include "test_tools.bl")
 
-(fun always-pass () True)
-(fun always-fail () False)
+(include "maths.bl")
 
-(TEST (always-pass) "Always pass")
-(TEST (always-fail) "Always fail")
-
-(TEST-SUMMARY)

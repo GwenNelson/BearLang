@@ -263,8 +263,10 @@ bl_val_t* bl_oper_xor(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_first(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* retval = bl_list_first(params);
-   return retval;
+   if(bl_list_len(params)==1) {
+      return bl_list_first(bl_ctx_eval(ctx,params));
+   }
+   return bl_list_first(params);
 }
 
 bl_val_t* bl_oper_second(bl_val_t* ctx, bl_val_t* params) {
@@ -289,11 +291,6 @@ bl_val_t* bl_oper_include(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* retval = bl_eval_file(ctx, filename->s_val, fd);
    fclose(fd);
    return retval;
-}
-
-bl_val_t* bl_oper_eval(bl_val_t* ctx, bl_val_t* params) {
-   if(bl_list_len(params)==1) return bl_ctx_eval(ctx,bl_list_first(params));
-   return bl_ctx_eval(ctx,params);
 }
 
 bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) {
