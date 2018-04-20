@@ -291,6 +291,11 @@ bl_val_t* bl_oper_include(bl_val_t* ctx, bl_val_t* params) {
    return retval;
 }
 
+bl_val_t* bl_oper_eval(bl_val_t* ctx, bl_val_t* params) {
+   if(bl_list_len(params)==1) return bl_ctx_eval(ctx,bl_list_first(params));
+   return bl_ctx_eval(ctx,params);
+}
+
 bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* sym    = bl_list_first(params);
    bl_val_t* symval = bl_ctx_get(ctx, sym->s_val);

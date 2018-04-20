@@ -40,6 +40,7 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval,     "cdr", bl_mk_native_oper(&bl_oper_rest));
    bl_ctx_set(retval, "include", bl_mk_native_oper(&bl_oper_include));
    bl_ctx_set(retval,   "isset", bl_mk_native_oper(&bl_oper_isset));
+   bl_ctx_set(retval,    "eval", bl_mk_native_oper(&bl_oper_eval));
 
    bl_ctx_set(retval, "True",  bl_mk_bool(true));
    bl_ctx_set(retval, "False", bl_mk_bool(false));
@@ -213,7 +214,7 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
 
 bl_val_t* bl_ctx_set(bl_val_t* ctx, char* key, bl_val_t* val) {
    if(ctx->parent != NULL) {
-      if(ctx->write_to_parent) ctx = ctx->parent;
+      if(ctx->write_to_parent) return bl_ctx_set(ctx->parent, key, val);
    }
    struct bl_hash_t* ht_val = (struct bl_hash_t*)GC_MALLOC(sizeof(struct bl_hash_t));
    snprintf(ht_val->key,32,"%s",key);

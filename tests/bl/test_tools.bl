@@ -1,9 +1,29 @@
 ; this file contains the tools for running automated tests
 
-(oper TEST (testfunc) 
-      (if (and (testfunc) (isset TESTS_PASSED)) (= TESTS_PASSED (+ TESTS_PASSED 1))
-                                                (= TESTS_PASSED 1))
-		       
-      (if (isset TESTS_RUN) (= TESTS_RUN (+ TESTS_RUN 1))
-	                    (= TESTS_RUN 1))
+(oper TEST (testfunc testname)
+      (print "Testing " testname)
+
+      (oper PASSTEST () 
+            (if (not (isset TESTS_PASSED))
+	             (= TESTS_PASSED 1)
+                     (= TESTS_PASSED (+ TESTS_PASSED 1)))
+            (print " PASS\n"))
+
+      (oper FAILTEST ()
+	    (if (not (isset TESTS_FAILED))
+	             (= TESTS_FAILED 1)
+		     (= TESTS_FAILED (+ TESTS_FAILED 1)))
+	    (print " FAIL\n"))
+      
+      (if (eval testfunc) (PASSTEST)
+                          (FAILTEST))
+
+      (if (not (isset TESTS_RUN))
+	       (= TESTS_RUN 1)
+               (= (+ TESTS_RUN 1)))
       )
+
+(fun TEST-SUMMARY ()
+     (print TESTS_RUN     " Tests run,")
+     (print TESTS_PASSED  " passed,")
+     (print TESTS_FAILED  " failed\n"))
