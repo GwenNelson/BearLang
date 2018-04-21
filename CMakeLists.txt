@@ -9,17 +9,24 @@ include(CodeCoverage)
 APPEND_COVERAGE_COMPILER_FLAGS()
 find_package (LibGc REQUIRED)
 find_package (Readline REQUIRED)
+find_package (FLEX REQUIRED)
 
 file(GLOB RUNTIME_SOURCE "runtime/src/*.c")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${LIBGC_INCLUDE_DIR})
 include_directories(${Readline_INCLUDE_DIR})
+include_directories(${FLEX_INCLUDES})
 
-add_library(blruntime SHARED ${RUNTIME_SOURCE})
-target_link_libraries(blruntime ${LIBGC_LIBRARIES})
+FLEX_TARGET(BLLexer
+            "runtime/src/lexer.l"
+            ${CMAKE_CURRENT_BINARY_DIR}/lexer.c)
+
+add_library(blruntime SHARED ${RUNTIME_SOURCE} ${FLEX_BLLexer_OUTPUTS})
+target_link_libraries(blruntime ${LIBGC_LIBRARIES} ${FLEX_LIBRARIES})
 
 enable_testing()
+
 
 file(GLOB RUNTIME_TEST_SRC "tests/runtime/*.c")
 file(GLOB BLI_SRC          "bli/src/*.c")
