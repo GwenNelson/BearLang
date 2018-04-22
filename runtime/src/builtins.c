@@ -121,7 +121,7 @@ bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {
    bl_val_type_t expected_types[2] = {BL_VAL_TYPE_SYMBOL,BL_VAL_TYPE_ANY};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
-     
+    
    retval = bl_ctx_eval(ctx,bl_list_second(params));
    bl_val_t* name   = bl_list_first(params); // TODO: Handle the case where this isn't a symbol
 

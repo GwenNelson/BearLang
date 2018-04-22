@@ -45,11 +45,11 @@ int main(int argc, char** argv) {
     for(;;) {
         char* input_line = readline(">>> ");
 	bl_val_t* expr    = bl_parse_sexp(input_line);
-        bl_val_t*      result = bl_ctx_eval(REPL_CTX, expr);
+	bl_val_t*      result = bl_ctx_eval(REPL_CTX, expr);
         char*          errmsg = "";
 	switch(result->type) {
            case BL_VAL_TYPE_NULL:
-              printf("\n");
+              printf("None\n");
 	   break;
            case BL_VAL_TYPE_ERROR:
               errmsg = bl_errmsg(result);
