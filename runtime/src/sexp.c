@@ -27,7 +27,8 @@ bl_val_t* read_list(yyscan_t scanner) {
     bl_val_t* e = bl_mk_null();
     while(e->type != BL_VAL_TYPE_LIST_END) {
        e = read_form(scanner);
-       if(e != NULL) if(e->type != BL_VAL_TYPE_LIST_END) {
+       if(e==NULL) return retval;
+       if(e->type != BL_VAL_TYPE_LIST_END) {
           L->cdr = bl_mk_val(BL_VAL_TYPE_CONS);
 	  L->cdr->car = e;
 	  L->cdr->cdr = NULL;
@@ -37,12 +38,43 @@ bl_val_t* read_list(yyscan_t scanner) {
     return retval;
 }
 
+char* unescape(char* s) {
+    size_t count = strlen(s);
+    char* retval = GC_MALLOC(sizeof(s) * count+1);
+    bool slash;
+    int i, j;
+    for(i=j=0; s[i] != '\0'; i++) {
+        switch(s[i]) {
+	   case '\\':
+	     slash = true;
+	   break;
+	   case 'n':
+	      if(slash) {
+	         retval[j++] = '\n';
+		 slash = false;
+	         break;
+	      }
+	   case 't':
+	      if(slash) {
+		 retval[j++] = '\t';
+		 slash = false;
+	         break;
+	      }
+	   default:
+	      retval[j++] = s[i];
+	      break;
+	}
+    }
+    retval[j] = '\0';
+    return retval;
+}
+
 bl_val_t* read_form(yyscan_t scanner) {
     bl_token_type_t tok = yylex(scanner);
     if(tok == 0) return NULL;
     switch(tok) {
 	case BL_TOKEN_STRING:
-		return bl_mk_str(yyget_text(scanner));
+		return bl_mk_str(unescape(yyget_text(scanner)));
 	break;
 	case BL_TOKEN_LPAREN:
 		return read_list(scanner);
@@ -76,7 +108,7 @@ bl_val_t* bl_parse_file(char* filename, FILE* fd) {
    yyscan_t scanner;
    yylex_init(&scanner);
    yyset_in(fd,scanner);
-   bl_val_t* retval = read_form(scanner);
+   bl_val_t* retval = read_list(scanner);
    yylex_destroy(scanner);
    return retval;
 }
