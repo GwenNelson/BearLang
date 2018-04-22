@@ -21,6 +21,7 @@ typedef enum bl_val_type_t {
         BL_VAL_TYPE_FUNC_NATIVE, // A native-code function
 	BL_VAL_TYPE_CTX,         // A context
 	BL_VAL_TYPE_ANY,         // Any type (only used for error handling etc)
+        BL_VAL_TYPE_LIST_END,    // used by the parser
 } bl_val_type_t;
 
 typedef enum bl_err_type_t {

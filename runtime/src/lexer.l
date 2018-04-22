@@ -3,7 +3,6 @@
 #include <bearlang/types.h>
 %}
 
-%option noyywrap
 %option reentrant
 %option yylineno
 
@@ -17,7 +16,6 @@ SYMBOL          [\*\-\/\+a-zA-Z0-9]+
 COMMENT_START   \;
 
 %%
-
 {STRING}           { memmove(yytext,yytext+1,yyleng-1); yytext[yyleng-2]='\0'; return BL_TOKEN_STRING; }
 {WHITESPACE}       { /* do nothing */ }
 {COMMENT_START}.*$ { /* do nothing */ }
