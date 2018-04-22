@@ -71,7 +71,8 @@ typedef struct bl_val_t {
 		struct { bl_err_t err_val; };
 
 		// BL_VAL_TYPE_NUMBER | BL_VAL_TYPE_BOOL
-		struct { int64_t i_val; };
+		struct { int64_t i_val;
+	                 float   f_val;	};
 
 		// BL_VAL_TYPE_SYMBOL | BL_VAL_TYPE_STRING
 		struct { char*   s_val; };

@@ -48,9 +48,7 @@ bl_val_t* read_form(yyscan_t scanner) {
 		return bl_mk_val(BL_VAL_TYPE_LIST_END);
 	break;
 	case BL_TOKEN_FLOAT:
-		// TODO: implement floats properly
-	//		printf("BL_TOKEN_NUMBER_FLOAT(%s) ", yyget_text(scanner));
-		return bl_mk_number(0);
+		return bl_mk_float(atof(yyget_text(scanner)));
 	break;
 	case BL_TOKEN_INTEGER:
 		return bl_mk_number(atoi(yyget_text(scanner)));
@@ -65,11 +63,14 @@ bl_val_t* read_form(yyscan_t scanner) {
 int main(int argc, char** argv) {
     GC_INIT();
     bl_init();
+    char* test_str = "(* \"hello, i am a string\" 123 ; i am a commented out bit (69) \n 4.5)";
 
     yyscan_t scanner;
     yylex_init(&scanner);
 
     bl_val_t* E=bl_mk_null();
+
+    yy_scan_string(test_str, scanner);
 
     while((E = read_form(scanner))) {
         printf("%s\n",bl_ser_sexp(E));
