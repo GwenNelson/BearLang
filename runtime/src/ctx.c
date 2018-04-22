@@ -63,7 +63,7 @@ void bl_ctx_close(bl_val_t* ctx) {
 
 bl_val_t* bl_eval_blfunc(bl_val_t* ctx, bl_val_t* f, bl_val_t* params) {
     bl_val_t* retval   = NULL;
-    bl_val_t* closure  = bl_ctx_new(ctx);
+    bl_val_t* closure  = bl_ctx_new(f->lexical_closure);
     bl_val_t* argsk_i  = f->bl_funcargs_ptr;
     bl_val_t* argsv_i  = params;
     while(argsk_i->cdr != NULL) {
@@ -194,7 +194,10 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 }
 
 bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
-
+   if(ctx->secondary != NULL) {
+      bl_val_t* s_V = bl_ctx_get(ctx->secondary, key);
+      if(s_V != NULL) return s_V;
+   }
    struct bl_hash_t* ht = ctx->hash_val;
    struct bl_hash_t* val = NULL;
    HASH_FIND_STR(ht, key, val);
@@ -202,11 +205,6 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
       if(ctx->parent != NULL) {
 	 bl_val_t* V = bl_ctx_get(ctx->parent, key);
 	 if(V != NULL) return V;
-	 if(ctx->secondary != NULL) { 
-           return bl_ctx_get(ctx->secondary, key);
-	 } else {
-           return NULL;
-	 }
       } else {
          return NULL;
       }

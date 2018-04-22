@@ -96,7 +96,8 @@ typedef struct bl_val_t {
 
 		// BL_VAL_TYPE_FUNC_BL
 		struct { bl_val_t* bl_func_ptr;
-		         bl_val_t* bl_funcargs_ptr; };
+		         bl_val_t* bl_funcargs_ptr;
+	                 bl_val_t* lexical_closure; };
 
 		// BL_VAL_TYPE_FUNC_NATIVE
 		struct { bl_val_t* (*func_ptr)(bl_val_t*,bl_val_t*); };

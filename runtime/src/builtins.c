@@ -156,6 +156,7 @@ bl_val_t* bl_oper_fn(bl_val_t* ctx, bl_val_t* params) {
    retval->type            = BL_VAL_TYPE_FUNC_BL;
    retval->bl_funcargs_ptr = bl_list_first(params);
    retval->bl_func_ptr     = bl_list_rest(params);
+   retval->lexical_closure = ctx;
    return retval;
 }
 
@@ -164,6 +165,7 @@ bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) {
    retval->type            = BL_VAL_TYPE_FUNC_BL;
    retval->bl_funcargs_ptr = bl_list_second(params);
    retval->bl_func_ptr     = bl_list_rest(bl_list_rest(params)); // the rest of the rest is better than the rest
+   retval->lexical_closure = ctx;
 
    bl_val_t* name = bl_list_first(params);
    bl_ctx_set(ctx, name->s_val, retval);

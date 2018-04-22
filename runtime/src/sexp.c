@@ -15,10 +15,13 @@ bl_val_t* read_list(yyscan_t scanner) {
     bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_CONS);
     retval->car = read_form(scanner);
     retval->cdr = NULL;
+    if(retval->car == NULL) return retval; 
+    if(retval->car->type == BL_VAL_TYPE_LIST_END) {
+       retval->car = NULL;
+       return retval;
+    }
     
-    if(retval->car->type == BL_VAL_TYPE_LIST_END) retval->car = NULL;
 
-    if(retval->car == NULL) return retval;
 
     bl_val_t* L = retval;
     bl_val_t* e = bl_mk_null();
@@ -72,9 +75,8 @@ bl_val_t* bl_parse_sexp(char* sexp) {
 bl_val_t* bl_parse_file(char* filename, FILE* fd) {
    yyscan_t scanner;
    yylex_init(&scanner);
-   YY_BUFFER_STATE buf = yy_create_buffer(fd, YY_BUF_SIZE,scanner);
-   yy_switch_to_buffer(buf,scanner);
-   bl_val_t* retval = read_list(scanner);
+   yyset_in(fd,scanner);
+   bl_val_t* retval = read_form(scanner);
    yylex_destroy(scanner);
    return retval;
 }
