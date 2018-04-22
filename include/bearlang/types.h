@@ -34,11 +34,11 @@ typedef enum bl_err_type_t {
 
 typedef enum bl_token_type_t {
 	BL_TOKEN_LPAREN  = 1,
-	BL_TOKEN_RPAREN  = 1,
-	BL_TOKEN_STRING  = 1,
-	BL_TOKEN_FLOAT   = 1,
-	BL_TOKEN_INTEGER = 1,
-	BL_TOKEN_SYMBOL  = 1,
+	BL_TOKEN_RPAREN  = 2,
+	BL_TOKEN_STRING  = 3,
+	BL_TOKEN_FLOAT   = 4,
+	BL_TOKEN_INTEGER = 5,
+	BL_TOKEN_SYMBOL  = 6,
 } bl_token_type_t;
 
 typedef struct bl_val_t bl_val_t;

@@ -3,7 +3,9 @@
 #include <bearlang/types.h>
 %}
 
+%option noyywrap
 %option reentrant
+%option yylineno
 
 LEFT_PAREN      "("
 RIGHT_PAREN     ")"
