@@ -1,6 +1,9 @@
 %{
 #include <stdio.h>
+#include <bearlang/types.h>
 %}
+
+%option reentrant
 
 LEFT_PAREN      "("
 RIGHT_PAREN     ")"
@@ -13,14 +16,13 @@ COMMENT_START   \;
 
 %%
 
-{STRING}           { printf("STRING(%s) ", yytext); }
+{STRING}           { memmove(yytext,yytext+1,yyleng-1); yytext[yyleng-2]='\0'; return BL_TOKEN_STRING; }
 {WHITESPACE}       { /* do nothing */ }
 {COMMENT_START}.*$ { /* do nothing */ }
-{LEFT_PAREN}       { printf("LEFT_PAREN "); }
-{RIGHT_PAREN}      { printf("RIGHT_PAREN "); }
-{NUMBER_FLOAT}     { printf("NUMBER_FLOAT(%s) ", yytext); }
-{NUMBER_INTEGER}   { printf("NUMBER_INTEGER(%s) ", yytext); }
-{SYMBOL}           { printf("SYMBOL(%s) ", yytext); }
+{LEFT_PAREN}       { return BL_TOKEN_LPAREN; }
+{RIGHT_PAREN}      { return BL_TOKEN_RPAREN; }
+{NUMBER_FLOAT}     { return BL_TOKEN_FLOAT; }
+{NUMBER_INTEGER}   { return BL_TOKEN_INTEGER; }
+{SYMBOL}           { return BL_TOKEN_SYMBOL; }
 
 %%
-
