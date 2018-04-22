@@ -32,6 +32,8 @@ bl_val_t* read_list(yyscan_t scanner) {
     return retval;
 }
 
+// TODO - make this read from strings, and then replace mpc
+
 bl_val_t* read_form(yyscan_t scanner) {
     bl_token_type_t tok = yylex(scanner);
     if(tok == 0) return NULL;
