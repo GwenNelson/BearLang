@@ -16,7 +16,8 @@ SYMBOL          [\*\-\/\+a-zA-Z0-9]+
 COMMENT_START   \;
 
 %%
-{STRING}           { memmove(yytext,yytext+1,yyleng-1); yytext[yyleng-2]='\0'; return BL_TOKEN_STRING; }
+{STRING}           { memmove(yyget_text(yyscanner),yyget_text(yyscanner)+1,yyget_leng(yyscanner)-1);
+                     yyget_text(yyscanner)[yyget_leng(yyscanner)-2]='\0'; return BL_TOKEN_STRING; }
 {WHITESPACE}       { /* do nothing */ }
 {COMMENT_START}.*$ { /* do nothing */ }
 {LEFT_PAREN}       { return BL_TOKEN_LPAREN; }
