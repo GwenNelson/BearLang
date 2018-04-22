@@ -63,8 +63,7 @@ bl_val_t* bl_mk_bool(bool b) {
 }
 
 bl_val_t* bl_eval_file(bl_val_t* ctx, char* filename, FILE* fd) {
-   bl_ast_node_t* ast = bl_parse_file(filename, fd);
-   bl_val_t*     sexp = bl_read_ast(ast);
+   bl_val_t*     sexp = bl_parse_file(filename, fd);
    bl_val_t*   retval = bl_ctx_eval(ctx, sexp);
    return retval;
 }

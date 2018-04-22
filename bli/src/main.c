@@ -44,8 +44,7 @@ int main(int argc, char** argv) {
 
     for(;;) {
         char* input_line = readline(">>> ");
-	bl_ast_node_t* ast    = bl_parse_sexp(input_line);
-        bl_val_t*      expr   = bl_read_ast(ast);
+	bl_val_t* expr    = bl_parse_sexp(input_line);
         bl_val_t*      result = bl_ctx_eval(REPL_CTX, expr);
         char*          errmsg = "";
 	switch(result->type) {

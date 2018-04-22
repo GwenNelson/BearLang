@@ -1,157 +1,82 @@
 #include <bearlang/common.h>
 #include <bearlang/sexp.h>
-#include <bearlang/mpc.h>
 #include <bearlang/list_ops.h>
+#include <bearlang/utils.h>
 
+#include <bl_lexer.h>
 #include <stdio.h>
 
-mpc_parser_t* Number;
-mpc_parser_t* String;
-mpc_parser_t* Comment;
-mpc_parser_t* Symbol;
-mpc_parser_t* Sexpr;
-mpc_parser_t* Expr;
-mpc_parser_t* Lispy;
-
 void bl_init_parser() {
-     Number  = mpc_new("number");
-     String  = mpc_new("string");
-     Comment = mpc_new("comment");
-     Symbol  = mpc_new("symbol");
-     Sexpr   = mpc_new("sexpr");
-     Expr    = mpc_new("expr");
-     Lispy   = mpc_new("lispy");
-
-     mpca_lang(MPCA_LANG_DEFAULT,
-      "                                            \
-        number : /-?[0-9]+/ ;                      \
-	symbol : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&:]+/; \
-	string  : /\"(\\\\.|[^\"])*\"/ ;           \
-        comment : /;[^\\r\\n]*/ ;                    \
-        sexpr  : '(' <expr>* ')' ;                 \
-        expr   : <number> | <symbol> | <string> | <comment> | <sexpr> ;   \
-        lispy  : /^/ <expr>* /$/ ;                 \
-      ",
-      Number, Symbol, String, Comment, Sexpr, Expr, Lispy);
 }
 
-bl_ast_node_t* mpc_to_bl(mpc_ast_t* T) {
-	bl_ast_node_t* retval = (bl_ast_node_t*)GC_MALLOC(sizeof(bl_ast_node_t));
-      char* s = NULL;
+bl_val_t* read_form(yyscan_t scanner);
 
-      if(strstr(T->tag,"number")) {
-         retval->node_val.type      = BL_VAL_TYPE_NUMBER;
-         retval->node_val.i_val = atoi(T->contents);
-         return retval;
-      }
+bl_val_t* read_list(yyscan_t scanner) {
+    bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_CONS);
+    retval->car = read_form(scanner);
+    retval->cdr = NULL;
+    
+    if(retval->car->type == BL_VAL_TYPE_LIST_END) retval->car = NULL;
 
-      if(strstr(T->tag,"string")) {
-         int content_len = strlen(T->contents);
-	 retval->node_val.type  = BL_VAL_TYPE_STRING;
-	 retval->node_val.s_val = (char*)GC_MALLOC(content_len+1);
-	 snprintf(retval->node_val.s_val,content_len-1,"%s",T->contents+1);
-         retval->node_val.s_val = mpcf_unescape(retval->node_val.s_val);
-	 return retval;
-      }
+    if(retval->car == NULL) return retval;
 
-      if(strstr(T->tag,"symbol")) {
-         int content_len = strlen(T->contents);
-         retval->node_val.type      = BL_VAL_TYPE_SYMBOL;
-         retval->node_val.s_val = (char*)GC_MALLOC(content_len+1);
-         snprintf(retval->node_val.s_val,content_len+1,"%s",T->contents);
-         return retval;
-      }
-
-      if((strcmp(T->tag,">") == 0) || strstr(T->tag, "sexpr")) {
-         retval->node_val.type = BL_VAL_TYPE_AST_LIST;
-         retval->children      = (bl_ast_node_t**)GC_MALLOC(sizeof(bl_ast_node_t*)*T->children_num);
-      }
-      
-      int i=0;
-      int c=0;
-      for(i=0; i < T->children_num; i++) {
-          if (strcmp(T->children[i]->contents, "(") == 0) { continue; }
-          if (strcmp(T->children[i]->contents, ")") == 0) { continue; }
-          if (strcmp(T->children[i]->tag,  "regex") == 0) { continue; }
-	  if (strstr(T->children[i]->tag, "comment")) { continue; }
-          bl_ast_node_t* parsed = mpc_to_bl(T->children[i]);
-          retval->children[c] = parsed;
-          c++;
-      }
-      retval->child_count = c;
-      return retval;
+    bl_val_t* L = retval;
+    bl_val_t* e = bl_mk_null();
+    while(e->type != BL_VAL_TYPE_LIST_END) {
+       e = read_form(scanner);
+       if(e != NULL) if(e->type != BL_VAL_TYPE_LIST_END) {
+          L->cdr = bl_mk_val(BL_VAL_TYPE_CONS);
+	  L->cdr->car = e;
+	  L->cdr->cdr = NULL;
+	  L = L->cdr;
+       }
+    }
+    return retval;
 }
 
-bl_ast_node_t* bl_parse_sexp(char* sexp) {
-      mpc_result_t   r;
-      bl_ast_node_t* retval = NULL;
-      // TODO - come up with a proper error handling approach
-      if(mpc_parse("input",sexp, Lispy, &r)) {
-         mpc_ast_t* mpc_ast = r.output;
-         
-	 retval = mpc_to_bl(mpc_ast->children[1]);
-         mpc_ast_delete(r.output);
-      } else {
-         mpc_err_print(r.error);
-         mpc_err_delete(r.error);
-         
-      }
-      return retval;
+bl_val_t* read_form(yyscan_t scanner) {
+    bl_token_type_t tok = yylex(scanner);
+    if(tok == 0) return NULL;
+    switch(tok) {
+	case BL_TOKEN_STRING:
+		return bl_mk_str(yyget_text(scanner));
+	break;
+	case BL_TOKEN_LPAREN:
+		return read_list(scanner);
+	break;
+	case BL_TOKEN_RPAREN:
+		return bl_mk_val(BL_VAL_TYPE_LIST_END);
+	break;
+	case BL_TOKEN_FLOAT:
+		return bl_mk_float(atof(yyget_text(scanner)));
+	break;
+	case BL_TOKEN_INTEGER:
+		return bl_mk_number(atoi(yyget_text(scanner)));
+	break;
+	case BL_TOKEN_SYMBOL:
+		return bl_mk_symbol(yyget_text(scanner));
+	break;
+   }
+ 
 }
 
-bl_ast_node_t* bl_parse_file(char* filename, FILE* fd) {
-      mpc_result_t   r;
-      bl_ast_node_t* retval = NULL;
-      if(mpc_parse_file(filename, fd,Lispy, &r)) {
-         mpc_ast_t* mpc_ast = r.output;
-         
-	 retval = mpc_to_bl(mpc_ast);
-         mpc_ast_delete(r.output);
-      } else {
-         mpc_err_print(r.error);
-         mpc_err_delete(r.error);
-         
-      }
-      return retval;
-
+bl_val_t* bl_parse_sexp(char* sexp) {
+   yyscan_t scanner;
+   yylex_init(&scanner);
+   yy_scan_string(sexp,scanner);
+   bl_val_t* retval = read_form(scanner);
+   yylex_destroy(scanner);
+   return retval;
 }
 
-char* bl_ser_ast(bl_ast_node_t* ast) {
-      char* retval = "";
-      switch(ast->node_val.type) {
-         case BL_VAL_TYPE_NULL:
-           retval = (char*)GC_MALLOC(sizeof(char)*5);
-           snprintf(retval, 5, "None");
-         break;
-         case BL_VAL_TYPE_AST_LIST:
-           retval = (char*)GC_MALLOC(sizeof(char)*3);
-           snprintf(retval,2,"(");
-           int i=0;
-           for(i=0; i < ast->child_count; i++) {
-               char* tmpbuf = bl_ser_ast(ast->children[i]);
-               retval = (char*)GC_realloc(retval,strlen(retval)+strlen(tmpbuf)+3);
-               strncat(retval, (const char*)tmpbuf,strlen(tmpbuf));
-               if(i < (ast->child_count-1)) strncat(retval, " ",1);
-           }
-           strncat(retval,")",1);
-         break;
-         case BL_VAL_TYPE_SYMBOL:
-           retval = (char*)GC_MALLOC(sizeof(char)*(strlen(ast->node_val.s_val)+1));
-           snprintf(retval,strlen(ast->node_val.s_val)+1,"%s",ast->node_val.s_val);
-         break;
-         case BL_VAL_TYPE_STRING:
-           retval = (char*)GC_MALLOC(sizeof(char)*(strlen(ast->node_val.s_val)+1));
-           snprintf(retval,strlen(ast->node_val.s_val)+3,"\"%s\"",ast->node_val.s_val);
-         break;
-         case BL_VAL_TYPE_NUMBER:
-           retval = (char*)GC_MALLOC(sizeof(char)*10); // TODO - switch numbers to libgmp
-           snprintf(retval,10,"%llu",ast->node_val.i_val);
-         break;
-	 default:
-
-	 break;
-      }
-      return retval;
+bl_val_t* bl_parse_file(char* filename, FILE* fd) {
+   yyscan_t scanner;
+   yylex_init(&scanner);
+   YY_BUFFER_STATE buf = yy_create_buffer(fd, YY_BUF_SIZE,scanner);
+   yy_switch_to_buffer(buf,scanner);
+   bl_val_t* retval = read_list(scanner);
+   yylex_destroy(scanner);
+   return retval;
 }
 
 char* bl_ser_sexp(bl_val_t* expr) {
@@ -244,48 +169,3 @@ char* bl_ser_naked_sexp(bl_val_t* expr) {
       return retval++;
 }
 
-bl_val_t* bl_read_ast(bl_ast_node_t* ast) {
-      
-      if(ast==NULL) return NULL;
-      bl_val_t* retval = NULL;
-      switch(ast->node_val.type) {
-         case BL_VAL_TYPE_NULL:
-              return NULL;
-	 break;
-	 case BL_VAL_TYPE_SYMBOL:
-              retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-              retval->type = BL_VAL_TYPE_SYMBOL;
-	      retval->s_val = (char*)GC_MALLOC(sizeof(char)*(strlen(ast->node_val.s_val)+1));
-	      snprintf(retval->s_val,strlen(ast->node_val.s_val)+1,"%s",ast->node_val.s_val);
-	      return retval;
-	 break;
-	 case BL_VAL_TYPE_STRING:
-              retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-              retval->type = BL_VAL_TYPE_STRING;
-	      retval->s_val = (char*)GC_MALLOC(sizeof(char)*(strlen(ast->node_val.s_val)+1));
-	      snprintf(retval->s_val,strlen(ast->node_val.s_val)+1,"%s",ast->node_val.s_val);
-	      return retval;
-	 break;
-	 case BL_VAL_TYPE_AST_LIST:
-              retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-              retval->type = BL_VAL_TYPE_CONS;
-              retval->car  = bl_read_ast(ast->children[0]);
-	      retval->cdr  = NULL;
-	      int i=1;
-	      for(i=1; i < ast->child_count; i++) {
-                  retval = bl_list_append(retval, bl_read_ast(ast->children[i]));
-	      }
-	      return retval;
-	 break;
-	 case BL_VAL_TYPE_NUMBER:
-              retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-              retval->type  = BL_VAL_TYPE_NUMBER;
-	      retval->i_val = ast->node_val.i_val;
-	      return retval;
-	 break;
-	 default:
-	      retval = NULL; // TODO - throw an error here or something
-	 break;
-      }
-      return retval;
-}
