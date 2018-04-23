@@ -68,45 +68,14 @@ void bl_set_params(bl_val_t* ctx, bl_val_t* param_names, bl_val_t* param_vals) {
     bl_val_t* argsv_i = param_vals;
     while(argsk_i->cdr != NULL) {
        if(argsk_i->car != NULL) {
-	       bl_ctx_set(ctx, argsk_i->car->s_val, bl_ctx_eval(ctx,argsv_i->car));
+	       bl_ctx_set(ctx, argsk_i->car->s_val, argsv_i->car);
        }
        argsk_i = argsk_i -> cdr;
        argsv_i = argsv_i -> cdr;
     }
     if(argsk_i->car != NULL) {
-       bl_ctx_set(ctx, argsk_i->car->s_val, bl_ctx_eval(ctx,argsv_i->car));
+       bl_ctx_set(ctx, argsk_i->car->s_val, argsv_i->car);
     }
-}
-
-bl_val_t* bl_eval_bloper(bl_val_t* ctx, bl_val_t* oper, bl_val_t* params) {
-    bl_val_t* retval   = NULL;
-    bl_val_t* closure  = bl_ctx_new(ctx);
-    closure->write_to_parent = true;
-
-    bl_val_t* argsk_i  = oper->bl_operargs_ptr;
-    bl_val_t* argsv_i  = params;
-    while(argsk_i->cdr != NULL) {
-       if(argsk_i->car != NULL) {
-     	    bl_ctx_set(closure, argsk_i->car->s_val, argsv_i->car);
-       }
-       argsk_i = argsk_i -> cdr;
-       argsv_i = argsv_i -> cdr;
-    }
-    if(argsk_i->car != NULL) {
-       bl_ctx_set(closure, argsk_i->car->s_val, argsv_i->car);
-    }
-
-    bl_val_t* i = oper->bl_oper_ptr;
-    while(i-> cdr != NULL) {
-       if(i-> car != NULL) {
-          retval = bl_ctx_eval(closure,i->car);
-       }
-       i = i->cdr;
-    }
-    if(i->car != NULL) {
-       retval = bl_ctx_eval(closure,i->car);
-    }
-    return retval;
 }
 
 bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
@@ -131,6 +100,7 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
 bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
     bl_val_t* retval = NULL;
     bool in_func = false;
+    bool in_oper = false;
     while(true) {
 	    if(expr == NULL) return bl_mk_null();
 	    bl_val_t* symval  = NULL;
@@ -158,13 +128,20 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 				break;
 				case BL_VAL_TYPE_FUNC_BL:
 					new_closure = bl_ctx_new(car->lexical_closure);
-					bl_set_params(new_closure,car->bl_funcargs_ptr,expr->cdr);
+					if(bl_list_len(expr) > 1) bl_set_params(new_closure,car->bl_funcargs_ptr,bl_eval_cons(ctx,expr->cdr));
 					ctx = new_closure;
 					expr = car->bl_func_ptr;
 					in_func = true;
 				break;
+				case BL_VAL_TYPE_OPER_BL:
+					ctx = bl_ctx_new(ctx);
+					ctx->write_to_parent = true;
+					expr = car->bl_oper_ptr;
+					in_oper = true;
+				break;
 				default:
 					retval = bl_eval_cons(ctx, expr);
+					if(in_oper) expr = retval->eval_last;
 					if(in_func) return retval->eval_last;
 					return retval;
 				break;
@@ -180,7 +157,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 		   }
 	      break;
 	      default:
-	           return expr;
+		   return expr;
 	      break;
 	   }
     }

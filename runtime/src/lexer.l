@@ -12,7 +12,7 @@ STRING          \"(\\.|[^"\\])*\"
 NUMBER_FLOAT    [0-9]+\.[0-9]+
 NUMBER_INTEGER  [0-9]+ 
 WHITESPACE      [ \t\n\r]
-SYMBOL          [\=\*\-\/\+a-zA-Z0-9]+
+SYMBOL          [\:\=\*\-\/\+a-zA-Z0-9]+
 COMMENT_START   \;
 
 %%
