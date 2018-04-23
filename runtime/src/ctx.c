@@ -25,7 +25,6 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval,    "oper", bl_mk_native_oper(&bl_oper_oper));
    bl_ctx_set(retval,      "eq", bl_mk_native_oper(&bl_oper_eq));
    bl_ctx_set(retval,      "==", bl_mk_native_oper(&bl_oper_eq));
-   bl_ctx_set(retval,      "if", bl_mk_native_oper(&bl_oper_if));
    bl_ctx_set(retval,   "print", bl_mk_native_oper(&bl_oper_print));
    bl_ctx_set(retval,     "and", bl_mk_native_oper(&bl_oper_and));
    bl_ctx_set(retval,     "not", bl_mk_native_oper(&bl_oper_not));
@@ -44,6 +43,7 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval, "True",  bl_mk_bool(true));
    bl_ctx_set(retval, "False", bl_mk_bool(false));
 
+   bl_ctx_set(retval,      "if", bl_mk_val(BL_VAL_TYPE_OPER_IF));
    bl_ctx_set(retval,      "do", bl_mk_val(BL_VAL_TYPE_OPER_DO));
    return retval;
 }
@@ -85,12 +85,14 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
     while(i->cdr != NULL) {
           if(i->car != NULL) {
 		meta = bl_ctx_eval(ctx,i->car);
+		if(meta->type == BL_VAL_TYPE_ERROR) return meta;
 		retval = bl_list_append(retval,meta);
           }
      	  i = i->cdr;
     }
     if(i->car != NULL) {
 		meta = bl_ctx_eval(ctx,i->car);
+		if(meta->type == BL_VAL_TYPE_ERROR) return meta;
 		retval = bl_list_append(retval,meta);
     }
     if(retval) retval->eval_last = meta;
@@ -103,10 +105,13 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
     bool in_oper = false;
     while(true) {
 	    if(expr == NULL) return bl_mk_null();
+	    if(expr->type == BL_VAL_TYPE_ERROR) return expr;
 	    bl_val_t* symval  = NULL;
 	    bl_val_t* car     = NULL;
 	    bl_val_t* retval  = NULL;
 	    bl_val_t* new_closure = NULL;
+	    bl_val_t* cond = NULL;
+	    bl_val_t* args = NULL;
 	    switch(expr->type) {
 	      case BL_VAL_TYPE_CONS:
 		   if(expr->car==NULL) {
@@ -119,16 +124,28 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 				car = expr->car;
 			   }
 			   switch(car->type) {
-				case BL_VAL_TYPE_OPER_NATIVE:
+				case BL_VAL_TYPE_ERROR:
+					return car;
+				break;
+   				case BL_VAL_TYPE_OPER_NATIVE:
 					expr = car->code_ptr(ctx, expr->cdr);
 				break;
 				case BL_VAL_TYPE_OPER_DO:
 					expr = expr->cdr;
 					in_func = true;
 				break;
+				case BL_VAL_TYPE_OPER_IF:
+					cond = bl_ctx_eval(ctx,bl_list_first(expr->cdr));
+					if(cond->i_val == 1) {
+						expr = bl_list_second(expr->cdr);
+					} else {
+						expr = bl_list_third(expr->cdr);
+					}
+				break;
 				case BL_VAL_TYPE_FUNC_BL:
 					new_closure = bl_ctx_new(car->lexical_closure);
-					if(bl_list_len(expr) > 1) bl_set_params(new_closure,car->bl_funcargs_ptr,bl_eval_cons(ctx,expr->cdr));
+					args        = bl_ctx_eval(ctx,expr->cdr);
+					if(bl_list_len(expr) > 1) bl_set_params(new_closure,car->bl_funcargs_ptr,args);
 					ctx = new_closure;
 					expr = car->bl_func_ptr;
 					in_func = true;
@@ -141,6 +158,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 				break;
 				default:
 					retval = bl_eval_cons(ctx, expr);
+					if(retval->type == BL_VAL_TYPE_ERROR) return retval;
 					if(in_oper) expr = retval->eval_last;
 					if(in_func) return retval->eval_last;
 					return retval;

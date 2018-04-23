@@ -137,8 +137,7 @@ char* bl_ser_sexp(bl_val_t* expr) {
 	   retval = (char*)GC_MALLOC(sizeof(char)*6);
 	   snprintf(retval,5,"<ctx>");
 	 case BL_VAL_TYPE_ERROR:
-           retval = (char*)GC_MALLOC(sizeof(char)*10);
-	   snprintf(retval, 9, "<error>");
+           retval = bl_errmsg(expr);
 	 break;
          case BL_VAL_TYPE_SYMBOL:
            retval = (char*)GC_MALLOC(sizeof(char)*(strlen(expr->s_val)+2));

@@ -23,15 +23,16 @@ typedef enum bl_val_type_t {
 	BL_VAL_TYPE_ANY,         // Any type (only used for error handling etc)
         BL_VAL_TYPE_LIST_END,    // used by the parser
 	BL_VAL_TYPE_OPER_DO,     // special form
+	BL_VAL_TYPE_OPER_IF,     // special form
 } bl_val_type_t;
 
 typedef enum bl_err_type_t {
-	BL_ERR_UNKNOWN,            // Generic / unknown error
-	BL_ERR_PARSE,              // Failed to parse an s-expression
-	BL_ERR_INSUFFICIENT_ARGS,  // Not enough arguments were provided
-        BL_ERR_TOOMANY_ARGS,       // Too many arguments were provided
-	BL_ERR_INVALID_ARGTYPE,    // Invalid argument type(s) was/were provided
-	BL_ERR_SYMBOL_NOTFOUND,
+	BL_ERR_UNKNOWN=1,            // Generic / unknown error
+	BL_ERR_PARSE=2,              // Failed to parse an s-expression
+	BL_ERR_INSUFFICIENT_ARGS=3,  // Not enough arguments were provided
+        BL_ERR_TOOMANY_ARGS=4,       // Too many arguments were provided
+	BL_ERR_INVALID_ARGTYPE=5,    // Invalid argument type(s) was/were provided
+	BL_ERR_SYMBOL_NOTFOUND=6,
 } bl_err_type_t;
 
 typedef enum bl_token_type_t {
@@ -99,7 +100,8 @@ typedef struct bl_val_t {
 		// BL_VAL_TYPE_FUNC_BL
 		struct { bl_val_t* bl_func_ptr;
 		         bl_val_t* bl_funcargs_ptr;
-	                 bl_val_t* lexical_closure; };
+	                 bl_val_t* lexical_closure;
+	       		 bl_val_t* sym;	};
 
 		// BL_VAL_TYPE_FUNC_NATIVE
 		struct { bl_val_t* (*func_ptr)(bl_val_t*,bl_val_t*); };

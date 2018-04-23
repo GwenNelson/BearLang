@@ -85,6 +85,7 @@ bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) {
+   params = bl_ctx_eval(ctx, params);
    bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
@@ -157,6 +158,7 @@ bl_val_t* bl_oper_fn(bl_val_t* ctx, bl_val_t* params) {
    retval->bl_funcargs_ptr = bl_list_first(params);
    retval->bl_func_ptr     = bl_list_rest(params);
    retval->lexical_closure = ctx;
+   retval->sym = bl_mk_symbol("anonymous-lambda");
    return retval;
 }
 
@@ -166,9 +168,9 @@ bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) {
    retval->bl_funcargs_ptr = bl_list_second(params);
    retval->bl_func_ptr     = bl_list_rest(bl_list_rest(params)); // the rest of the rest is better than the rest
    retval->lexical_closure = ctx;
+   retval->sym = bl_list_first(params);
 
-   bl_val_t* name = bl_list_first(params);
-   bl_ctx_set(ctx, name->s_val, retval);
+   bl_ctx_set(ctx, retval->sym->s_val, retval);
    return retval;
 }
 
