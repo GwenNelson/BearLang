@@ -22,6 +22,7 @@ typedef enum bl_val_type_t {
 	BL_VAL_TYPE_CTX,         // A context
 	BL_VAL_TYPE_ANY,         // Any type (only used for error handling etc)
         BL_VAL_TYPE_LIST_END,    // used by the parser
+	BL_VAL_TYPE_OPER_DO,     // special form
 } bl_val_type_t;
 
 typedef enum bl_err_type_t {
@@ -65,7 +66,8 @@ struct bl_hash_t {
 
 typedef struct bl_val_t {
         bl_val_type_t type;
-        union {
+	bl_val_t* eval_last; // used by bl_eval_cons
+	union {
 
 		// BL_VAL_TYPE_ERROR
 		struct { bl_err_t err_val; };

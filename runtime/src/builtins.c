@@ -11,7 +11,7 @@
 
 bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 
-   bl_val_t* L=params;
+   bl_val_t* L = bl_eval_cons(ctx,params);
 
    bl_val_t* retval = bl_errif_invalid_len(L,1,BL_LONGEST_LIST);
    if(retval != NULL) return retval;
@@ -130,13 +130,13 @@ bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* i = params;
+   bl_val_t* i = bl_ctx_eval(ctx,params);
    while(i->cdr != NULL) {
       if(i->car != NULL) {
 	 if(i->car->type == BL_VAL_TYPE_STRING) {
             printf("%s",i->car->s_val);
 	 } else {
-     	    printf("%s", bl_ser_naked_sexp(bl_ctx_eval(ctx,i->car)));
+     	    printf("%s", bl_ser_naked_sexp(i->car));
 	 }
       }
       i = i->cdr;
@@ -145,7 +145,7 @@ bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
       if(i->car->type == BL_VAL_TYPE_STRING) {
          printf("%s", i->car->s_val);
       } else {
-  	 printf("%s", bl_ser_naked_sexp(bl_ctx_eval(ctx,i->car)));
+  	 printf("%s", bl_ser_naked_sexp(i->car));
       }
    }
    return bl_mk_null();
@@ -211,26 +211,11 @@ bl_val_t* bl_oper_if(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* then_action = bl_list_second(params);
    bl_val_t* else_action = bl_list_third(params);
    if(cond->i_val == 1) {
-      return bl_ctx_eval(ctx, then_action); 
+      return then_action; 
    } else {
-      if(else_action != NULL) return bl_ctx_eval(ctx, else_action);
+      if(else_action != NULL) return else_action;
    }
    return bl_mk_null();
-}
-
-bl_val_t* bl_oper_do(bl_val_t* ctx, bl_val_t* params) {
-    bl_val_t* retval = NULL;
-    bl_val_t* i = params;
-    while(i-> cdr != NULL) {
-       if(i-> car != NULL) {
-          retval = bl_ctx_eval(ctx,i->car);
-       }
-       i = i->cdr;
-    }
-    if(i->car != NULL) {
-       retval = bl_ctx_eval(ctx,i->car);
-    }
-    return retval; 
 }
 
 bl_val_t* bl_oper_and(bl_val_t* ctx, bl_val_t* params) {
