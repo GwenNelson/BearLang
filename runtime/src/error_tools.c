@@ -87,7 +87,7 @@ bl_val_t* bl_err_symnotfound(char* sym) {
       retval->type     = BL_VAL_TYPE_ERROR;
 
       retval->err_val.type = BL_ERR_SYMBOL_NOTFOUND;
-      retval->err_val.symbol_name = (char*)GC_MALLOC(sizeof(char)*(strlen(sym)+1));
+      retval->err_val.symbol_name = (char*)GC_MALLOC_ATOMIC(sizeof(char)*(strlen(sym)+1));
 
       snprintf(retval->err_val.symbol_name,strlen(sym)+1,"%s",sym);
       return retval;
@@ -141,12 +141,12 @@ char* bl_ser_type(bl_val_type_t t) {
 char* bl_ser_types(uint64_t count, bl_val_type_t* types) {
       int i=0;
       size_t maxlen = sizeof(char)*32*count;
-      char* retbuf = (char*)GC_MALLOC(maxlen);
+      char* retbuf = (char*)GC_MALLOC_ATOMIC(maxlen);
       for(i=0; i<count; i++) {
           char* s = bl_ser_type(types[i]);
           snprintf(retbuf + strlen(retbuf),maxlen,"%s,",s);
       }
-      char* retval = (char*)GC_MALLOC(maxlen+4);
+      char* retval = (char*)GC_MALLOC_ATOMIC(maxlen+4);
       snprintf(retval,maxlen+4,"(%s", retbuf);
       retval[strlen(retval)-1]=')';
       return retval;
@@ -155,7 +155,7 @@ char* bl_ser_types(uint64_t count, bl_val_type_t* types) {
 char* bl_errmsg(bl_val_t* E) {
       // TODO - nested errors - return an error if E is not an error ;)
 
-      char* retval = (char*)GC_MALLOC(sizeof(char)*1024);
+      char* retval = (char*)GC_MALLOC_ATOMIC(sizeof(char)*1024);
 	printf("ERROR %d\n", E->err_val.type);
       switch(E->err_val.type) {
           case BL_ERR_UNKNOWN:

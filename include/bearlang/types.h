@@ -4,6 +4,12 @@
 #include <stdbool.h>
 #include <bearlang/uthash.h>
 
+#undef uthash_malloc
+#undef uthash_free
+
+#define uthash_malloc(sz) GC_MALLOC(sz)
+#define uthash_free(ptr,sz) GC_FREE(ptr)
+
 #define BL_LONGEST_LIST 0xFFFFFFFFFFFFFFFF
 
 typedef enum bl_val_type_t {

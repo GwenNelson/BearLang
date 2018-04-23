@@ -14,14 +14,16 @@ bl_val_t* bl_mk_val(bl_val_type_t type) {
    return retval;
 }
 
+bl_val_t* null_val = NULL;
 bl_val_t* bl_mk_null() {
-   return bl_mk_val(BL_VAL_TYPE_NULL);
+   if(!null_val) null_val = bl_mk_val(BL_VAL_TYPE_NULL);
+   return null_val;
 }
 
 bl_val_t* bl_mk_symbol(char* sym) {
    bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_SYMBOL);
    size_t count     = strlen(sym)*sizeof(char)+1;
-   retval->s_val    = (char*)GC_MALLOC(count);
+   retval->s_val    = (char*)GC_MALLOC_ATOMIC(count);
    snprintf(retval->s_val,count,"%s",sym);
    return retval;
 }
@@ -41,7 +43,7 @@ bl_val_t* bl_mk_float(float f) {
 bl_val_t* bl_mk_str(char* s) {
    bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_STRING);
    size_t count     = strlen(s)*sizeof(char)+1;
-   retval->s_val    = (char*)GC_MALLOC(count);
+   retval->s_val    = (char*)GC_MALLOC_ATOMIC(count);
    snprintf(retval->s_val,count,"%s",s);
    return retval;
 }
@@ -52,14 +54,14 @@ bl_val_t* bl_mk_native_oper(void* func_ptr) {
    return retval;
 }
 
+bl_val_t true_val = {.type = BL_VAL_TYPE_BOOL,
+	             .i_val = 1};
+bl_val_t false_val = {.type = BL_VAL_TYPE_BOOL,
+	              .i_val = 0};
+
 bl_val_t* bl_mk_bool(bool b) {
-   bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_BOOL);
-   if(b==true) {
-     retval->i_val = 1;
-   } else {
-     retval->i_val = 0;
-   }
-   return retval;
+   if(b) return &true_val;
+   return &false_val;
 }
 
 bl_val_t* bl_eval_file(bl_val_t* ctx, char* filename, FILE* fd) {

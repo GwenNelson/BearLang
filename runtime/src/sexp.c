@@ -2,7 +2,7 @@
 #include <bearlang/sexp.h>
 #include <bearlang/list_ops.h>
 #include <bearlang/utils.h>
-
+#include <bearlang/error_tools.h>
 #include <bl_lexer.h>
 #include <stdio.h>
 
@@ -40,7 +40,7 @@ bl_val_t* read_list(yyscan_t scanner) {
 
 char* unescape(char* s) {
     size_t count = strlen(s);
-    char* retval = GC_MALLOC(sizeof(s) * count+1);
+    char* retval = GC_MALLOC_ATOMIC(sizeof(s) * count+1);
     bool slash;
     int i, j;
     for(i=j=0; s[i] != '\0'; i++) {
@@ -69,7 +69,12 @@ char* unescape(char* s) {
     return retval;
 }
 
+bl_val_t if_oper_val  = {.type = BL_VAL_TYPE_OPER_IF};
+bl_val_t do_oper_val  = {.type = BL_VAL_TYPE_OPER_DO};
+bl_val_t end_list_val = {.type = BL_VAL_TYPE_LIST_END};
+
 bl_val_t* read_form(yyscan_t scanner) {
+    char* s = NULL;
     bl_token_type_t tok = yylex(scanner);
     if(tok == 0) return NULL;
     switch(tok) {
@@ -80,7 +85,7 @@ bl_val_t* read_form(yyscan_t scanner) {
 		return read_list(scanner);
 	break;
 	case BL_TOKEN_RPAREN:
-		return bl_mk_val(BL_VAL_TYPE_LIST_END);
+		return &end_list_val;
 	break;
 	case BL_TOKEN_FLOAT:
 		return bl_mk_float(atof(yyget_text(scanner)));
@@ -89,10 +94,12 @@ bl_val_t* read_form(yyscan_t scanner) {
 		return bl_mk_number(atoi(yyget_text(scanner)));
 	break;
 	case BL_TOKEN_SYMBOL:
+		s = yyget_text(scanner);
+		if(strncmp(s,"if",2)==0) return &if_oper_val;
+		if(strncmp(s,"do",2)==0) return &do_oper_val;
 		return bl_mk_symbol(yyget_text(scanner));
 	break;
    }
- 
 }
 
 bl_val_t* bl_parse_sexp(char* sexp) {
@@ -115,44 +122,35 @@ bl_val_t* bl_parse_file(char* filename, FILE* fd) {
 
 char* bl_ser_sexp(bl_val_t* expr) {
       if(expr == NULL) return "";
-      char* retval="";
+      char* retval=GC_MALLOC_ATOMIC(1024);
       char* s="";
       switch(expr->type) {
          case BL_VAL_TYPE_ANY:
-           retval = (char*)GC_MALLOC(sizeof(char)*6);
 	   snprintf(retval,5,"<any>");
 	 break;
          case BL_VAL_TYPE_FUNC_NATIVE:
-           retval = (char*)GC_MALLOC(sizeof(char)*64);
 	   snprintf(retval,32,"<nativefunction>");
          case BL_VAL_TYPE_AST_LIST:
-           retval = (char*)GC_MALLOC(sizeof(char)*10);
 	   snprintf(retval,10,"<astlist>");
 	 break;
 	 case BL_VAL_TYPE_NULL:
-           retval = (char*)GC_MALLOC(sizeof(char)*6);
            snprintf(retval, 5, "None");
          break;
 	 case BL_VAL_TYPE_CTX:
-	   retval = (char*)GC_MALLOC(sizeof(char)*6);
 	   snprintf(retval,5,"<ctx>");
 	 case BL_VAL_TYPE_ERROR:
            retval = bl_errmsg(expr);
 	 break;
          case BL_VAL_TYPE_SYMBOL:
-           retval = (char*)GC_MALLOC(sizeof(char)*(strlen(expr->s_val)+2));
            snprintf(retval,strlen(expr->s_val)+1,"%s",expr->s_val);
          break;
          case BL_VAL_TYPE_STRING:
-           retval = (char*)GC_MALLOC(sizeof(char)*(strlen(expr->s_val)+5));
            snprintf(retval,strlen(expr->s_val)+3,"\"%s\"",expr->s_val);
          break;
          case BL_VAL_TYPE_NUMBER:
-           retval = (char*)GC_MALLOC(sizeof(char)*10); // TODO - switch numbers to libgmp
            snprintf(retval,10,"%llu",expr->i_val);
          break;
 	 case BL_VAL_TYPE_BOOL:
-           retval = (char*)GC_MALLOC(sizeof(char)*10);
            if(expr->i_val == 1) {
               snprintf(retval,10,"True");
 	   } else {
@@ -160,16 +158,12 @@ char* bl_ser_sexp(bl_val_t* expr) {
 	   }
 	 break;
          case BL_VAL_TYPE_FUNC_BL:
-           // TODO - dynamically figure out the length of the string here
-           retval = (char*)GC_MALLOC(1024);
 	   snprintf(retval,1024,"(fn %s %s)",bl_ser_sexp(expr->bl_funcargs_ptr), bl_ser_sexp(expr->bl_func_ptr));
 	 break;
          case BL_VAL_TYPE_OPER_NATIVE:
-           retval = (char*)GC_MALLOC(sizeof(char)*10);
 	   snprintf(retval,5,"OPER");
 	 break;
 	 case BL_VAL_TYPE_CONS:
-           retval = (char*)GC_MALLOC(sizeof(char)*1024);
 	   retval[0]='(';
            if((expr->car == NULL) && (expr->cdr == NULL)) {
      	       snprintf(retval,4,"%s","()");

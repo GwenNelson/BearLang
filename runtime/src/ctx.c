@@ -43,8 +43,6 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval, "True",  bl_mk_bool(true));
    bl_ctx_set(retval, "False", bl_mk_bool(false));
 
-   bl_ctx_set(retval,      "if", bl_mk_val(BL_VAL_TYPE_OPER_IF));
-   bl_ctx_set(retval,      "do", bl_mk_val(BL_VAL_TYPE_OPER_DO));
    return retval;
 }
 
@@ -99,7 +97,7 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
     return retval;
 }
 
-bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
+bl_val_t* _bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
     bl_val_t* retval = NULL;
     bool in_func = false;
     bool in_oper = false;
@@ -128,7 +126,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 					return car;
 				break;
    				case BL_VAL_TYPE_OPER_NATIVE:
-					expr = car->code_ptr(ctx, expr->cdr);
+					return car->code_ptr(ctx, expr->cdr);
 				break;
 				case BL_VAL_TYPE_OPER_DO:
 					expr = expr->cdr;
@@ -181,6 +179,14 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
     }
 }
 
+bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
+   bl_val_t* retval=NULL;
+   GC_disable();
+   retval = _bl_ctx_eval(ctx,expr);
+   GC_enable();
+   return retval;
+}
+
 bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
    if(ctx->secondary != NULL) {
       bl_val_t* s_V = bl_ctx_get(ctx->secondary, key);
@@ -199,6 +205,7 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
    } else {
       return val->val;
    }
+   return NULL;
 }
 
 bl_val_t* bl_ctx_set(bl_val_t* ctx, char* key, bl_val_t* val) {
