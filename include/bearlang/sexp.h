@@ -1,8 +1,10 @@
 #pragma once
 
+#include <stdio.h>
+
 #include <bearlang/types.h>
 #include <bearlang/common.h>
-#include <bearlang/mpc.h>
+
 
 void bl_init_parser(); // prepare the parser for use, called by bl_init()
 

@@ -558,7 +558,7 @@ int main(int argc, char** argv) {
     TEST("or operator                                ", test_or_oper)
     TEST("xor operator                               ", test_or_oper)
     TEST("list operators                             ", test_list_opers)
-    TEST("parse a string via MPC                     ", test_parse_string)
+    TEST("parse a string                             ", test_parse_string)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
