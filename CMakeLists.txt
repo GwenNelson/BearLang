@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
-set(CMAKE_C_FLAGS "-DREDIRECT_MALLOC=GC_malloc -DIGNORE_FREE")
+add_compile_options("-DHASH_FUNCTION=HASH_OAT")
+add_compile_options("-O3")
 
 #include(CodeCoverage)
 

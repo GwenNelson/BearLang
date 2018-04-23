@@ -128,7 +128,10 @@ char* bl_ser_sexp(bl_val_t* expr) {
          case BL_VAL_TYPE_ANY:
 	   snprintf(retval,5,"<any>");
 	 break;
-         case BL_VAL_TYPE_FUNC_NATIVE:
+         case BL_VAL_TYPE_OPER_IF:
+	   snprintf(retval,3,"if");
+	 break;
+	 case BL_VAL_TYPE_FUNC_NATIVE:
 	   snprintf(retval,32,"<nativefunction>");
          case BL_VAL_TYPE_AST_LIST:
 	   snprintf(retval,10,"<astlist>");

@@ -8,7 +8,13 @@
 #undef uthash_free
 
 #define uthash_malloc(sz) GC_MALLOC(sz)
-#define uthash_free(ptr,sz) GC_FREE(ptr)
+#define uthash_free(ptr,sz) 
+
+#undef HASH_INITIAL_NUM_BUCKETS
+#undef HASH_INITIAL_NUM_BUCKETS_LOG2
+
+#define HASH_INITIAL_NUM_BUCKETS 64U
+#define HASH_INITIAL_NUM_BUCKETS_LOG2 6U
 
 #define BL_LONGEST_LIST 0xFFFFFFFFFFFFFFFF
 

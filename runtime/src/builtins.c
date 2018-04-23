@@ -23,7 +23,6 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
       first  = bl_list_first(params);
    }
 
-
    if(first->type == BL_VAL_TYPE_NUMBER) {
       retval = bl_mk_number(0);
    } else {
@@ -45,9 +44,8 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 	   } else {
              s = bl_ser_naked_sexp(x);
 	     c = strlen(s) + strlen(retval->s_val)+5;
-             buf = GC_MALLOC(c);
-             snprintf(buf,c,"%s%s", retval->s_val,s);
-	     retval->s_val = buf; 
+             retval->s_val = GC_REALLOC(retval->s_val,c);
+             snprintf(retval->s_val,c,"%s%s", retval->s_val,s);
 	   }
 	}
 	L = L->cdr;
@@ -59,9 +57,9 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 	   } else {
              s = bl_ser_naked_sexp(x);
 	     c = strlen(s) + strlen(retval->s_val)+5;
-             buf = GC_MALLOC(c);
-             snprintf(buf,c,"%s%s", retval->s_val,s);
-	     retval->s_val = buf; 
+             retval->s_val = GC_REALLOC(retval->s_val,c);
+             snprintf(retval->s_val,c,"%s%s", retval->s_val,s);
+
 	   }
    }
    return retval;

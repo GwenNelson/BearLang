@@ -5,77 +5,118 @@
 
 #include <bearlang/common.h>
 #include <bearlang/types.h>
-#include <bearlang/utils.h>
-#include <bearlang/list_ops.h>
 #include <bearlang/sexp.h>
+#include <bearlang/list_ops.h>
+#include <bearlang/error_tools.h>
+#include <bearlang/ctx.h>
+#include <bearlang/utils.h>
+#include <bearlang/builtins.h>
 
-#include <bl_lexer.h>
+bl_val_t n_symbol = {.type  = BL_VAL_TYPE_SYMBOL,
+	             .s_val = "n"};
 
-bl_val_t* read_form(yyscan_t scanner);
 
-bl_val_t* read_list(yyscan_t scanner) {
-    bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_CONS);
-    retval->car = read_form(scanner);
-    retval->cdr = NULL;
+bl_val_t a_symbol = {.type  = BL_VAL_TYPE_SYMBOL,
+	             .s_val = "a"};
 
-    bl_val_t* L = retval;
-    bl_val_t* e = bl_mk_null();
-    while(e->type != BL_VAL_TYPE_LIST_END) {
-       e = read_form(scanner);
-       if(e->type != BL_VAL_TYPE_LIST_END) {
-          L->cdr = bl_mk_val(BL_VAL_TYPE_CONS);
-	  L->cdr->car = e;
-	  L->cdr->cdr = NULL;
-	  L = L->cdr;
-       }
-    }
-    return retval;
-}
+bl_val_t cons_wrapped_a = {.type = BL_VAL_TYPE_CONS,
+	                          .car  = &a_symbol};
 
-// TODO - make this read from strings, and then replace mpc
+bl_val_t fac1_funcargs_ptr = {.type = BL_VAL_TYPE_CONS,
+	                      .car  = &n_symbol,
+                              .cdr  = &cons_wrapped_a};
 
-bl_val_t* read_form(yyscan_t scanner) {
-    bl_token_type_t tok = yylex(scanner);
-    if(tok == 0) return NULL;
-    switch(tok) {
-	case BL_TOKEN_STRING:
-		return bl_mk_str(yyget_text(scanner));
-	break;
-	case BL_TOKEN_LPAREN:
-		return read_list(scanner);
-	break;
-	case BL_TOKEN_RPAREN:
-		return bl_mk_val(BL_VAL_TYPE_LIST_END);
-	break;
-	case BL_TOKEN_FLOAT:
-		return bl_mk_float(atof(yyget_text(scanner)));
-	break;
-	case BL_TOKEN_INTEGER:
-		return bl_mk_number(atoi(yyget_text(scanner)));
-	break;
-	case BL_TOKEN_SYMBOL:
-		return bl_mk_symbol(yyget_text(scanner));
-	break;
-   }
- 
-}
+bl_val_t if_oper = {.type = BL_VAL_TYPE_OPER_IF};
+
+bl_val_t eq_symbol = {.type  = BL_VAL_TYPE_OPER_NATIVE,
+	              .code_ptr = &bl_oper_eq};
+
+bl_val_t number_1 = {.type = BL_VAL_TYPE_NUMBER,
+	             .i_val = 1};
+
+bl_val_t cons_single_1 = {.type = BL_VAL_TYPE_CONS,
+	                  .car  = &number_1};
+
+bl_val_t n1_statement = {.type = BL_VAL_TYPE_CONS,
+	                 .car  = &n_symbol,
+			 .cdr  = &cons_single_1};
+
+bl_val_t eq_n1_statement = {.type = BL_VAL_TYPE_CONS,
+	                    .car  = &eq_symbol,
+                            .cdr  = &n1_statement};
+
+
+
+bl_val_t sym_minus = {.type  = BL_VAL_TYPE_OPER_NATIVE,
+	              .code_ptr = &bl_oper_sub};
+
+bl_val_t cons_n_minus1 = {.type = BL_VAL_TYPE_CONS,
+	                  .car  = &sym_minus,
+                          .cdr  = &n1_statement};
+
+bl_val_t sym_mult = {.type = BL_VAL_TYPE_OPER_NATIVE,
+	             .code_ptr = &bl_oper_mult};
+
+bl_val_t cons_mult_na = {.type = BL_VAL_TYPE_CONS,
+	                 .car  = &sym_mult,
+                         .cdr  = &fac1_funcargs_ptr};
+
+bl_val_t cons_cons_mult_na = {.type = BL_VAL_TYPE_CONS,
+	                      .car  = &cons_mult_na,
+			      };
+
+bl_val_t cons_cons_n_minus1 = {.type = BL_VAL_TYPE_CONS,
+	                       .car  = &cons_n_minus1,
+                               .cdr  = &cons_cons_mult_na};
+
+bl_val_t fac1;
+
+bl_val_t cons_if_else_fac = {.type = BL_VAL_TYPE_CONS,
+	                     .car  = &fac1,
+                             .cdr  = &cons_cons_n_minus1};
+
+bl_val_t cons_cons_if_else_fac = {.type = BL_VAL_TYPE_CONS,
+	                          .car  = &cons_if_else_fac,
+                                  .cdr  = NULL};
+
+bl_val_t cons_if_then_a = {.type = BL_VAL_TYPE_CONS,
+	                   .car  = &a_symbol,
+                           .cdr  = &cons_cons_if_else_fac};
+
+bl_val_t eq_n1_cons = {.type = BL_VAL_TYPE_CONS,
+	               .car  = &eq_n1_statement,
+                       .cdr  = &cons_if_then_a};
+
+bl_val_t if_statement = {.type = BL_VAL_TYPE_CONS,
+	                 .car  = &if_oper,
+                         .cdr  = &eq_n1_cons};
+
+bl_val_t fac1_funcptr = {.type = BL_VAL_TYPE_CONS,
+	                 .car  = &if_statement}; 
+
+bl_val_t eval_ctx = {.type = BL_VAL_TYPE_CTX};
+
+bl_val_t fac1 = {.type=BL_VAL_TYPE_FUNC_BL,
+                 .bl_func_ptr     = &fac1_funcptr,
+                 .bl_funcargs_ptr = &fac1_funcargs_ptr,
+                 .lexical_closure = &eval_ctx,
+	         .sym             = NULL};
+
+bl_val_t number_input = {.type = BL_VAL_TYPE_NUMBER,
+	              .i_val = 50};
+
+bl_val_t params_cons = {.type = BL_VAL_TYPE_CONS,
+	                .car  = &number_input,
+			.cdr  = &cons_single_1};
+
+bl_val_t run_expr = {.type = BL_VAL_TYPE_CONS,
+	             .car  = &fac1,
+		     .cdr  = &params_cons};
 
 int main(int argc, char** argv) {
-    GC_INIT();
     bl_init();
-    char* test_str = "(* \"hello, i am a string\" 123 ; i am a commented out bit (69) \n 4.5)";
 
-    yyscan_t scanner;
-    yylex_init(&scanner);
-
-    bl_val_t* E=bl_mk_null();
-
-    yy_scan_string(test_str, scanner);
-
-    while((E = read_form(scanner))) {
-        printf("%s\n",bl_ser_sexp(E));
-    }
-    yylex_destroy(scanner);
-    return 0;
+    bl_val_t* resp = bl_ctx_eval(&eval_ctx,&run_expr);
+    printf("%llu", resp->i_val);
 
 }

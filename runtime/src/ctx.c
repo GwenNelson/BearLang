@@ -97,7 +97,7 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
     return retval;
 }
 
-bl_val_t* _bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
+bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
     bl_val_t* retval = NULL;
     bool in_func = false;
     bool in_oper = false;
@@ -179,13 +179,6 @@ bl_val_t* _bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
     }
 }
 
-bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
-   bl_val_t* retval=NULL;
-   GC_disable();
-   retval = _bl_ctx_eval(ctx,expr);
-   GC_enable();
-   return retval;
-}
 
 bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
    if(ctx->secondary != NULL) {
@@ -210,12 +203,19 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
 
 bl_val_t* bl_ctx_set(bl_val_t* ctx, char* key, bl_val_t* val) {
    if(ctx->parent != NULL) {
-      if(ctx->write_to_parent) return bl_ctx_set(ctx->parent, key, val);
+      if(ctx->write_to_parent) ctx = ctx->parent;
    }
-   struct bl_hash_t* ht_val = (struct bl_hash_t*)GC_MALLOC(sizeof(struct bl_hash_t));
-   snprintf(ht_val->key,32,"%s",key);
-   ht_val->val = val;
-   struct bl_hash_t* ignored = NULL;
-   HASH_REPLACE_STR(ctx->hash_val,key,ht_val,ignored);
+
+   struct bl_hash_t* cur_val = NULL;
+   HASH_FIND_STR(ctx->hash_val, key, cur_val);
+   if(!cur_val) {
+           struct bl_hash_t* ht_val = (struct bl_hash_t*)GC_MALLOC(sizeof(struct bl_hash_t));
+           snprintf(ht_val->key,32,"%s",key);
+           ht_val->val = val;
+     	   HASH_ADD_STR(ctx->hash_val, key, ht_val);
+   } else {
+      cur_val->val = val;
+   }
+
    return val;
 }

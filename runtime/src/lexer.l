@@ -1,10 +1,15 @@
 %{
 #include <stdio.h>
 #include <bearlang/types.h>
+#include <bearlang/common.h>
 %}
 
 %option reentrant
 %option yylineno
+%option noyyalloc
+%option noyyrealloc
+%option noyyfree
+
 
 LEFT_PAREN      "("
 RIGHT_PAREN     ")"
@@ -27,3 +32,15 @@ COMMENT_START   \;
 {SYMBOL}           { return BL_TOKEN_SYMBOL; }
 
 %%
+
+void* yyalloc(size_t bytes, void* yyscanner) {
+      return GC_MALLOC(bytes);
+}
+
+void* yyrealloc(void* ptr, size_t bytes, void* yyscanner) {
+      return GC_REALLOC(ptr, bytes);
+}
+
+void yyfree(void* ptr, void* yyscanner) {
+     GC_FREE(ptr);
+}
