@@ -556,7 +556,7 @@ int main(int argc, char** argv) {
     TEST("and operator                               ", test_and_oper)
     TEST("not operator                               ", test_not_oper)
     TEST("or operator                                ", test_or_oper)
-    TEST("xor operator                               ", test_or_oper)
+    TEST("xor operator                               ", test_xor_oper)
     TEST("list operators                             ", test_list_opers)
     TEST("parse a string                             ", test_parse_string)
 
