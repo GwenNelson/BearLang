@@ -525,6 +525,19 @@ int test_parse_string() {
     return 0;
 }
 
+int test_eval_file() {
+    char* tmpfile = "/tmp/bearlang-test.bl";
+    FILE* fd = fopen(tmpfile,"w");
+    fprintf(fd,"True\n");
+    fclose(fd);
+    fd = fopen(tmpfile,"r");
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* eval_result = bl_eval_file(ctx,tmpfile,fd);
+    fclose(fd);
+    ASSERT("Successfully evaluated file",  eval_result->car->i_val==1)
+    return 0;
+}
+
 int main(int argc, char** argv) {
     GC_INIT();
     int passed_tests = 0;
@@ -559,6 +572,7 @@ int main(int argc, char** argv) {
     TEST("xor operator                               ", test_xor_oper)
     TEST("list operators                             ", test_list_opers)
     TEST("parse a string                             ", test_parse_string)
+    TEST("evaluate file                              ", test_eval_file)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
