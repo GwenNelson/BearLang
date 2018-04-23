@@ -171,26 +171,26 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
 }
 
 bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
-    bl_val_t* retval = bl_mk_null();
-    if(expr == NULL) return retval;
-    bl_val_t* symval = NULL;
-    switch(expr->type) {
-      case BL_VAL_TYPE_CONS:
-           retval = bl_eval_cons(ctx, expr);
-      break;
-      case BL_VAL_TYPE_SYMBOL:
-           symval = bl_ctx_get(ctx, expr->s_val);
-           if(symval == NULL) {
-              retval = bl_err_symnotfound(expr->s_val);
-	   } else {
-              retval = bl_ctx_eval(ctx,symval);
+    while(true) {
+	    if(expr == NULL) return bl_mk_null();
+	    bl_val_t* symval = NULL;
+	    switch(expr->type) {
+	      case BL_VAL_TYPE_CONS:
+	           return bl_eval_cons(ctx, expr);
+	      break;
+	      case BL_VAL_TYPE_SYMBOL:
+	           symval = bl_ctx_get(ctx, expr->s_val);
+	           if(symval == NULL) {
+	              return bl_err_symnotfound(expr->s_val);
+		   } else {
+	              expr = bl_ctx_eval(ctx,symval);
+		   }
+	      break;
+	      default:
+	           return expr;
+	      break;
 	   }
-      break;
-      default:
-           retval = expr;
-      break;
-   }
-   return retval;
+    }
 }
 
 bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
