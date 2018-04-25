@@ -103,7 +103,7 @@ bl_val_t fac1 = {.type=BL_VAL_TYPE_FUNC_BL,
 	         .sym             = NULL};
 
 bl_val_t number_input = {.type = BL_VAL_TYPE_NUMBER,
-	              .i_val = 50};
+	              .i_val = 16};
 
 bl_val_t params_cons = {.type = BL_VAL_TYPE_CONS,
 	                .car  = &number_input,
