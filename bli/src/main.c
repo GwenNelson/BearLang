@@ -9,14 +9,23 @@
 #include <bearlang/ctx.h>
 #include <bearlang/error_tools.h>
 #include <bearlang/utils.h>
+#include <bearlang/list_ops.h>
 
 #include <readline/readline.h>
 
-void run_file(char* filename) {
+void run_file(char* filename, int argc, char** argv) {
      bl_val_t* STDLIB_CTX = bl_ctx_new_std();
      bl_val_t* FILE_CTX   = bl_ctx_new(STDLIB_CTX);
 
      bl_ctx_set(FILE_CTX, "*MAINFILE*", bl_mk_str(basename(filename)));
+     bl_ctx_set(FILE_CTX, "*ARGC*",     bl_mk_number(argc));
+
+     int i=0;
+     bl_val_t* argv_cons = NULL;
+     for(i=0; i<argc; i++) {
+         argv_cons = bl_list_append(argv_cons, bl_mk_str(argv[i]));
+     }
+     bl_ctx_set(FILE_CTX, "*ARGV*", argv_cons);
 
      FILE* fd = fopen(filename,"r");
 
@@ -34,7 +43,7 @@ int main(int argc, char** argv) {
 
     if(argc==2) {
        char* filename = argv[1];
-       run_file(filename);
+       run_file(filename,argc-1,argv+1);
        return 0;
     }
 

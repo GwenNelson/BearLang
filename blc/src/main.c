@@ -15,21 +15,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-LLVMTypeRef bl_val_t_cons;
+FILE* output_fd=NULL;
 
-LLVMModuleRef create_module(const char* mod_name) {
+/*LLVMModuleRef create_module(const char* mod_name) {
    LLVMModuleRef retval = LLVMModuleCreateWithName(mod_name);
-   
    return retval;
 }
 
-bl_val_t* get_code(char* filename) {
-   fprintf(stderr,"Reading from %s\n", filename);
-   FILE* fd = fopen(filename,"r");
-   bl_val_t* retval = bl_parse_file(filename,fd);
-   fclose(fd);
-   return retval;
-}
 
 void handle_toplevel(LLVMModuleRef mod, bl_val_t* E) {
      // for now naively assume all toplevels are functions
@@ -50,7 +42,53 @@ void handle_toplevel(LLVMModuleRef mod, bl_val_t* E) {
      LLVMValueRef tmp = LLVMGetParam(main, 0);
 
 
+
      LLVMBuildRet(builder, tmp);
+     LLVMDisposeBuilder(builder);
+}*/
+
+typedef enum c_types_t {
+     C_INT,
+     C_2D_CHAR_ARRAY,
+} c_types_t;
+
+const char* c_type_to_str(c_types_t T) {
+      switch(T) {
+         case C_INT:
+              return "int";
+	 break;
+	 case C_2D_CHAR_ARRAY:
+	      return "char**";
+	 break;
+	 default:
+	      return "";
+	 break;
+      }
+}
+
+void generate_c_func(char* func_name, c_types_t* arg_types, char** arg_names, c_types_t ret_type) {
+     while(arg_names) {
+
+     }
+}
+
+void handle_toplevel(bl_val_t* E) {
+     bl_val_t* func_name = bl_list_second(E);
+     bl_val_t* func_args = bl_list_third(E);
+     bl_val_t* func_body = bl_list_rest(bl_list_rest(bl_list_rest(E)));
+     printf("Generating function %s with args %s and %llu expressions\n", bl_ser_sexp(func_name),
+		                                                          bl_ser_sexp(func_args),
+							                  bl_list_len(func_body));
+
+}
+
+
+bl_val_t* get_code(char* filename) {
+   fprintf(stderr,"Reading from %s\n", filename);
+   FILE* fd = fopen(filename,"r");
+   bl_val_t* retval = bl_parse_file(filename,fd);
+   fclose(fd);
+   return retval;
 }
 
 int main(int argc, char** argv) {
@@ -60,21 +98,26 @@ int main(int argc, char** argv) {
     char* filename = argv[1];
 
     bl_val_t* code = get_code(filename);
-    LLVMModuleRef mod = create_module(filename);
+//    LLVMModuleRef mod = create_module(filename);
     bl_val_t* L = code;
 
+    char output_filename[1024];
+    snprintf(output_filename,1024,"%s.c", filename);
+
+    output_fd = fopen(output_filename,"w");
+
     while(L->car != NULL) {
-      handle_toplevel(mod,L->car);
+      handle_toplevel(L->car);
       L = L->cdr;
       if(L==NULL) break;
     }
 
 
-    char *error = NULL;
+/*    char *error = NULL;
     LLVMVerifyModule(mod, LLVMAbortProcessAction, &error);
-    LLVMDisposeMessage(error);
+    LLVMDisposeMessage(error);*/
 
-    LLVMExecutionEngineRef engine;
+/*    LLVMExecutionEngineRef engine;
     error = NULL;
     LLVMLinkInMCJIT();
     LLVMInitializeNativeTarget();
@@ -88,16 +131,14 @@ int main(int argc, char** argv) {
         fprintf(stderr, "error: %s\n", error);
         LLVMDisposeMessage(error);
         exit(EXIT_FAILURE);
-    }
+    }*/
 
 
     // Write out bitcode to file
-    if (LLVMWriteBitcodeToFile(mod, "output.bc") != 0) {
+/*    if (LLVMWriteBitcodeToFile(mod, "output.bc") != 0) {
         fprintf(stderr, "error writing bitcode to file, skipping\n");
-    }
+    }*/
 
-//    LLVMDisposeBuilder(builder);
-    LLVMDisposeExecutionEngine(engine);
 
     return 0;
 }

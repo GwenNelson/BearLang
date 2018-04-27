@@ -101,9 +101,6 @@ char* bl_ser_type(bl_val_type_t t) {
          case BL_VAL_TYPE_ERROR:
 	      return "ERROR";
 	 break;
-	 case BL_VAL_TYPE_AST_LIST:
-	      return "AST_LIST";
-	 break;
 	 case BL_VAL_TYPE_SYMBOL:
 	      return "SYMBOL";
 	 break;
