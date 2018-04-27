@@ -19,23 +19,22 @@
 #define BL_LONGEST_LIST 0xFFFFFFFFFFFFFFFF
 
 typedef enum bl_val_type_t {
-        BL_VAL_TYPE_NULL,        // The None or NULL type
-        BL_VAL_TYPE_ERROR,       // Error / exception - if this is returned anywhere, something went wrong
-	BL_VAL_TYPE_AST_LIST,    // A list from the AST
-        BL_VAL_TYPE_SYMBOL,      // A BearLang symbol
-        BL_VAL_TYPE_NUMBER,      // A number
-	BL_VAL_TYPE_BOOL,        // A boolean value
-        BL_VAL_TYPE_STRING,      // A string
-	BL_VAL_TYPE_CONS,        // A cons cell (or a list)
-        BL_VAL_TYPE_OPER_NATIVE, // A native-code operator
-	BL_VAL_TYPE_OPER_BL,     // A BearLang-code operator
-	BL_VAL_TYPE_FUNC_BL,     // A BearLang-code function (uncompiled)
-        BL_VAL_TYPE_FUNC_NATIVE, // A native-code function
-	BL_VAL_TYPE_CTX,         // A context
-	BL_VAL_TYPE_ANY,         // Any type (only used for error handling etc)
-        BL_VAL_TYPE_LIST_END,    // used by the parser
-	BL_VAL_TYPE_OPER_DO,     // special form
-	BL_VAL_TYPE_OPER_IF,     // special form
+        BL_VAL_TYPE_NULL=1,         // The None or NULL type
+        BL_VAL_TYPE_ERROR=2,        // Error / exception - if this is returned anywhere, something went wrong
+        BL_VAL_TYPE_SYMBOL=3,       // A BearLang symbol
+        BL_VAL_TYPE_NUMBER=4,       // A number
+	BL_VAL_TYPE_BOOL=5,         // A boolean value
+        BL_VAL_TYPE_STRING=6,       // A string
+	BL_VAL_TYPE_CONS=7,         // A cons cell (or a list)
+        BL_VAL_TYPE_OPER_NATIVE=8,  // A native-code operator
+	BL_VAL_TYPE_OPER_BL=9,      // A BearLang-code operator
+	BL_VAL_TYPE_FUNC_BL=10,     // A BearLang-code function (uncompiled)
+        BL_VAL_TYPE_FUNC_NATIVE=11, // A native-code function
+	BL_VAL_TYPE_CTX=12,         // A context
+	BL_VAL_TYPE_ANY=13,         // Any type (only used for error handling etc)
+        BL_VAL_TYPE_LIST_END=14,    // used by the parser
+	BL_VAL_TYPE_OPER_DO=15,     // special form
+	BL_VAL_TYPE_OPER_IF=16,     // special form
 } bl_val_type_t;
 
 typedef enum bl_err_type_t {
