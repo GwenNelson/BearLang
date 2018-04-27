@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
     GC_INIT();
     bl_init();
 
-    if(argc==2) {
+    if(argc>=2) {
        char* filename = argv[1];
        run_file(filename,argc-1,argv+1);
        return 0;

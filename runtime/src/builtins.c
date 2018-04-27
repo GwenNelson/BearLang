@@ -257,16 +257,19 @@ bl_val_t* bl_oper_first(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_second(bl_val_t* ctx, bl_val_t* params) {
+   if(bl_list_len(params)==1) params = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* retval = bl_list_second(params);
    return retval;
 }
 
 bl_val_t* bl_oper_third(bl_val_t* ctx, bl_val_t* params) {
+   if(bl_list_len(params)==1) params = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* retval = bl_list_third(params);
    return retval;
 }
 
 bl_val_t* bl_oper_rest(bl_val_t* ctx, bl_val_t* params) {
+   if(bl_list_len(params)==1) params = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* retval = bl_list_rest(params);
    return retval;
 }
