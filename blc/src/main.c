@@ -20,17 +20,30 @@ LLVMTypeRef bl_str_struct;
 LLVMTypeRef bl_null_struct;
 LLVMTypeRef bl_char_str;
 
+void add_bl_init(LLVMModuleRef mod) {
+     LLVMTypeRef param_types[] = {};
+     LLVMTypeRef ret_type = LLVMFunctionType(LLVMVoidType(), param_types, 0, 0);
+     
+     LLVMAddFunction(mod, "bl_init", ret_type);
+}
+
+void add_ctx_new_std(LLVMModuleRef mod) {
+     LLVMTypeRef param_types[] = {};
+     LLVMTypeRef ret_type = LLVMFunctionType(bl_null_struct, param_types, 0, 0);
+     
+     LLVMAddFunction(mod, "bl_ctx_new_std", ret_type);
+}
+
 void add_ctx_eval(LLVMModuleRef mod) {
-     LLVMTypeRef param_types[] = {LLVMPointerType(LLVMStructType(NULL,0,0),0),
-                                  LLVMPointerType(LLVMStructType(NULL,0,0),0)};
-     LLVMTypeRef ret_type = LLVMFunctionType(LLVMPointerType(LLVMStructType(NULL,0,0),0), param_types, 2, 0);
+     LLVMTypeRef param_types[] = {bl_null_struct, bl_null_struct};
+     LLVMTypeRef ret_type = LLVMFunctionType(bl_null_struct, param_types, 2, 0);
      
      LLVMAddFunction(mod, "bl_ctx_eval", ret_type);
 }
 
 void add_mk_list(LLVMModuleRef mod) {
      LLVMTypeRef param_types[] =  {LLVMInt32Type()};
-     LLVMTypeRef ret_type      =  LLVMFunctionType(LLVMInt64Type(), param_types, 1, 1);
+     LLVMTypeRef ret_type      =  LLVMFunctionType(bl_null_struct, param_types, 1, 1);
      printf("mk_list: %s\n", LLVMPrintValueToString(LLVMAddFunction(mod, "bl_mk_list", ret_type)));
 }
 
@@ -43,7 +56,7 @@ void add_mk_symbol(LLVMModuleRef mod) {
 
 void add_mk_str(LLVMModuleRef mod) {
      LLVMTypeRef param_types[] = {LLVMPointerType(LLVMInt8Type(),0)};
-     LLVMTypeRef ret_type = LLVMFunctionType(LLVMPointerType(LLVMStructType(NULL,0,0),0), param_types, 1, 0);
+     LLVMTypeRef ret_type = LLVMFunctionType(bl_null_struct, param_types, 1, 0);
      
      LLVMAddFunction(mod, "bl_mk_str", ret_type);
 }
@@ -61,6 +74,9 @@ LLVMModuleRef create_module(const char* mod_name) {
    bl_str_struct = LLVMStructType(s_members,3,0);
 
    // declare the parts of the BearLang API that we need to use
+   add_bl_init(retval);
+   add_ctx_new_std(retval);
+//   add_ctx_new(retval);
    add_ctx_eval(retval); 
    add_mk_list(retval);
    add_mk_symbol(retval);
@@ -77,23 +93,7 @@ bl_val_t* get_code(char* filename) {
    return retval;
 }
 
-LLVMValueRef llvmGenLocalStringVar(LLVMModuleRef mod, const char* data, int len)
-{
-  LLVMValueRef glob = LLVMAddGlobal(mod, LLVMArrayType(LLVMInt8Type(), len), "");
-
-  // set as internal linkage and constant
-  LLVMSetLinkage(glob, LLVMInternalLinkage);
-  LLVMSetGlobalConstant(glob, 1);
-
-  // Initialize with string:
-  LLVMSetInitializer(glob, LLVMConstString(data, len, 1));
-
-
-
-  return glob;
-}
-
-void write_expr(LLVMModuleRef mod, LLVMBuilderRef builder, bl_val_t* E) {
+void write_expr(LLVMModuleRef mod, LLVMValueRef ctx, LLVMBuilderRef builder, bl_val_t* E) {
      uint64_t expr_len = bl_list_len(E);
      LLVMValueRef *contents = GC_MALLOC(sizeof(LLVMValueRef)*(expr_len+1));
      int i=0;
@@ -102,13 +102,15 @@ void write_expr(LLVMModuleRef mod, LLVMBuilderRef builder, bl_val_t* E) {
      LLVMValueRef mk_params[1];
      for(i=1; i< (expr_len+1); i++) {
            mk_params[0] = LLVMBuildGlobalStringPtr(builder,L->car->s_val,"");
-    	     contents[1] = LLVMBuildCall(builder,LLVMGetNamedFunction(mod,"bl_mk_symbol"),mk_params,1,"");
+    	   contents[i] = LLVMBuildCall(builder,LLVMGetNamedFunction(mod,"bl_mk_symbol"),mk_params,1,"");
          L=L->cdr;
      }
 
      LLVMValueRef expr_list = LLVMBuildCall(builder,LLVMGetNamedFunction(mod,"bl_mk_list"),
-		                                    contents,expr_len,"");
-     LLVMValueRef eval_params[] = {expr_list};
+		                                    contents,expr_len+1,"");
+     LLVMValueRef eval_params[] = {ctx,expr_list};
+     LLVMBuildCall(builder, LLVMGetNamedFunction(mod,"bl_ctx_eval"),
+			                            eval_params,2,"");
      LLVMDumpModule(mod);
 
 }
@@ -125,16 +127,19 @@ void handle_toplevel(LLVMModuleRef mod, bl_val_t* E) {
      LLVMTypeRef ret_type      = LLVMFunctionType(LLVMInt32Type(), param_types, 2, 0);
      LLVMValueRef main         = LLVMAddFunction(mod, "main", ret_type);
 
-     LLVMBasicBlockRef entry = LLVMAppendBasicBlock(main, "entry");
+     LLVMBasicBlockRef entry = LLVMAppendBasicBlock(main, "");
 
      LLVMBuilderRef builder = LLVMCreateBuilder();
      LLVMPositionBuilderAtEnd(builder, entry);
      LLVMValueRef tmp = LLVMGetParam(main, 0);
 
+     LLVMBuildCall(builder, LLVMGetNamedFunction(mod, "bl_init"), NULL,0,"");
+     LLVMValueRef ctx = LLVMBuildCall(builder, LLVMGetNamedFunction(mod, "bl_ctx_new_std"), NULL, 0, "");
+
      bl_val_t* L = func_body;
      while(L->car != NULL) {
      LLVMPositionBuilderAtEnd(builder, entry);
-       	     write_expr(mod,builder,L->car);
+       	     write_expr(mod,ctx,builder,L->car);
       L = L->cdr;
       if(L==NULL) break;
      }
