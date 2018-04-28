@@ -15,10 +15,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <unistd.h>
+#include <errno.h>
 
 LLVMTypeRef bl_str_struct;
 LLVMTypeRef bl_null_struct;
 LLVMTypeRef bl_char_str;
+
+static int verbose = 0;
 
 void add_bl_init(LLVMModuleRef mod) {
      LLVMTypeRef param_types[] = {};
@@ -34,6 +38,14 @@ void add_ctx_new_std(LLVMModuleRef mod) {
      LLVMAddFunction(mod, "bl_ctx_new_std", ret_type);
 }
 
+
+void add_ctx_new(LLVMModuleRef mod) {
+     LLVMTypeRef param_types[] = {bl_null_struct};
+     LLVMTypeRef ret_type = LLVMFunctionType(bl_null_struct, param_types, 0, 0);
+     
+     LLVMAddFunction(mod, "bl_ctx_new", ret_type);
+}
+
 void add_ctx_eval(LLVMModuleRef mod) {
      LLVMTypeRef param_types[] = {bl_null_struct, bl_null_struct};
      LLVMTypeRef ret_type = LLVMFunctionType(bl_null_struct, param_types, 2, 0);
@@ -44,7 +56,7 @@ void add_ctx_eval(LLVMModuleRef mod) {
 void add_mk_list(LLVMModuleRef mod) {
      LLVMTypeRef param_types[] =  {LLVMInt32Type()};
      LLVMTypeRef ret_type      =  LLVMFunctionType(bl_null_struct, param_types, 1, 1);
-     printf("mk_list: %s\n", LLVMPrintValueToString(LLVMAddFunction(mod, "bl_mk_list", ret_type)));
+     LLVMAddFunction(mod, "bl_mk_list", ret_type);
 }
 
 void add_mk_symbol(LLVMModuleRef mod) {
@@ -76,7 +88,7 @@ LLVMModuleRef create_module(const char* mod_name) {
    // declare the parts of the BearLang API that we need to use
    add_bl_init(retval);
    add_ctx_new_std(retval);
-//   add_ctx_new(retval);
+   add_ctx_new(retval);
    add_ctx_eval(retval); 
    add_mk_list(retval);
    add_mk_symbol(retval);
@@ -111,7 +123,7 @@ void write_expr(LLVMModuleRef mod, LLVMValueRef ctx, LLVMBuilderRef builder, bl_
      LLVMValueRef eval_params[] = {ctx,expr_list};
      LLVMBuildCall(builder, LLVMGetNamedFunction(mod,"bl_ctx_eval"),
 			                            eval_params,2,"");
-     LLVMDumpModule(mod);
+     if(verbose) LLVMDumpModule(mod);
 
 }
 
@@ -120,7 +132,7 @@ void handle_toplevel(LLVMModuleRef mod, bl_val_t* E) {
      bl_val_t* func_name = bl_list_second(E);
      bl_val_t* func_args = bl_list_third(E);
      bl_val_t* func_body = bl_list_rest(bl_list_rest(bl_list_rest(E)));
-     printf("Generating function %s with args %s and body %s\n", bl_ser_sexp(func_name),
+     if(verbose) printf("Generating function %s with args %s and body %s\n", bl_ser_sexp(func_name),
 		                                                 bl_ser_sexp(func_args),
 								 bl_ser_sexp(func_body));
      LLVMTypeRef param_types[] = {LLVMInt32Type(), LLVMPointerType(LLVMInt8Type(),0)}; // this is for main
@@ -150,54 +162,87 @@ void handle_toplevel(LLVMModuleRef mod, bl_val_t* E) {
      LLVMDisposeBuilder(builder);
 }
 
+void compile_file(char* input_filename, char* output_filename) {
+     bl_val_t* code = get_code(input_filename);
+     LLVMModuleRef mod = create_module(input_filename);
+     bl_val_t* L = code;
+
+     while(L->car != NULL) {
+      if(L->car != NULL) handle_toplevel(mod,L->car);
+      L = L->cdr;
+      if(L==NULL) break;
+     }
+
+     char *error = NULL;
+     LLVMVerifyModule(mod, LLVMAbortProcessAction, &error);
+     LLVMDisposeMessage(error);
+
+     // Write out bitcode to file
+     if (LLVMWriteBitcodeToFile(mod, output_filename) != 0) {
+         fprintf(stderr, "error writing bitcode to file!\n");
+     }
+
+
+}
+
+
+static char* exe_name;
+
+#define ERR_BAD_PARAMS 1
+#define ERR_NOT_OPEN   2
+
+
+void print_usage() {
+     fprintf(stderr,"usage: %s -i filename -o output_file [-v]\n", exe_name);
+}
 
 int main(int argc, char** argv) {
     GC_INIT();
     bl_init();
 
-    char* filename = argv[1];
+    extern char *optarg;
+    extern int optind;
 
-    bl_val_t* code = get_code(filename);
-    LLVMModuleRef mod = create_module(filename);
-    bl_val_t* L = code;
+    exe_name = strdup(argv[0]);
 
-    char output_filename[1024];
-    snprintf(output_filename,1024,"%s.bc", filename);
+    char* input_filename     = NULL;
+    char* output_filename    = NULL;
 
+    int c = 0;
 
-    while(L->car != NULL) {
-      if(L->car != NULL) handle_toplevel(mod,L->car);
-      L = L->cdr;
-      if(L==NULL) break;
+    while ((c = getopt(argc, argv, "i:o:v")) != -1) {
+       switch(c) {
+          case 'i':
+             input_filename = strdup(optarg);
+          break;
+
+          case 'o':
+             output_filename = strdup(optarg);
+          break;
+
+          case 'v':
+             verbose = 1;
+          break;
+
+          case '?':
+             print_usage();
+             exit(ERR_BAD_PARAMS);
+          break;
+
+       }
     }
 
-
-    char *error = NULL;
-    LLVMVerifyModule(mod, LLVMAbortProcessAction, &error);
-    LLVMDisposeMessage(error);
-
-/*    LLVMExecutionEngineRef engine;
-    error = NULL;
-    LLVMLinkInMCJIT();
-    LLVMInitializeNativeTarget();
-    LLVMInitializeNativeAsmPrinter();
-    LLVMInitializeNativeAsmParser();
-    if (LLVMCreateExecutionEngineForModule(&engine, mod, &error) != 0) {
-        fprintf(stderr, "failed to create execution engine\n");
-        abort();
-    }
-    if (error) {
-        fprintf(stderr, "error: %s\n", error);
-        LLVMDisposeMessage(error);
-        exit(EXIT_FAILURE);
-    }*/
-
-
-    // Write out bitcode to file
-    if (LLVMWriteBitcodeToFile(mod, output_filename) != 0) {
-        fprintf(stderr, "error writing bitcode to file, skipping\n");
+    if(input_filename == NULL) {
+      print_usage();
+      exit(ERR_BAD_PARAMS);
     }
 
+    if(output_filename == NULL) {
+      print_usage();
+      exit(ERR_BAD_PARAMS);
+    }
+
+    compile_file(input_filename,output_filename);
 
     return 0;
 }
