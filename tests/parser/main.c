@@ -118,16 +118,10 @@ int main(int argc, char** argv) {
 
 //    bl_val_t* resp = bl_ctx_eval(&eval_ctx,&run_expr);
 
-    bl_val_t* fun_fac1_args[] = {bl_mk_symbol("n"),
-	                         bl_mk_symbol("a"),
-                                 NULL};
 
-    bl_val_t* fun_fac1_expr[] = {bl_mk_symbol("fun"),
-		                 bl_mk_symbol("fac1"),
-				 bl_mk_list(fun_fac1_args),
-				 NULL};
-    
-    bl_val_t* run_expr = bl_mk_list(&fun_fac1_expr);
+
+    bl_val_t* run_expr = bl_mk_list(3,bl_mk_symbol("fun"), bl_mk_symbol("fac1"),
+		                      bl_mk_list(2,bl_mk_symbol("n"), bl_mk_symbol("a")));    
     printf("%s\n", bl_ser_sexp(run_expr));
     
 

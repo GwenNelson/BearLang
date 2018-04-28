@@ -29,14 +29,14 @@ void add_ctx_eval(LLVMModuleRef mod) {
 }
 
 void add_mk_list(LLVMModuleRef mod) {
-     LLVMTypeRef param_types[] =  {LLVMPointerType(bl_str_struct,0)};
-     LLVMTypeRef ret_type      =  LLVMFunctionType(LLVMInt64Type(), param_types, 1, 0);
+     LLVMTypeRef param_types[] =  {LLVMInt32Type()};
+     LLVMTypeRef ret_type      =  LLVMFunctionType(LLVMInt64Type(), param_types, 1, 1);
      printf("mk_list: %s\n", LLVMPrintValueToString(LLVMAddFunction(mod, "bl_mk_list", ret_type)));
 }
 
 void add_mk_symbol(LLVMModuleRef mod) {
-     LLVMTypeRef param_types[] = {LLVMArrayType(LLVMInt8Type(),2)};
-     LLVMTypeRef ret_type = LLVMFunctionType(LLVMPointerType(bl_null_struct,0), param_types, 1, 0);
+     LLVMTypeRef param_types[] = {LLVMPointerType(LLVMInt8Type(),0)};
+     LLVMTypeRef ret_type = LLVMFunctionType(bl_null_struct, param_types, 1, 0);
      
      LLVMAddFunction(mod, "bl_mk_symbol", ret_type);
 }
@@ -95,31 +95,21 @@ LLVMValueRef llvmGenLocalStringVar(LLVMModuleRef mod, const char* data, int len)
 
 void write_expr(LLVMModuleRef mod, LLVMBuilderRef builder, bl_val_t* E) {
      uint64_t expr_len = bl_list_len(E);
-     LLVMValueRef *contents = GC_MALLOC(sizeof(LLVMValueRef)*expr_len);
+     LLVMValueRef *contents = GC_MALLOC(sizeof(LLVMValueRef)*(expr_len+1));
      int i=0;
      bl_val_t* L=E;
-     LLVMValueRef single_contents[3];
-     for(i=0; i< expr_len; i++) {
-         single_contents[0] = LLVMConstInt(LLVMInt8Type(), (unsigned long long) L->car->type,0); // write type value
-         single_contents[1] = LLVMConstNull(bl_null_struct);
-	 single_contents[2] = LLVMBuildGlobalStringPtr(builder,L->car->s_val,"");
-	 contents[i] = LLVMConstNamedStruct(bl_str_struct,single_contents,3);
+     contents[0] = LLVMConstInt(LLVMInt32Type(),expr_len,0);
+     LLVMValueRef mk_params[1];
+     for(i=1; i< (expr_len+1); i++) {
+           mk_params[0] = LLVMBuildGlobalStringPtr(builder,L->car->s_val,"");
+    	     contents[1] = LLVMBuildCall(builder,LLVMGetNamedFunction(mod,"bl_mk_symbol"),mk_params,1,"");
          L=L->cdr;
      }
 
-     LLVMValueRef glob = LLVMAddGlobal(mod,LLVMArrayType(bl_str_struct, expr_len),"");
-     LLVMSetLinkage(glob, LLVMInternalLinkage);
-     LLVMSetGlobalConstant(glob, 1);
-     LLVMSetInitializer(glob, LLVMConstArray(bl_str_struct,contents,expr_len));
-//     LLVMValueRef index = LLVMBuildLoad(builder, glob, "");
-     LLVMValueRef mk_list_args[] = {glob};
-     printf("\n\n");
-     printf("%s:\n", bl_ser_sexp(E));
-     LLVMDumpValue(mk_list_args[0]);
-     printf("\n\n");
-     LLVMDumpModule(mod);
      LLVMValueRef expr_list = LLVMBuildCall(builder,LLVMGetNamedFunction(mod,"bl_mk_list"),
-		                                    mk_list_args,1,"");
+		                                    contents,expr_len,"");
+     LLVMValueRef eval_params[] = {expr_list};
+     LLVMDumpModule(mod);
 
 }
 
@@ -143,7 +133,8 @@ void handle_toplevel(LLVMModuleRef mod, bl_val_t* E) {
 
      bl_val_t* L = func_body;
      while(L->car != NULL) {
-      write_expr(mod,builder,L->car);
+     LLVMPositionBuilderAtEnd(builder, entry);
+       	     write_expr(mod,builder,L->car);
       L = L->cdr;
       if(L==NULL) break;
      }
