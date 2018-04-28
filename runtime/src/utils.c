@@ -2,7 +2,7 @@
 #include <bearlang/sexp.h>
 #include <bearlang/ctx.h>
 #include <bearlang/sexp.h>
-
+#include <bearlang/list_ops.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -66,6 +66,20 @@ bl_val_t false_val = {.type = BL_VAL_TYPE_BOOL,
 bl_val_t* bl_mk_bool(bool b) {
    if(b) return &true_val;
    return &false_val;
+}
+
+bl_val_t* bl_mk_list(size_t count,...) {
+   bl_val_t* retval = NULL;
+
+   va_list ap;
+   bl_val_t* E;
+   va_start(ap,count);
+
+   int i=0;
+   for (i=0; i < count; i++ ) {
+      retval = bl_list_append(retval,va_arg(ap,bl_val_t*));
+   }
+   return retval;
 }
 
 bl_val_t* bl_eval_file(bl_val_t* ctx, char* filename, FILE* fd) {

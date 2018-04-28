@@ -538,6 +538,14 @@ int test_eval_file() {
     return 0;
 }
 
+int test_create_list() {
+    bl_val_t* L = bl_mk_list(3,bl_mk_number(1),bl_mk_number(2),bl_mk_number(3));
+    ASSERT("First", bl_list_first(L)->i_val==1)
+    ASSERT("Second", bl_list_second(L)->i_val==2)
+    ASSERT("Third", bl_list_third(L)->i_val==3)
+    return 0;
+}
+
 int main(int argc, char** argv) {
     GC_INIT();
     int passed_tests = 0;
@@ -573,6 +581,7 @@ int main(int argc, char** argv) {
     TEST("list operators                             ", test_list_opers)
     TEST("parse a string                             ", test_parse_string)
     TEST("evaluate file                              ", test_eval_file)
+    TEST("Create list using API                      ", test_create_list)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

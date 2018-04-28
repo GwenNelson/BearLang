@@ -109,14 +109,26 @@ bl_val_t params_cons = {.type = BL_VAL_TYPE_CONS,
 	                .car  = &number_input,
 			.cdr  = &cons_single_1};
 
-bl_val_t run_expr = {.type = BL_VAL_TYPE_CONS,
-	             .car  = &fac1,
-		     .cdr  = &params_cons};
+//bl_val_t run_expr = {.type = BL_VAL_TYPE_CONS,
+//	             .car  = &fac1,
+//		     .cdr  = &params_cons};
 
 int main(int argc, char** argv) {
     bl_init();
 
-    bl_val_t* resp = bl_ctx_eval(&eval_ctx,&run_expr);
-    printf("%llu", resp->i_val);
+//    bl_val_t* resp = bl_ctx_eval(&eval_ctx,&run_expr);
+
+    bl_val_t* fun_fac1_args[] = {bl_mk_symbol("n"),
+	                         bl_mk_symbol("a"),
+                                 NULL};
+
+    bl_val_t* fun_fac1_expr[] = {bl_mk_symbol("fun"),
+		                 bl_mk_symbol("fac1"),
+				 bl_mk_list(fun_fac1_args),
+				 NULL};
+    
+    bl_val_t* run_expr = bl_mk_list(&fun_fac1_expr);
+    printf("%s\n", bl_ser_sexp(run_expr));
+    
 
 }
