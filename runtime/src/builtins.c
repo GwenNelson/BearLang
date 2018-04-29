@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <libgen.h>
+#include <dlfcn.h>
 
 bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 
@@ -285,6 +286,8 @@ bl_val_t* bl_oper_include(bl_val_t* ctx, bl_val_t* params) {
    return retval;
 }
 
+typedef bl_val_t* (*mod_init_fn)(bl_val_t*);
+
 bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* module_name = bl_ctx_eval(ctx,bl_list_first(params));
    // first try to find a BearLang module
@@ -300,6 +303,21 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
       bl_ctx_set(ctx, module_name->s_val, new_ctx);
       return new_ctx;
    } else {
+      snprintf(filename,1024,"%s.so",module_name->s_val);
+      if(access(filename, R_OK) == -1) {
+         snprintf(filename,1024,"%s.dylib", module_name->s_val);
+      }
+      if(access(filename, R_OK) == -1) {
+         // TODO - throw error here
+	 return bl_mk_null();
+      }
+      bl_val_t* dylib_val = bl_mk_val(BL_VAL_TYPE_CPTR);
+      dylib_val->c_ptr = dlopen(filename,RTLD_LAZY);
+      if(!dylib_val->c_ptr) fprintf(stderr, "dlopen error: %s\n", dlerror());
+      mod_init_fn mod_init = dlsym(dylib_val->c_ptr, "bl_mod_init");
+      char* err = dlerror();
+      if(err) fprintf(stderr,"dlsym failed: %s\n", err);
+      return mod_init(ctx);
    }
 }
 

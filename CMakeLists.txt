@@ -32,10 +32,11 @@ FLEX_TARGET(BLLexer
 	    DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/bl_lexer.h)
 
 add_library(blruntime SHARED ${RUNTIME_SOURCE} ${FLEX_BLLexer_OUTPUTS})
-target_link_libraries(blruntime ${LIBGC_LIBRARIES} ${FLEX_LIBRARIES})
+target_link_libraries(blruntime ${LIBGC_LIBRARIES} ${FLEX_LIBRARIES} dl)
+
+add_subdirectory(stdlib)
 
 enable_testing()
-
 
 file(GLOB RUNTIME_TEST_SRC "tests/runtime/*.c")
 file(GLOB PARSER_TEST_SRC  "tests/parser/*.c")

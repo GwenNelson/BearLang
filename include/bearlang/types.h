@@ -31,10 +31,11 @@ typedef enum bl_val_type_t {
 	BL_VAL_TYPE_FUNC_BL=10,     // A BearLang-code function (uncompiled)
         BL_VAL_TYPE_FUNC_NATIVE=11, // A native-code function
 	BL_VAL_TYPE_CTX=12,         // A context
-	BL_VAL_TYPE_ANY=13,         // Any type (only used for error handling etc)
-        BL_VAL_TYPE_LIST_END=14,    // used by the parser
-	BL_VAL_TYPE_OPER_DO=15,     // special form
-	BL_VAL_TYPE_OPER_IF=16,     // special form
+	BL_VAL_TYPE_CPTR=13,        // For use by extension modules
+	BL_VAL_TYPE_ANY=14,         // Any type (only used for error handling etc)
+        BL_VAL_TYPE_LIST_END=15,    // used by the parser
+	BL_VAL_TYPE_OPER_DO=16,     // special form
+	BL_VAL_TYPE_OPER_IF=17,     // special form
 } bl_val_type_t;
 
 typedef enum bl_err_type_t {
@@ -100,6 +101,9 @@ typedef struct bl_val_t {
 	                 bl_val_t* parent;
 	                 bl_val_t* secondary;
 	                 bool write_to_parent; };
+
+		// BL_VAL_TYPE_CPTR
+		struct { void* c_ptr; };
 
 		// BL_VAL_TYPE_OPER_NATIVE
 		struct { bl_val_t* (*code_ptr)(bl_val_t*,bl_val_t*); };
