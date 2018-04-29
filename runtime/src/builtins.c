@@ -8,6 +8,8 @@
 #include <bearlang/utils.h>
 
 #include <stdio.h>
+#include <unistd.h>
+#include <libgen.h>
 
 bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 
@@ -275,12 +277,30 @@ bl_val_t* bl_oper_rest(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_include(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* filename = bl_list_first(params);
+   bl_val_t* filename = bl_ctx_eval(ctx,bl_list_first(params));
 
    FILE* fd         = fopen(filename->s_val,"r");
    bl_val_t* retval = bl_eval_file(ctx, filename->s_val, fd);
    fclose(fd);
    return retval;
+}
+
+bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* module_name = bl_ctx_eval(ctx,bl_list_first(params));
+   // first try to find a BearLang module
+   char filename[1024];
+   snprintf(filename,1024,"%s.bl",module_name->s_val);
+
+   if(access(filename, R_OK) != -1) {
+      // it exists, so let's parse it
+      FILE* fd = fopen(filename,"r");
+      bl_val_t* new_ctx = bl_ctx_new(ctx);
+      bl_eval_file(new_ctx, filename, fd);
+      fclose(fd);
+      bl_ctx_set(ctx, module_name->s_val, new_ctx);
+      return new_ctx;
+   } else {
+   }
 }
 
 bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) {

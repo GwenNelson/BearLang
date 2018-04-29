@@ -137,7 +137,8 @@ char* bl_ser_sexp(bl_val_t* expr) {
            snprintf(retval, 5, "None");
          break;
 	 case BL_VAL_TYPE_CTX:
-	   snprintf(retval,5,"<ctx>");
+	   snprintf(retval,6,"<ctx>");
+	 break;
 	 case BL_VAL_TYPE_ERROR:
            retval = bl_errmsg(expr);
 	 break;
