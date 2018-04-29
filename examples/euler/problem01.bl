@@ -1,0 +1,20 @@
+; BearLang implementation of project euler problem 1
+; See https://projecteuler.net/problem=1 
+
+(fun countup (n) 
+     (if (eq n 0)
+         (0)
+         (append (countup (- n 1)) n)))
+
+(fun getmults (n) 
+     (if (or (eq (% n 5) 0)
+	     (eq (% n 3) 0)) n 0))
+		   
+		  
+
+
+
+
+(= numbers-below-1000 (countup 999))
+(= multiples (map getmults numbers-below-1000))
+(print (+ multiples) "\n")

@@ -122,7 +122,7 @@ bl_val_t* bl_parse_file(char* filename, FILE* fd) {
 
 char* bl_ser_sexp(bl_val_t* expr) {
       if(expr == NULL) return "";
-      char* retval=GC_MALLOC_ATOMIC(1024);
+      char* retval=GC_MALLOC_ATOMIC(4096);
       char* s="";
       switch(expr->type) {
          case BL_VAL_TYPE_ANY:
@@ -173,13 +173,13 @@ char* bl_ser_sexp(bl_val_t* expr) {
 	       while(L->cdr != NULL) {
                   if(L->car != NULL) {
                      char* newval = bl_ser_sexp(L->car);
-                     snprintf(retval,1024,"%s%s ", retval, newval);
+                     snprintf(retval,4096,"%s%s ", retval, newval);
 		  }
                   L = L->cdr;
 	       }
                if(L->car != NULL) {
                   char* newval = bl_ser_sexp(L->car);
-                  snprintf(retval,1024,"%s%s)", retval, newval);
+                  snprintf(retval,4096,"%s%s)", retval, newval);
 	       }
 	   }
 

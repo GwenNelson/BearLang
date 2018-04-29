@@ -15,13 +15,16 @@ bl_val_t* bl_ctx_new_std() {
 
    bl_ctx_set(retval,"*VERSION*", bl_mk_str("0.WHATEVER")); // TODO - change this and use a real versioning system
 
+   bl_ctx_set(retval,    "None", bl_mk_null());
    bl_ctx_set(retval,       "+", bl_mk_native_oper(&bl_oper_add));
    bl_ctx_set(retval,       "-", bl_mk_native_oper(&bl_oper_sub));
    bl_ctx_set(retval,       "*", bl_mk_native_oper(&bl_oper_mult));
    bl_ctx_set(retval,       "/", bl_mk_native_oper(&bl_oper_div));
+   bl_ctx_set(retval,       "%", bl_mk_native_oper(&bl_oper_mod));
    bl_ctx_set(retval,       "=", bl_mk_native_oper(&bl_oper_set));
    bl_ctx_set(retval,      "fn", bl_mk_native_oper(&bl_oper_fn));
    bl_ctx_set(retval,     "fun", bl_mk_native_oper(&bl_oper_fun));
+   bl_ctx_set(retval,     "map", bl_mk_native_oper(&bl_oper_map));
    bl_ctx_set(retval,    "oper", bl_mk_native_oper(&bl_oper_oper));
    bl_ctx_set(retval,      "eq", bl_mk_native_oper(&bl_oper_eq));
    bl_ctx_set(retval,      "==", bl_mk_native_oper(&bl_oper_eq));
@@ -34,6 +37,7 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval,  "second", bl_mk_native_oper(&bl_oper_second));
    bl_ctx_set(retval,   "third", bl_mk_native_oper(&bl_oper_third));
    bl_ctx_set(retval,    "rest", bl_mk_native_oper(&bl_oper_rest));
+   bl_ctx_set(retval,  "append", bl_mk_native_oper(&bl_oper_append));
    bl_ctx_set(retval,     "car", bl_mk_native_oper(&bl_oper_first));
    bl_ctx_set(retval,     "cdr", bl_mk_native_oper(&bl_oper_rest));
    bl_ctx_set(retval, "include", bl_mk_native_oper(&bl_oper_include));
@@ -84,6 +88,7 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
     while(i->cdr != NULL) {
           if(i->car != NULL) {
 		meta = bl_ctx_eval(ctx,i->car);
+		if(meta == NULL) return retval;
 		if(meta->type == BL_VAL_TYPE_ERROR) return meta;
 		retval = bl_list_append(retval,meta);
           }
@@ -114,7 +119,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 	    switch(expr->type) {
 	      case BL_VAL_TYPE_CONS:
 		   if(expr->car==NULL) {
-                      return expr;
+                      return bl_mk_null();
 		   } else {
 			   if(expr->car->type == BL_VAL_TYPE_SYMBOL) {
 	 			car = bl_ctx_get(ctx, expr->car->s_val);
@@ -127,7 +132,8 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 					return car;
 				break;
    				case BL_VAL_TYPE_OPER_NATIVE:
-					return car->code_ptr(ctx, expr->cdr);
+					retval = car->code_ptr(ctx, expr->cdr);
+					return retval;
 				break;
 				case BL_VAL_TYPE_OPER_DO:
 					expr = expr->cdr;
@@ -157,9 +163,11 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 				break;
 				default:
 					retval = bl_eval_cons(ctx, expr);
+					if(retval==NULL) return bl_mk_null();
 					if(retval->type == BL_VAL_TYPE_ERROR) return retval;
 					if(in_oper) expr = retval->eval_last;
 					if(in_func) return retval->eval_last;
+					
 					return retval;
 				break;
 			   }

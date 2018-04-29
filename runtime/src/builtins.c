@@ -12,6 +12,28 @@
 #include <libgen.h>
 #include <dlfcn.h>
 
+bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) {
+   params = bl_eval_cons(ctx,params);
+
+   bl_val_t* func = bl_list_first(params);
+   bl_val_t* L    = bl_list_second(params);
+
+   bl_val_t* func_expr = NULL;
+   bl_val_t* retval = NULL;
+
+   while(L != NULL) {
+     if(L->car != NULL) {
+        func_expr = NULL;
+	func_expr = bl_list_append(func_expr,func);
+	func_expr = bl_list_append(func_expr,L->car);
+        retval = bl_list_append(retval,bl_ctx_eval(ctx,func_expr));
+     }
+     L = L->cdr;
+   }
+   return retval;
+
+}
+
 bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 
    bl_val_t* L = bl_eval_cons(ctx,params);
@@ -116,6 +138,25 @@ bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
    retval->i_val = first->i_val / second->i_val;
+   return retval;
+}
+
+bl_val_t* bl_oper_mod(bl_val_t* ctx, bl_val_t* params) {
+   params = bl_ctx_eval(ctx,params);
+   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
+   bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
+   if(retval != NULL) return retval;
+
+   retval = bl_errif_invalid_len(params,2,2);
+   if(retval != NULL) return retval;
+
+   retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   retval->type     = BL_VAL_TYPE_NUMBER;
+
+   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+
+   retval->i_val = first->i_val % second->i_val;
    return retval;
 }
 
@@ -253,14 +294,14 @@ bl_val_t* bl_oper_xor(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_first(bl_val_t* ctx, bl_val_t* params) {
-   if(bl_list_len(params)==1) {
-      return bl_list_first(bl_ctx_eval(ctx,params));
-   }
+   params = bl_ctx_eval(ctx,params);
+   if(bl_list_len(params)==1) return bl_list_first(bl_list_first(params));
    return bl_list_first(params);
 }
 
 bl_val_t* bl_oper_second(bl_val_t* ctx, bl_val_t* params) {
-   if(bl_list_len(params)==1) params = bl_ctx_eval(ctx,bl_list_first(params));
+   params = bl_ctx_eval(ctx,params);
+   if(bl_list_len(params)==1) return bl_list_second(bl_list_first(params));
    bl_val_t* retval = bl_list_second(params);
    return retval;
 }
@@ -272,8 +313,13 @@ bl_val_t* bl_oper_third(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_rest(bl_val_t* ctx, bl_val_t* params) {
+
+   params = bl_ctx_eval(ctx,params);
    if(bl_list_len(params)==1) params = bl_ctx_eval(ctx,bl_list_first(params));
+   if(params->type == BL_VAL_TYPE_NULL) return bl_mk_null();
+   if(bl_list_len(params)==0) return bl_mk_null();
    bl_val_t* retval = bl_list_rest(params);
+   if(retval==NULL) retval = bl_mk_null();
    return retval;
 }
 
@@ -335,4 +381,9 @@ bl_val_t* bl_oper_serexp (bl_val_t* ctx, bl_val_t* params) {
    if(bl_list_len(params)==1) params = bl_list_first(params);
    bl_val_t* retval = bl_mk_str(bl_ser_sexp(params));
    return retval;
+}
+
+bl_val_t* bl_oper_append(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* L = bl_ctx_eval(ctx,bl_list_first(params));
+   return bl_list_append(L, bl_ctx_eval(ctx,bl_list_second(params)));
 }
