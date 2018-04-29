@@ -1,0 +1,20 @@
+; BearLang implementation of project euler problem 2
+; See https://projecteuler.net/problem=2
+
+(fun calcE ()
+     (= x 1)
+     (= y 2)
+     (= sum 2)
+     (while (lt y 4000000)
+	    (do 
+	        (= x (+ x y))
+                (if (eq (% x 2) 0)
+		    (= sum (+ sum x)))
+                (= y (+ x y))
+                (if (eq (% y 2) 0)
+		    (= sum (+ sum y)))))
+
+     sum)
+
+(print (calcE) "\n")
+

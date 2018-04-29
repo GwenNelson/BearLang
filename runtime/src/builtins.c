@@ -12,6 +12,14 @@
 #include <libgen.h>
 #include <dlfcn.h>
 
+bl_val_t* bl_oper_while(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* cond = bl_list_first(params);
+   bl_val_t* body = bl_list_second(params);
+   while(bl_ctx_eval(ctx,cond)->i_val==1) {
+     	   bl_ctx_eval(ctx,body);
+   }
+}
+
 bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) {
    params = bl_eval_cons(ctx,params);
 
@@ -158,6 +166,41 @@ bl_val_t* bl_oper_mod(bl_val_t* ctx, bl_val_t* params) {
 
    retval->i_val = first->i_val % second->i_val;
    return retval;
+}
+
+bl_val_t* bl_oper_lt(bl_val_t* ctx, bl_val_t* params) {
+   params = bl_ctx_eval(ctx,params);
+   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
+   bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
+   if(retval != NULL) return retval;
+
+   retval = bl_errif_invalid_len(params,2,2);
+   if(retval != NULL) return retval;
+
+   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+
+   if(first->i_val < second->i_val) return bl_mk_bool(true);
+   return bl_mk_bool(false);
+}
+
+bl_val_t* bl_oper_gt(bl_val_t* ctx, bl_val_t* params) {
+   params = bl_ctx_eval(ctx,params);
+   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
+   bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
+   if(retval != NULL) return retval;
+
+   retval = bl_errif_invalid_len(params,2,2);
+   if(retval != NULL) return retval;
+
+   retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   retval->type     = BL_VAL_TYPE_NUMBER;
+
+   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+
+   if(first->i_val > second->i_val) return bl_mk_bool(true);
+   return bl_mk_bool(false);
 }
 
 bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {

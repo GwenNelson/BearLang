@@ -27,6 +27,9 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval,     "map", bl_mk_native_oper(&bl_oper_map));
    bl_ctx_set(retval,    "oper", bl_mk_native_oper(&bl_oper_oper));
    bl_ctx_set(retval,      "eq", bl_mk_native_oper(&bl_oper_eq));
+   bl_ctx_set(retval,      "lt", bl_mk_native_oper(&bl_oper_lt));
+   bl_ctx_set(retval,      "gt", bl_mk_native_oper(&bl_oper_gt));
+   bl_ctx_set(retval,   "while", bl_mk_native_oper(&bl_oper_while));
    bl_ctx_set(retval,      "==", bl_mk_native_oper(&bl_oper_eq));
    bl_ctx_set(retval,   "print", bl_mk_native_oper(&bl_oper_print));
    bl_ctx_set(retval,     "and", bl_mk_native_oper(&bl_oper_and));
