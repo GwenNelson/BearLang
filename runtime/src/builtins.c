@@ -317,7 +317,9 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
       mod_init_fn mod_init = dlsym(dylib_val->c_ptr, "bl_mod_init");
       char* err = dlerror();
       if(err) fprintf(stderr,"dlsym failed: %s\n", err);
-      return mod_init(ctx);
+      bl_val_t* new_ctx = mod_init(ctx);
+      bl_ctx_set(ctx, module_name->s_val, new_ctx);
+      return new_ctx;
    }
 }
 

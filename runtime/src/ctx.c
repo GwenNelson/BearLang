@@ -182,6 +182,16 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 
 
 bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
+   if(strstr(key,"::")) {
+
+     strstr(key,"::")[0]='\0';
+     char* ctx_key = key;
+     char* sym_key = key+strlen(ctx_key)+2;
+     bl_val_t* other_ctx = bl_ctx_get(ctx, ctx_key);
+     if(other_ctx == NULL) return NULL;
+     return bl_ctx_get(other_ctx,sym_key);
+
+   }
    if(ctx->secondary != NULL) {
       bl_val_t* s_V = bl_ctx_get(ctx->secondary, key);
       if(s_V != NULL) return s_V;
