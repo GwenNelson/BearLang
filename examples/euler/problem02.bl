@@ -13,7 +13,6 @@
                 (= y (+ x y))
                 (if (eq (% y 2) 0)
 		    (= sum (+ sum y)))))
-
      sum)
 
 (print (calcE) "\n")
