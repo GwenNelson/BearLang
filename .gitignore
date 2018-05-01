@@ -13,3 +13,6 @@ vendor/gc-7.6.4/include/stamp-h1
 .libs
 vendor/gc-7.6.4/cord/.dirstamp
 vendor/gc-7.6.4/libtool
+vendor/gmp-6.1.2
+vendor/gc-7.6.4/libatomic_ops
+
