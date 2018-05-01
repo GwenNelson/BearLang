@@ -422,3 +422,21 @@ bl_val_t* bl_oper_append(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* L = bl_ctx_eval(ctx,bl_list_first(params));
    return bl_list_append(L, bl_ctx_eval(ctx,bl_list_second(params)));
 }
+
+bl_val_t* bl_oper_prepend(bl_val_t* ctx, bl_val_t* params) {
+   bl_val_t* L = bl_ctx_eval(ctx,bl_list_first(params));
+   return bl_list_prepend(L, bl_ctx_eval(ctx,bl_list_second(params)));
+}
+
+bl_val_t* bl_oper_reverse(bl_val_t* ctx, bl_val_t* params) {
+
+   params = bl_ctx_eval(ctx,params);
+   if(params->type == BL_VAL_TYPE_ERROR) return params;
+
+   if(bl_list_len(params)==1) params = bl_ctx_eval(ctx,bl_list_first(params));
+   if(params->type == BL_VAL_TYPE_NULL) return bl_mk_null();
+   if(bl_list_len(params)==0) return bl_mk_null();
+   bl_val_t* retval = bl_list_reverse(params);
+   if(retval==NULL) retval = bl_mk_null();
+   return retval;
+}

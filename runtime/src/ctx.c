@@ -41,6 +41,8 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval,   "third", bl_mk_native_oper(&bl_oper_third));
    bl_ctx_set(retval,    "rest", bl_mk_native_oper(&bl_oper_rest));
    bl_ctx_set(retval,  "append", bl_mk_native_oper(&bl_oper_append));
+   bl_ctx_set(retval, "prepend", bl_mk_native_oper(&bl_oper_prepend));
+   bl_ctx_set(retval, "reverse", bl_mk_native_oper(&bl_oper_reverse));
    bl_ctx_set(retval,     "car", bl_mk_native_oper(&bl_oper_first));
    bl_ctx_set(retval,     "cdr", bl_mk_native_oper(&bl_oper_rest));
    bl_ctx_set(retval, "include", bl_mk_native_oper(&bl_oper_include));

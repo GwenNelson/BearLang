@@ -60,3 +60,12 @@ uint64_t bl_list_len(bl_val_t* L) {
    if(L->car != NULL) retval++;
    return retval;
 }
+
+bl_val_t* bl_list_reverse(bl_val_t* L) {
+   bl_val_t* retval = NULL;
+   while(L != NULL) {
+      retval = bl_list_prepend(retval,L->car);
+      L = L->cdr;
+   }
+   return retval;
+}
