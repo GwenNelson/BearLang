@@ -88,10 +88,10 @@ bl_val_t* read_form(yyscan_t scanner) {
 		return &end_list_val;
 	break;
 	case BL_TOKEN_FLOAT:
-		return bl_mk_float(atof(yyget_text(scanner)));
+		return bl_mk_float(yyget_text(scanner));
 	break;
 	case BL_TOKEN_INTEGER:
-		return bl_mk_number(atoi(yyget_text(scanner)));
+		return bl_mk_integer(yyget_text(scanner));
 	break;
 	case BL_TOKEN_SYMBOL:
 		s = yyget_text(scanner);
@@ -149,7 +149,7 @@ char* bl_ser_sexp(bl_val_t* expr) {
            snprintf(retval,strlen(expr->s_val)+3,"\"%s\"",expr->s_val);
          break;
          case BL_VAL_TYPE_NUMBER:
-           snprintf(retval,10,"%llu",expr->i_val);
+            retval = mpz_get_str(NULL, 10, expr->i_val);
          break;
 	 case BL_VAL_TYPE_BOOL:
            if(expr->i_val == 1) {

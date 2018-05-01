@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <bearlang/uthash.h>
+#include <gmp.h>
 
 #undef uthash_malloc
 #undef uthash_free
@@ -85,9 +86,13 @@ typedef struct bl_val_t {
 		// BL_VAL_TYPE_ERROR
 		struct { bl_err_t err_val; };
 
-		// BL_VAL_TYPE_NUMBER | BL_VAL_TYPE_BOOL
-		struct { int64_t i_val;
-	                 float   f_val;	};
+		// BL_VAL_TYPE_BOOL
+		struct { bool b_val; };
+
+		// BL_VAL_TYPE_NUMBER
+		struct { mpz_t i_val;
+	                 mpf_t f_val;
+			 bool is_float;	};
 
 		// BL_VAL_TYPE_SYMBOL | BL_VAL_TYPE_STRING
 		struct { char*   s_val; };

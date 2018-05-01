@@ -11,11 +11,12 @@
 #include <unistd.h>
 #include <libgen.h>
 #include <dlfcn.h>
+#include <gmp.h>
 
 bl_val_t* bl_oper_while(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* cond = bl_list_first(params);
    bl_val_t* body = bl_list_second(params);
-   while(bl_ctx_eval(ctx,cond)->i_val==1) {
+   while(bl_ctx_eval(ctx,cond)->b_val) {
      	   bl_ctx_eval(ctx,body);
    }
 }
@@ -57,7 +58,7 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
    }
 
    if(first->type == BL_VAL_TYPE_NUMBER) {
-      retval = bl_mk_number(0);
+      retval = bl_mk_integer("0");
    } else {
       retval = bl_mk_str("");
    }
@@ -73,7 +74,7 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
         if(L->car != NULL) {
            x = bl_ctx_eval(ctx,L->car);
 	   if(retval->type == BL_VAL_TYPE_NUMBER) {
- 	     retval->i_val += x->i_val;
+             mpz_add(retval->i_val, retval->i_val, x->i_val);
 	   } else {
              s = bl_ser_naked_sexp(x);
 	     c = strlen(s) + strlen(retval->s_val)+5;
@@ -86,7 +87,7 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
    if(L->car != NULL) {
         x = bl_ctx_eval(ctx,L->car);
 	   if(retval->type == BL_VAL_TYPE_NUMBER) {
-             retval->i_val += x->i_val;
+             mpz_add(retval->i_val, retval->i_val, x->i_val);
 	   } else {
              s = bl_ser_naked_sexp(x);
 	     c = strlen(s) + strlen(retval->s_val)+5;
@@ -111,7 +112,7 @@ bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_list_first(params);
    bl_val_t* second = bl_list_second(params);
 
-   retval->i_val = first->i_val - second->i_val;
+   mpz_sub(retval->i_val, first->i_val, second->i_val);
    return retval;
 }
 
@@ -127,7 +128,7 @@ bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   retval->i_val = first->i_val * second->i_val;
+   mpz_mul(retval->i_val, first->i_val, second->i_val);
    return retval;
 }
 
@@ -145,7 +146,7 @@ bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   retval->i_val = first->i_val / second->i_val;
+   mpz_divexact(retval->i_val, first->i_val, second->i_val);
    return retval;
 }
 
@@ -164,7 +165,7 @@ bl_val_t* bl_oper_mod(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   retval->i_val = first->i_val % second->i_val;
+   mpz_mod(retval->i_val, first->i_val, second->i_val);
    return retval;
 }
 
@@ -180,8 +181,8 @@ bl_val_t* bl_oper_lt(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   if(first->i_val < second->i_val) return bl_mk_bool(true);
-   return bl_mk_bool(false);
+   if(mpz_cmp(first->i_val,second->i_val)>0) return bl_mk_bool(false);
+   return bl_mk_bool(true);
 }
 
 bl_val_t* bl_oper_gt(bl_val_t* ctx, bl_val_t* params) {
@@ -199,8 +200,8 @@ bl_val_t* bl_oper_gt(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   if(first->i_val > second->i_val) return bl_mk_bool(true);
-   return bl_mk_bool(false);
+   if(mpz_cmp(first->i_val,second->i_val)<0) return bl_mk_bool(false);
+   return bl_mk_bool(true);
 }
 
 bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {
@@ -274,23 +275,19 @@ bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   retval->type     = BL_VAL_TYPE_BOOL;
 
    if(first->type == BL_VAL_TYPE_STRING && second->type == BL_VAL_TYPE_STRING) {
       if(strcmp(first->s_val, second->s_val)==0) {
-         retval->i_val = 1;
+         return bl_mk_bool(true);
       } else {
-         retval->i_val = 0;
+         return bl_mk_bool(false);
       }
-      return retval;
    }
-   if(first->i_val == second->i_val) {
-      retval->i_val = 1;
+   if(mpz_cmp(first->i_val, second->i_val)==0) {
+      return bl_mk_bool(true);
    } else {
-      retval->i_val = 0;
+      return bl_mk_bool(false);
    }
-   return retval;
 }
 
 bl_val_t* bl_oper_if(bl_val_t* ctx, bl_val_t* params) {

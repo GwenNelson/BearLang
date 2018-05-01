@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include <gmp.h>
+
 bl_val_t* bl_mk_val(bl_val_type_t type) {
    bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
    retval->type     = type;
@@ -32,15 +34,17 @@ bl_val_t* bl_mk_symbol(char* sym) {
    return retval;
 }
 
-bl_val_t* bl_mk_number(uint64_t n) {
+bl_val_t* bl_mk_integer(char* s) {
    bl_val_t* retval = bl_mk_val_atomic(BL_VAL_TYPE_NUMBER);
-   retval->i_val    = n;
+   mpz_init_set_str(retval->i_val,s,10);
+   retval->is_float = false;
    return retval;
 }
 
-bl_val_t* bl_mk_float(float f) {
+bl_val_t* bl_mk_float(char* s) {
    bl_val_t* retval = bl_mk_val_atomic(BL_VAL_TYPE_NUMBER);
-   retval->f_val    = f;
+   mpf_init_set_str(retval->f_val,s,10);
+   retval->is_float = true;
    return retval;
 }
 
@@ -59,9 +63,9 @@ bl_val_t* bl_mk_native_oper(void* func_ptr) {
 }
 
 bl_val_t true_val = {.type = BL_VAL_TYPE_BOOL,
-	             .i_val = 1};
+	             .b_val = true};
 bl_val_t false_val = {.type = BL_VAL_TYPE_BOOL,
-	              .i_val = 0};
+	              .b_val = false};
 
 bl_val_t* bl_mk_bool(bool b) {
    if(b) return &true_val;
