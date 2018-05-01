@@ -25,26 +25,11 @@ int test_sexp_parse_list() {
     ASSERT("second item is int",   sexp->cdr->car->type      == BL_VAL_TYPE_NUMBER)
     ASSERT("second item is int",   sexp->cdr->cdr->car->type == BL_VAL_TYPE_NUMBER)
 
-    ASSERT("first item is +", strcmp(sexp->car->s_val,"+")==0)
-
-    ASSERT("second item has value 1", sexp->cdr->car->i_val == 1)
-    ASSERT("second item has value 2", sexp->cdr->cdr->car->i_val == 2)
-
-
     return 0;
 }
 
 int test_ser_sexp() {
-    bl_val_t* sexp = bl_mk_val(BL_VAL_TYPE_CONS);
-
-    sexp->car = bl_mk_symbol("+");
-
-    sexp->cdr      = bl_mk_val(BL_VAL_TYPE_CONS);
-    sexp->cdr->car = bl_mk_number(1);
-
-    sexp->cdr->cdr = bl_mk_val(BL_VAL_TYPE_CONS);
-    sexp->cdr->cdr->car = bl_mk_number(2);
-    sexp->cdr->cdr->cdr = NULL;
+    bl_val_t* sexp = bl_mk_list(3,bl_mk_symbol("+"),bl_mk_integer("1"),bl_mk_integer("2"));
 
     char* serialised_sexp = bl_ser_sexp(sexp);
 
@@ -54,46 +39,17 @@ int test_ser_sexp() {
 }
 
 int test_first_second_rest() {
-    // first construct a list with 3 items: 4, 8, 87
-
-    // first cons cell
-    bl_val_t* L = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    L->type = BL_VAL_TYPE_CONS;
-
-    // first item
-    L->car = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    L->car->type  = BL_VAL_TYPE_NUMBER;
-    L->car->i_val = 4;
-
-    // next cons cell
-    L->cdr = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    L->cdr->type = BL_VAL_TYPE_CONS;
-    
-    // second item
-    L->cdr->car = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    L->cdr->car->type  = BL_VAL_TYPE_NUMBER;
-    L->cdr->car->i_val = 8;
-
-    // next cons cell
-    L->cdr->cdr = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    L->cdr->cdr->type = BL_VAL_TYPE_CONS;
-
-    // third item
-    L->cdr->cdr->car = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    L->cdr->cdr->car->type  = BL_VAL_TYPE_NUMBER;
-    L->cdr->cdr->car->i_val = 87;
-
-    // finally test the fucker
+    bl_val_t* L = bl_mk_list(3,bl_mk_integer("4"),bl_mk_integer("8"),bl_mk_integer("87"));
 
     // first goes first
     bl_val_t* first_val = bl_list_first(L);
     ASSERT("bl_list_first() returns correct val type", first_val->type==BL_VAL_TYPE_NUMBER)
-    ASSERT("bl_list_first() returns correct i_val",    first_val->i_val==4)
+    ASSERT("bl_list_first() returns correct value",    strcmp(bl_ser_sexp(first_val),"4")==0)
 
     // second goes second.....
     bl_val_t* second_val = bl_list_second(L);
     ASSERT("bl_list_second() returns correct val type", second_val->type==BL_VAL_TYPE_NUMBER)
-    ASSERT("bl_list_second() returns correct i_val",    second_val->i_val==8)
+    ASSERT("bl_list_second() returns correct value",    strcmp(bl_ser_sexp(second_val),"8")==0)
 
     // then we do the rest, first checking that it returns a valid list
     bl_val_t* rest = bl_list_rest(L);
@@ -105,60 +61,31 @@ int test_first_second_rest() {
     // and finally, let's check the second of the rest, which should be the third item
     bl_val_t* third = bl_list_second(rest);
     ASSERT("bl_list_second(rest) returns correct val type", third->type==BL_VAL_TYPE_NUMBER)
-    ASSERT("bl_list_second(rest) returns correct i_val",    third->i_val==87)
+    ASSERT("bl_list_second(rest) returns correct i_val",    strcmp(bl_ser_sexp(third),"87")==0)
     return 0;
 
 }
 
 int test_third() {
     // first construct a list with 3 items: 4, 8, 87
-
-    // first cons cell
-    bl_val_t* L = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    L->type = BL_VAL_TYPE_CONS;
-
-    // first item
-    L->car = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    L->car->type  = BL_VAL_TYPE_NUMBER;
-    L->car->i_val = 4;
-
-    // next cons cell
-    L->cdr = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    L->cdr->type = BL_VAL_TYPE_CONS;
-    
-    // second item
-    L->cdr->car = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    L->cdr->car->type  = BL_VAL_TYPE_NUMBER;
-    L->cdr->car->i_val = 8;
-
-    // next cons cell
-    L->cdr->cdr = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    L->cdr->cdr->type = BL_VAL_TYPE_CONS;
-
-    // third item
-    L->cdr->cdr->car = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    L->cdr->cdr->car->type  = BL_VAL_TYPE_NUMBER;
-    L->cdr->cdr->car->i_val = 87;
+    bl_val_t* L = bl_mk_list(3,bl_mk_integer("4"),bl_mk_integer("8"),bl_mk_integer("87"));
 
     bl_val_t* third_val = bl_list_third(L);
     ASSERT("bl_list_third(L) returns correct val_type", third_val->type == BL_VAL_TYPE_NUMBER)
-    ASSERT("bl_list_third(L) returns correct i_val",    third_val->i_val == 87)
+    ASSERT("bl_list_third(L) returns correct value",    strcmp(bl_ser_sexp(third_val),"87")==0)
     return 0;
 }
 
 int test_prepend_null() {
     bl_val_t* empty      = NULL;
-    bl_val_t* first_item = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    first_item->type     = BL_VAL_TYPE_NUMBER;
-    first_item->i_val    = 666;
+    bl_val_t* first_item = bl_mk_str("foo");
 
     empty = bl_list_prepend(empty,first_item);
 
-
     ASSERT("bl_list_prepend returns a valid cons cell", empty->type==BL_VAL_TYPE_CONS)
 
-    ASSERT("bl_list_prepend returns the correct val type for first item",       bl_list_first(empty)->type==BL_VAL_TYPE_NUMBER)
-    ASSERT("bl_list_prepend returns the correct val number for the first item", bl_list_first(empty)->i_val==666) // Hail Satan!
+    ASSERT("bl_list_prepend returns the correct val type for first item",       bl_list_first(empty)->type==BL_VAL_TYPE_STRING)
+    ASSERT("bl_list_prepend returns the correct val number for the first item", strcmp(bl_list_first(empty)->s_val, "foo")==0)
 
     return 0;
 }
@@ -168,16 +95,13 @@ int test_empty_ctx() {
     bl_val_t* empty_ctx = bl_ctx_new(NULL);
 
     // now set a random-ish key to an interesting value
-    bl_val_t* our_item = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    our_item->type  = BL_VAL_TYPE_NUMBER;
-    our_item->i_val = 666;
-    bl_ctx_set(empty_ctx,"TheOneForYouAndMe", our_item);
+    bl_ctx_set(empty_ctx,"TheOneForYouAndMe", bl_mk_str("666"));
 
 
     // and now look it up and check it's the same
     bl_val_t* retval = bl_ctx_get(empty_ctx,"TheOneForYouAndMe");
 
-    ASSERT("bl_ctx_get/set", (retval->type==BL_VAL_TYPE_NUMBER) && (retval->i_val == 666))
+    ASSERT("bl_ctx_get/set", (retval->type==BL_VAL_TYPE_STRING) && (strcmp(retval->s_val, "666")==0))
 
     bl_ctx_close(empty_ctx);
     return 0;
@@ -186,16 +110,14 @@ int test_empty_ctx() {
 int test_child_ctx() {
     // create parent context and set something in it
     bl_val_t* parent_ctx = bl_ctx_new(NULL);
-    bl_val_t* our_item   = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-    our_item->type       = BL_VAL_TYPE_NUMBER;
-    our_item->i_val      = 666;
+    bl_val_t* our_item   = bl_mk_str("666");
     bl_ctx_set(parent_ctx,"TheOneForYouAndMe", our_item);
 
     // create an empty child context and lookup the key in it
     bl_val_t* child_ctx = bl_ctx_new(parent_ctx);
 
     bl_val_t* looked_up = bl_ctx_get(child_ctx,"TheOneForYouAndMe");
-    ASSERT("bl_ctx_get with child ctx", (looked_up->type==BL_VAL_TYPE_NUMBER) && (looked_up->i_val==666))
+    ASSERT("bl_ctx_get with child ctx", (looked_up->type==BL_VAL_TYPE_STRING) && (strcmp(looked_up->s_val,"666")==0))
   
     bl_ctx_close(child_ctx);
     bl_ctx_close(parent_ctx);
@@ -539,7 +461,7 @@ int test_eval_file() {
 }
 
 int test_create_list() {
-    bl_val_t* L = bl_mk_list(3,bl_mk_number(1),bl_mk_number(2),bl_mk_number(3));
+    bl_val_t* L = bl_mk_list(3,bl_mk_integer("1"),bl_mk_integer("2"),bl_mk_integer("3"));
     ASSERT("First", bl_list_first(L)->i_val==1)
     ASSERT("Second", bl_list_second(L)->i_val==2)
     ASSERT("Third", bl_list_third(L)->i_val==3)
