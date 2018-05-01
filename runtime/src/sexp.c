@@ -152,7 +152,7 @@ char* bl_ser_sexp(bl_val_t* expr) {
             retval = mpz_get_str(NULL, 10, expr->i_val);
          break;
 	 case BL_VAL_TYPE_BOOL:
-           if(expr->i_val == 1) {
+           if(expr->b_val) {
               snprintf(retval,10,"True");
 	   } else {
               snprintf(retval,10,"False");

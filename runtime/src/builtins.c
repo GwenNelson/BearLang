@@ -12,6 +12,7 @@
 #include <libgen.h>
 #include <dlfcn.h>
 #include <gmp.h>
+#include <stdbool.h>
 
 bl_val_t* bl_oper_while(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* cond = bl_list_first(params);
@@ -294,7 +295,7 @@ bl_val_t* bl_oper_if(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* cond        = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* then_action = bl_list_second(params);
    bl_val_t* else_action = bl_list_third(params);
-   if(cond->i_val == 1) {
+   if(cond->b_val) {
       return then_action; 
    } else {
       if(else_action != NULL) return else_action;
@@ -306,14 +307,14 @@ bl_val_t* bl_oper_and(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   if((first->i_val == 1) && (second->i_val == 1)) return bl_mk_bool(true);
+   if((first->b_val) && (second->b_val)) return bl_mk_bool(true);
    return bl_mk_bool(false);
 }
 
 bl_val_t* bl_oper_not(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
 
-   if(first->i_val == 1) return bl_mk_bool(false);
+   if(first->b_val) return bl_mk_bool(false);
    return bl_mk_bool(true);
 }
 
@@ -321,7 +322,7 @@ bl_val_t* bl_oper_or(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   if((first->i_val == 1) || (second->i_val == 1)) return bl_mk_bool(true);
+   if((first->b_val) || (second->b_val)) return bl_mk_bool(true);
    return bl_mk_bool(false);
 }
 
@@ -329,7 +330,7 @@ bl_val_t* bl_oper_xor(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   if((first->i_val == 1) ^ (second->i_val == 1)) return bl_mk_bool(true);
+   if((first->b_val) ^ (second->b_val)) return bl_mk_bool(true);
    return bl_mk_bool(false);
 }
 

@@ -144,7 +144,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 				break;
 				case BL_VAL_TYPE_OPER_IF:
 					cond = bl_ctx_eval(ctx,bl_list_first(expr->cdr));
-					if(cond->i_val == 1) {
+					if(cond->b_val) {
 						expr = bl_list_second(expr->cdr);
 					} else {
 						expr = bl_list_third(expr->cdr);
