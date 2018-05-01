@@ -16,9 +16,10 @@
 
 bl_val_t* bl_oper_while(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* cond = bl_list_first(params);
-   bl_val_t* body = bl_list_second(params);
+   bl_val_t* body = bl_list_rest(params);
    while(bl_ctx_eval(ctx,cond)->b_val) {
-     	   bl_ctx_eval(ctx,body);
+      bl_val_t* retval = bl_ctx_eval(ctx,body);
+      if(retval->type == BL_VAL_TYPE_ERROR) return retval;
    }
    return bl_mk_null();
 }

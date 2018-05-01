@@ -23,7 +23,8 @@ bool bl_is_valid_funcarg_len(bl_val_t* f, bl_val_t* L) {
 }
 
 bl_val_t* bl_errif_invalid_len(bl_val_t* L, uint64_t min, uint64_t max) {
-     uint64_t L_len = bl_list_len(L);
+     if(L->type == BL_VAL_TYPE_ERROR) return L;
+   	uint64_t L_len = bl_list_len(L);
      if((L_len >= min) && (L_len <= max)) return NULL;
 
      if(L_len == min == max) return NULL;
@@ -51,6 +52,7 @@ bl_val_t* bl_errif_invalid_fixed_args(bl_val_t* params, const bl_val_type_t* exp
       bl_val_t* list_iter = params;
       bool is_good        = true;
       for(i=0; i < args_len; i++) {
+          if(list_iter->car->type == BL_VAL_TYPE_ERROR) return list_iter->car;
           if(expected_types[i] != list_iter->car->type) {
             if(expected_types[i] != BL_VAL_TYPE_ANY) { 
 	       is_good=false;
