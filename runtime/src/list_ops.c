@@ -5,16 +5,19 @@
 
 bl_val_t* bl_list_first(bl_val_t* L) {
    if(L==NULL) return NULL;
+//   if(L->type == BL_VAL_TYPE_ERROR) return L;
    return L->car;
 }
 
 bl_val_t* bl_list_second(bl_val_t* L) {
    if(L==NULL) return NULL;
+//   if(L->type == BL_VAL_TYPE_ERROR) return L;
    return bl_list_first(bl_list_rest(L));
 }
 
 bl_val_t* bl_list_rest(bl_val_t* L) {
    if(L==NULL) return NULL;
+//   if(L->type == BL_VAL_TYPE_ERROR) return L;
    return L->cdr;
 }
 

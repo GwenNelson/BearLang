@@ -17,9 +17,6 @@ void gmp_free(void* ptr, size_t size) {
 }
 
 int bl_init() {
-    GC_time_limit=1;
-    GC_full_freq=90;
-    GC_free_space_divisor=2;
     GC_init();
 
     mp_set_memory_functions(&gmp_malloc, &gmp_realloc, &gmp_free);

@@ -20,6 +20,7 @@ bl_val_t* bl_oper_while(bl_val_t* ctx, bl_val_t* params) {
    while(bl_ctx_eval(ctx,cond)->b_val) {
      	   bl_ctx_eval(ctx,body);
    }
+   return bl_mk_null();
 }
 
 bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) {
@@ -47,7 +48,6 @@ bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) {
 bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 
    bl_val_t* L = bl_eval_cons(ctx,params);
-
    bl_val_t* retval = bl_errif_invalid_len(L,1,BL_LONGEST_LIST);
    if(retval != NULL) return retval;
 
@@ -113,6 +113,7 @@ bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_list_first(params);
    bl_val_t* second = bl_list_second(params);
 
+   mpz_init(retval->i_val);
    mpz_sub(retval->i_val, first->i_val, second->i_val);
    return retval;
 }
@@ -129,6 +130,7 @@ bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
+   mpz_init(retval->i_val);
    mpz_mul(retval->i_val, first->i_val, second->i_val);
    return retval;
 }
@@ -147,6 +149,7 @@ bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
+   mpz_init(retval->i_val);
    mpz_divexact(retval->i_val, first->i_val, second->i_val);
    return retval;
 }
@@ -166,6 +169,7 @@ bl_val_t* bl_oper_mod(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
+   mpz_init(retval->i_val);
    mpz_mod(retval->i_val, first->i_val, second->i_val);
    return retval;
 }
@@ -291,18 +295,6 @@ bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) {
    }
 }
 
-bl_val_t* bl_oper_if(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* cond        = bl_ctx_eval(ctx,bl_list_first(params));
-   bl_val_t* then_action = bl_list_second(params);
-   bl_val_t* else_action = bl_list_third(params);
-   if(cond->b_val) {
-      return then_action; 
-   } else {
-      if(else_action != NULL) return else_action;
-   }
-   return bl_mk_null();
-}
-
 bl_val_t* bl_oper_and(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
@@ -356,6 +348,8 @@ bl_val_t* bl_oper_third(bl_val_t* ctx, bl_val_t* params) {
 bl_val_t* bl_oper_rest(bl_val_t* ctx, bl_val_t* params) {
 
    params = bl_ctx_eval(ctx,params);
+   if(params->type == BL_VAL_TYPE_ERROR) return params;
+
    if(bl_list_len(params)==1) params = bl_ctx_eval(ctx,bl_list_first(params));
    if(params->type == BL_VAL_TYPE_NULL) return bl_mk_null();
    if(bl_list_len(params)==0) return bl_mk_null();

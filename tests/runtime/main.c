@@ -428,14 +428,19 @@ int test_list_opers() {
     char* first_str  = "(first 1 2 3 4 5)";
     char* second_str = "(second 1 2 3 4 5)";
     char* third_str  = "(third 1 2 3 4 5)";
+    char* rest_str   = "(rest 1 2 3 4 5)";
+
 
     bl_val_t* first_result  = bl_ctx_eval(ctx,bl_parse_sexp(first_str));
     bl_val_t* second_result = bl_ctx_eval(ctx,bl_parse_sexp(second_str));
     bl_val_t* third_result  = bl_ctx_eval(ctx,bl_parse_sexp(third_str));
+    bl_val_t* rest_result   = bl_ctx_eval(ctx,bl_parse_sexp(rest_str));
 
     ASSERT("(first 1 2 3 4 5)  returns 1", strcmp(bl_ser_sexp(first_result),"1")==0)
     ASSERT("(second 1 2 3 4 5) returns 2", strcmp(bl_ser_sexp(second_result),"2")==0)
     ASSERT("(third 1 2 3 4 5)  returns 3", strcmp(bl_ser_sexp(third_result),"3")==0)
+
+    ASSERT("(rest 1 2 3 4 5)  returns (b c d e)", strcmp(bl_ser_sexp(rest_result),"(2 3 4 5)")==0)
 
     bl_ctx_close(ctx);
     return 0;
@@ -458,6 +463,21 @@ int test_eval_file() {
     bl_val_t* eval_result = bl_eval_file(ctx,tmpfile,fd);
     fclose(fd);
     ASSERT("Successfully evaluated file",  eval_result->car->b_val)
+    return 0;
+}
+
+int test_while_oper() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_ctx_eval(ctx,bl_parse_sexp("(= x 10)"));
+    bl_ctx_eval(ctx,bl_parse_sexp("(while (gt x 0) (= x (- x 1)))"));
+    bl_ctx_eval(ctx,bl_parse_sexp("(print x)"));
+
+    bl_val_t* x_val = bl_ctx_get(ctx,"x");
+
+
+    ASSERT("while works correctly", strcmp(bl_ser_sexp(x_val),"-1")==0)
+
+    bl_ctx_close(ctx);
     return 0;
 }
 
@@ -496,6 +516,7 @@ int main(int argc, char** argv) {
     TEST("list operators                             ", test_list_opers)
     TEST("parse a string                             ", test_parse_string)
     TEST("evaluate file                              ", test_eval_file)
+    TEST("while oper                                 ", test_while_oper)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

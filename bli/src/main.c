@@ -18,7 +18,6 @@ void run_file(char* filename, int argc, char** argv) {
      bl_val_t* FILE_CTX   = bl_ctx_new(STDLIB_CTX);
 
      bl_ctx_set(FILE_CTX, "*MAINFILE*", bl_mk_str(basename(filename)));
-//     bl_ctx_set(FILE_CTX, "*ARGC*",     bl_mk_number(argc));
 
      int i=0;
      bl_val_t* argv_cons = NULL;
@@ -69,7 +68,7 @@ int main(int argc, char** argv) {
               printf("%s\n",bl_ser_sexp(result));
 	   break;
 	}
-        GC_gcollect();
+	GC_FREE(expr);
     }
     return 0;
 }
