@@ -1,0 +1,11 @@
+; BearLang implementation of project euler problem 3
+; See https://projecteuler.net/problem=3
+
+(= n 600851475143)
+(= div 2)
+(while (gt n 1)
+       (if (eq (% n div) 0) 
+ 	   (do (= n (/ n div))
+	       (= div (- div 1))))
+       (= div (+ div 1)))
+(print div)

@@ -472,12 +472,10 @@ int test_while_oper() {
     bl_val_t* ctx = bl_ctx_new_std();
     bl_ctx_eval(ctx,bl_parse_sexp("(= x 10)"));
     bl_ctx_eval(ctx,bl_parse_sexp("(while (gt x 0) (= x (- x 1)))"));
-    bl_ctx_eval(ctx,bl_parse_sexp("(print x)"));
 
     bl_val_t* x_val = bl_ctx_get(ctx,"x");
 
-
-    ASSERT("while works correctly", strcmp(bl_ser_sexp(x_val),"-1")==0)
+    ASSERT("while works correctly", strcmp(bl_ser_sexp(x_val),"0")==0)
 
     bl_ctx_close(ctx);
     return 0;

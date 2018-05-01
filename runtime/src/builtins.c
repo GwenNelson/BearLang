@@ -137,7 +137,8 @@ bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
+   params = bl_ctx_eval(ctx, params);
+     	bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
 
@@ -187,7 +188,7 @@ bl_val_t* bl_oper_lt(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   if(mpz_cmp(first->i_val,second->i_val)>0) return bl_mk_bool(false);
+   if(mpz_cmp(first->i_val,second->i_val)>=0) return bl_mk_bool(false);
    return bl_mk_bool(true);
 }
 
@@ -206,7 +207,7 @@ bl_val_t* bl_oper_gt(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   if(mpz_cmp(first->i_val,second->i_val)<0) return bl_mk_bool(false);
+   if(mpz_cmp(first->i_val,second->i_val)<=0) return bl_mk_bool(false);
    return bl_mk_bool(true);
 }
 
