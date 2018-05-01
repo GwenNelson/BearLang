@@ -225,6 +225,7 @@ bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {
 
 bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* i = bl_ctx_eval(ctx,params);
+   if(i->type == BL_VAL_TYPE_ERROR) return i;
    while(i->cdr != NULL) {
       if(i->car != NULL) {
 	 if(i->car->type == BL_VAL_TYPE_STRING) {
