@@ -49,6 +49,9 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval,  "import", bl_mk_native_oper(&bl_oper_import));
    bl_ctx_set(retval,   "isset", bl_mk_native_oper(&bl_oper_isset));
    bl_ctx_set(retval,  "serexp", bl_mk_native_oper(&bl_oper_serexp));
+   bl_ctx_set(retval,     "inc", bl_mk_native_oper(&bl_oper_inc));
+   bl_ctx_set(retval,     "dec", bl_mk_native_oper(&bl_oper_dec));
+
 
    bl_ctx_set(retval, "True",  bl_mk_bool(true));
    bl_ctx_set(retval, "False", bl_mk_bool(false));

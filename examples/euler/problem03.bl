@@ -6,6 +6,6 @@
 (while (gt n 1)
        (if (eq (% n div) 0) 
  	   (do (= n (/ n div))
-	       (= div (- div 1))))
-       (= div (+ div 1)))
+	       (dec div)))
+       (inc div))
 (print div)

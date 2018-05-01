@@ -442,3 +442,22 @@ bl_val_t* bl_oper_reverse(bl_val_t* ctx, bl_val_t* params) {
    if(retval==NULL) retval = bl_mk_null();
    return retval;
 }
+
+bool has_init_integer_one = false;
+static mpz_t integer_one;
+
+bl_val_t* bl_oper_inc(bl_val_t* ctx, bl_val_t* params) {
+   if(!has_init_integer_one) mpz_init_set_ui(integer_one,1);
+   bl_val_t* symname = bl_list_first(params);
+   bl_val_t* symval  = bl_ctx_get(ctx,symname->s_val);
+   mpz_add(symval->i_val, symval->i_val, integer_one);
+   return symval;
+}
+
+bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) {
+   if(!has_init_integer_one) mpz_init_set_ui(integer_one,1);
+   bl_val_t* symname = bl_list_first(params);
+   bl_val_t* symval  = bl_ctx_get(ctx,symname->s_val);
+   mpz_sub(symval->i_val, symval->i_val, integer_one);
+   return symval;
+}

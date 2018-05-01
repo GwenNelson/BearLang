@@ -43,3 +43,6 @@ bl_val_t* bl_oper_append  (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_prepend (bl_val_t* ctx, bl_val_t* params);
 
 bl_val_t* bl_oper_reverse (bl_val_t* ctx, bl_val_t* params);
+
+bl_val_t* bl_oper_inc (bl_val_t* ctx, bl_val_t* params);
+bl_val_t* bl_oper_dec (bl_val_t* ctx, bl_val_t* params);
