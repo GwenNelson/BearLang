@@ -35,7 +35,7 @@ bl_val_t* bl_mk_symbol(char* sym) {
 }
 
 bl_val_t* bl_mk_integer(char* s) {
-   bl_val_t* retval = bl_mk_val_atomic(BL_VAL_TYPE_NUMBER);
+   bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
    if(mpz_init_set_str(retval->i_val,s,10)==-1) {
       fprintf(stderr,"Error in gmp!\n");
    }

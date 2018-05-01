@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
               printf("%s\n",bl_ser_sexp(result));
 	   break;
 	}
-	GC_FREE(expr);
+	GC_gcollect();
     }
     return 0;
 }
