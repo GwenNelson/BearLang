@@ -24,7 +24,7 @@ bl_val_t* bl_oper_while(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) {
-   params = bl_eval_cons(ctx,params);
+   params = bl_eval_cons(ctx,params,true);
 
    bl_val_t* func = bl_list_first(params);
    bl_val_t* L    = bl_list_second(params);
@@ -47,7 +47,7 @@ bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) {
 
 bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 
-   bl_val_t* L = bl_eval_cons(ctx,params);
+   bl_val_t* L = bl_eval_cons(ctx,params,true);
    bl_val_t* retval = bl_errif_invalid_len(L,1,BL_LONGEST_LIST);
    if(retval != NULL) return retval;
 

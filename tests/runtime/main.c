@@ -276,6 +276,8 @@ int test_list_len() {
     char* single_item_list = "(1337)";
     sexp  = bl_parse_sexp(single_item_list);
     uint64_t single_len = bl_list_len(sexp);
+
+    printf("%llu single_len\n", single_len);
     ASSERT("length of (1337)==1",single_len==1)
 
     char* multi_item_list = "(1337 42 666)";

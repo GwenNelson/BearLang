@@ -84,7 +84,7 @@ void bl_set_params(bl_val_t* ctx, bl_val_t* param_names, bl_val_t* param_vals) {
     }
 }
 
-bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
+bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr, bool build_new_list) {
     bl_val_t* meta   = NULL;
     bl_val_t* retval = NULL;
     bl_val_t* i = expr;
@@ -93,14 +93,18 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
 		meta = bl_ctx_eval(ctx,i->car);
 		if(meta == NULL) return retval;
 		if(meta->type == BL_VAL_TYPE_ERROR) return meta;
-		retval = bl_list_append(retval,meta);
+		if(build_new_list) retval = bl_list_append(retval,meta);
           }
      	  i = i->cdr;
     }
     if(i->car != NULL) {
 		meta = bl_ctx_eval(ctx,i->car);
 		if(meta->type == BL_VAL_TYPE_ERROR) return meta;
-		retval = bl_list_append(retval,meta);
+		if(build_new_list) retval = bl_list_append(retval,meta);
+    }
+    if(!build_new_list && (retval==NULL)) {
+        retval = bl_mk_null();
+	retval->eval_last = meta;
     }
     if(retval) retval->eval_last = meta;
     return retval;
@@ -165,11 +169,18 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 					in_oper = true;
 				break;
 				default:
-					retval = bl_eval_cons(ctx, expr);
+					if(in_func) { 
+						retval = bl_eval_cons(ctx,expr,false);
+						if(retval != NULL) {
+							if(retval->type==BL_VAL_TYPE_ERROR) return retval;
+							return retval->eval_last;
+						}
+					}
+					retval = bl_eval_cons(ctx, expr, true);
 					if(retval==NULL) return bl_mk_null();
 					if(retval->type == BL_VAL_TYPE_ERROR) return retval;
 					if(in_oper) expr = retval->eval_last;
-					if(in_func) return retval->eval_last;
+
 					
 					return retval;
 				break;

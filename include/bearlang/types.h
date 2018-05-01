@@ -99,7 +99,7 @@ typedef struct bl_val_t {
 
 		// BL_VAL_TYPE_CONS
 		struct { bl_val_t* car;
-                         bl_val_t* cdr; };
+                         bl_val_t* cdr;	};
 
 		// BL_VAL_TYPE_CTX
 		struct { struct bl_hash_t *hash_val;
