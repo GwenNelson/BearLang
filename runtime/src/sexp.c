@@ -5,6 +5,7 @@
 #include <bearlang/error_tools.h>
 #include <bl_lexer.h>
 #include <stdio.h>
+#include <gc.h>
 
 void bl_init_parser() {
 }
@@ -165,7 +166,7 @@ char* bl_ser_sexp(bl_val_t* expr) {
 	   snprintf(retval,5,"OPER");
 	 break;
 	 case BL_VAL_TYPE_CONS:
-	   retval[0]='(';
+	   snprintf(retval,2,"%s","(");
            if((expr->car == NULL) && (expr->cdr == NULL)) {
      	       snprintf(retval,4,"%s","()");
 	   } else {
@@ -173,14 +174,19 @@ char* bl_ser_sexp(bl_val_t* expr) {
 	       while(L->cdr != NULL) {
                   if(L->car != NULL) {
                      char* newval = bl_ser_sexp(L->car);
-                     snprintf(retval,4096,"%s%s ", retval, newval);
+		     retval = GC_REALLOC(retval,strlen(retval)+strlen(newval)+4);
+		     retval = strcat(retval,newval);
+		     retval = strcat(retval," ");
 		  }
                   L = L->cdr;
 	       }
                if(L->car != NULL) {
                   char* newval = bl_ser_sexp(L->car);
-                  snprintf(retval,4096,"%s%s)", retval, newval);
+		     retval = GC_REALLOC(retval,strlen(retval)+strlen(newval)+4);
+                     retval = strcat(retval,newval);
+                     retval = strcat(retval," ");
 	       }
+	       retval[strlen(retval)-1]=')';
 	   }
 
          break;
