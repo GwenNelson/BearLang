@@ -95,11 +95,12 @@ int test_empty_ctx() {
     bl_val_t* empty_ctx = bl_ctx_new(NULL);
 
     // now set a random-ish key to an interesting value
-    bl_ctx_set(empty_ctx,"TheOneForYouAndMe", bl_mk_str("666"));
+    bl_ctx_set(empty_ctx,bl_mk_symbol("TheOneForYouAndMe"), bl_mk_str("666"));
 
 
     // and now look it up and check it's the same
-    bl_val_t* retval = bl_ctx_get(empty_ctx,"TheOneForYouAndMe");
+    bl_val_t* retval = bl_ctx_get(empty_ctx,bl_mk_symbol("TheOneForYouAndMe"));
+
 
     ASSERT("bl_ctx_get/set", (retval->type==BL_VAL_TYPE_STRING) && (strcmp(retval->s_val, "666")==0))
 
@@ -111,12 +112,12 @@ int test_child_ctx() {
     // create parent context and set something in it
     bl_val_t* parent_ctx = bl_ctx_new(NULL);
     bl_val_t* our_item   = bl_mk_str("666");
-    bl_ctx_set(parent_ctx,"TheOneForYouAndMe", our_item);
+    bl_ctx_set(parent_ctx,bl_mk_symbol("TheOneForYouAndMe"), our_item);
 
     // create an empty child context and lookup the key in it
     bl_val_t* child_ctx = bl_ctx_new(parent_ctx);
 
-    bl_val_t* looked_up = bl_ctx_get(child_ctx,"TheOneForYouAndMe");
+    bl_val_t* looked_up = bl_ctx_get(child_ctx,bl_mk_symbol("TheOneForYouAndMe"));
     ASSERT("bl_ctx_get with child ctx", (looked_up->type==BL_VAL_TYPE_STRING) && (strcmp(looked_up->s_val,"666")==0))
   
     bl_ctx_close(child_ctx);
@@ -277,7 +278,6 @@ int test_list_len() {
     sexp  = bl_parse_sexp(single_item_list);
     uint64_t single_len = bl_list_len(sexp);
 
-    printf("%llu single_len\n", single_len);
     ASSERT("length of (1337)==1",single_len==1)
 
     char* multi_item_list = "(1337 42 666)";
@@ -473,7 +473,7 @@ int test_while_oper() {
     bl_ctx_eval(ctx,bl_parse_sexp("(= x 10)"));
     bl_ctx_eval(ctx,bl_parse_sexp("(while (gt x 0) (= x (- x 1)))"));
 
-    bl_val_t* x_val = bl_ctx_get(ctx,"x");
+    bl_val_t* x_val = bl_ctx_get(ctx,bl_mk_symbol("x"));
 
     ASSERT("while works correctly", strcmp(bl_ser_sexp(x_val),"-1")==0)
 

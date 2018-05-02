@@ -13,48 +13,48 @@
 bl_val_t* bl_ctx_new_std() {
    bl_val_t* retval = bl_ctx_new(NULL);
 
-   bl_ctx_set(retval,"*VERSION*", bl_mk_str("0.WHATEVER")); // TODO - change this and use a real versioning system
+   bl_ctx_set(retval,bl_mk_symbol("*VERSION*"), bl_mk_str("0.WHATEVER")); // TODO - change this and use a real versioning system
 
-   bl_ctx_set(retval,    "None", bl_mk_null());
-   bl_ctx_set(retval,       "+", bl_mk_native_oper(&bl_oper_add));
-   bl_ctx_set(retval,       "-", bl_mk_native_oper(&bl_oper_sub));
-   bl_ctx_set(retval,       "*", bl_mk_native_oper(&bl_oper_mult));
-   bl_ctx_set(retval,       "/", bl_mk_native_oper(&bl_oper_div));
-   bl_ctx_set(retval,       "%", bl_mk_native_oper(&bl_oper_mod));
-   bl_ctx_set(retval,       "=", bl_mk_native_oper(&bl_oper_set));
-   bl_ctx_set(retval,      "fn", bl_mk_native_oper(&bl_oper_fn));
-   bl_ctx_set(retval,     "fun", bl_mk_native_oper(&bl_oper_fun));
-   bl_ctx_set(retval,     "map", bl_mk_native_oper(&bl_oper_map));
-   bl_ctx_set(retval,    "oper", bl_mk_native_oper(&bl_oper_oper));
-   bl_ctx_set(retval,      "eq", bl_mk_native_oper(&bl_oper_eq));
-   bl_ctx_set(retval,      "lt", bl_mk_native_oper(&bl_oper_lt));
-   bl_ctx_set(retval,      "gt", bl_mk_native_oper(&bl_oper_gt));
-   bl_ctx_set(retval,   "while", bl_mk_native_oper(&bl_oper_while));
-   bl_ctx_set(retval,      "==", bl_mk_native_oper(&bl_oper_eq));
-   bl_ctx_set(retval,   "print", bl_mk_native_oper(&bl_oper_print));
-   bl_ctx_set(retval,     "and", bl_mk_native_oper(&bl_oper_and));
-   bl_ctx_set(retval,     "not", bl_mk_native_oper(&bl_oper_not));
-   bl_ctx_set(retval,      "or", bl_mk_native_oper(&bl_oper_or));
-   bl_ctx_set(retval,     "xor", bl_mk_native_oper(&bl_oper_xor));
-   bl_ctx_set(retval,   "first", bl_mk_native_oper(&bl_oper_first));
-   bl_ctx_set(retval,  "second", bl_mk_native_oper(&bl_oper_second));
-   bl_ctx_set(retval,   "third", bl_mk_native_oper(&bl_oper_third));
-   bl_ctx_set(retval,    "rest", bl_mk_native_oper(&bl_oper_rest));
-   bl_ctx_set(retval,  "append", bl_mk_native_oper(&bl_oper_append));
-   bl_ctx_set(retval, "prepend", bl_mk_native_oper(&bl_oper_prepend));
-   bl_ctx_set(retval, "reverse", bl_mk_native_oper(&bl_oper_reverse));
-   bl_ctx_set(retval,     "car", bl_mk_native_oper(&bl_oper_first));
-   bl_ctx_set(retval,     "cdr", bl_mk_native_oper(&bl_oper_rest));
-   bl_ctx_set(retval, "include", bl_mk_native_oper(&bl_oper_include));
-   bl_ctx_set(retval,  "import", bl_mk_native_oper(&bl_oper_import));
-   bl_ctx_set(retval,   "isset", bl_mk_native_oper(&bl_oper_isset));
-   bl_ctx_set(retval,  "serexp", bl_mk_native_oper(&bl_oper_serexp));
-   bl_ctx_set(retval,     "inc", bl_mk_native_oper(&bl_oper_inc));
-   bl_ctx_set(retval,     "dec", bl_mk_native_oper(&bl_oper_dec));
+   bl_ctx_set(retval,   bl_mk_symbol( "None"), bl_mk_null());
+   bl_ctx_set(retval,       bl_mk_symbol("+"), bl_mk_native_oper(&bl_oper_add));
+   bl_ctx_set(retval,       bl_mk_symbol("-"), bl_mk_native_oper(&bl_oper_sub));
+   bl_ctx_set(retval,       bl_mk_symbol("*"), bl_mk_native_oper(&bl_oper_mult));
+   bl_ctx_set(retval,       bl_mk_symbol("/"), bl_mk_native_oper(&bl_oper_div));
+   bl_ctx_set(retval,       bl_mk_symbol("%"), bl_mk_native_oper(&bl_oper_mod));
+   bl_ctx_set(retval,       bl_mk_symbol("="), bl_mk_native_oper(&bl_oper_set));
+   bl_ctx_set(retval,      bl_mk_symbol("fn"), bl_mk_native_oper(&bl_oper_fn));
+   bl_ctx_set(retval,     bl_mk_symbol("fun"), bl_mk_native_oper(&bl_oper_fun));
+   bl_ctx_set(retval,     bl_mk_symbol("map"), bl_mk_native_oper(&bl_oper_map));
+   bl_ctx_set(retval,    bl_mk_symbol("oper"), bl_mk_native_oper(&bl_oper_oper));
+   bl_ctx_set(retval,      bl_mk_symbol("eq"), bl_mk_native_oper(&bl_oper_eq));
+   bl_ctx_set(retval,      bl_mk_symbol("lt"), bl_mk_native_oper(&bl_oper_lt));
+   bl_ctx_set(retval,      bl_mk_symbol("gt"), bl_mk_native_oper(&bl_oper_gt));
+   bl_ctx_set(retval,   bl_mk_symbol("while"), bl_mk_native_oper(&bl_oper_while));
+   bl_ctx_set(retval,      bl_mk_symbol("=="), bl_mk_native_oper(&bl_oper_eq));
+   bl_ctx_set(retval,   bl_mk_symbol("print"), bl_mk_native_oper(&bl_oper_print));
+   bl_ctx_set(retval,     bl_mk_symbol("and"), bl_mk_native_oper(&bl_oper_and));
+   bl_ctx_set(retval,     bl_mk_symbol("not"), bl_mk_native_oper(&bl_oper_not));
+   bl_ctx_set(retval,      bl_mk_symbol("or"), bl_mk_native_oper(&bl_oper_or));
+   bl_ctx_set(retval,     bl_mk_symbol("xor"), bl_mk_native_oper(&bl_oper_xor));
+   bl_ctx_set(retval,   bl_mk_symbol("first"), bl_mk_native_oper(&bl_oper_first));
+   bl_ctx_set(retval,  bl_mk_symbol("second"), bl_mk_native_oper(&bl_oper_second));
+   bl_ctx_set(retval,   bl_mk_symbol("third"), bl_mk_native_oper(&bl_oper_third));
+   bl_ctx_set(retval,    bl_mk_symbol("rest"), bl_mk_native_oper(&bl_oper_rest));
+   bl_ctx_set(retval,  bl_mk_symbol("append"), bl_mk_native_oper(&bl_oper_append));
+   bl_ctx_set(retval, bl_mk_symbol("prepend"), bl_mk_native_oper(&bl_oper_prepend));
+   bl_ctx_set(retval, bl_mk_symbol("reverse"), bl_mk_native_oper(&bl_oper_reverse));
+   bl_ctx_set(retval,     bl_mk_symbol("car"), bl_mk_native_oper(&bl_oper_first));
+   bl_ctx_set(retval,     bl_mk_symbol("cdr"), bl_mk_native_oper(&bl_oper_rest));
+   bl_ctx_set(retval, bl_mk_symbol("include"), bl_mk_native_oper(&bl_oper_include));
+   bl_ctx_set(retval,  bl_mk_symbol("import"), bl_mk_native_oper(&bl_oper_import));
+   bl_ctx_set(retval,   bl_mk_symbol("isset"), bl_mk_native_oper(&bl_oper_isset));
+   bl_ctx_set(retval,  bl_mk_symbol("serexp"), bl_mk_native_oper(&bl_oper_serexp));
+   bl_ctx_set(retval,     bl_mk_symbol("inc"), bl_mk_native_oper(&bl_oper_inc));
+   bl_ctx_set(retval,     bl_mk_symbol("dec"), bl_mk_native_oper(&bl_oper_dec));
 
 
-   bl_ctx_set(retval, "True",  bl_mk_bool(true));
-   bl_ctx_set(retval, "False", bl_mk_bool(false));
+   bl_ctx_set(retval, bl_mk_symbol("True"),  bl_mk_bool(true));
+   bl_ctx_set(retval, bl_mk_symbol("False"), bl_mk_bool(false));
 
    return retval;
 }
@@ -79,13 +79,13 @@ void bl_set_params(bl_val_t* ctx, bl_val_t* param_names, bl_val_t* param_vals) {
     bl_val_t* argsv_i = param_vals;
     while(argsk_i->cdr != NULL) {
        if(argsk_i->car != NULL) {
-	       bl_ctx_set(ctx, argsk_i->car->s_val, argsv_i->car);
+	       bl_ctx_set(ctx, argsk_i->car, argsv_i->car);
        }
        argsk_i = argsk_i -> cdr;
        argsv_i = argsv_i -> cdr;
     }
     if(argsk_i->car != NULL) {
-       bl_ctx_set(ctx, argsk_i->car->s_val, argsv_i->car);
+       bl_ctx_set(ctx, argsk_i->car, argsv_i->car);
     }
 }
 
@@ -134,7 +134,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
                       return bl_mk_null();
 		   } else {
 			   if(expr->car->type == BL_VAL_TYPE_SYMBOL) {
-	 			car = bl_ctx_get(ctx, expr->car->s_val);
+	 			car = bl_ctx_get(ctx, expr->car);
 				if(car == NULL)  return bl_err_symnotfound(expr->car->s_val);
 			   } else {
 				car = expr->car;
@@ -193,7 +193,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 		}
               break;
 	      case BL_VAL_TYPE_SYMBOL:
-	           symval = bl_ctx_get(ctx, expr->s_val);
+	           symval = bl_ctx_get(ctx, expr);
 	           if(symval == NULL) {
 	              return bl_err_symnotfound(expr->s_val);
 		   } else {
@@ -208,15 +208,19 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 }
 
 
-bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
-   if(strstr(key,"::")) {
-
-     strstr(key,"::")[0]='\0';
-     char* ctx_key = key;
-     char* sym_key = key+strlen(ctx_key)+2;
-     bl_val_t* other_ctx = bl_ctx_get(ctx, ctx_key);
-     if(other_ctx == NULL) return NULL;
-     return bl_ctx_get(other_ctx,sym_key);
+bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) {
+   if(strstr(key->s_val,"::")) {
+     char* tmp = strdup(key->s_val);
+     strstr(tmp,"::")[0]='\0';
+     char* ctx_key = tmp;
+     char* sym_key = tmp+strlen(ctx_key)+2;
+     bl_val_t* other_ctx = bl_ctx_get(ctx, bl_mk_symbol(ctx_key));
+     free(tmp);
+     if(other_ctx == NULL) { 
+   	return NULL;
+     }
+   
+     return bl_ctx_get(other_ctx,bl_mk_symbol(sym_key));
 
    }
    if(ctx->secondary != NULL) {
@@ -225,7 +229,7 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
    }
    struct bl_hash_t* ht = ctx->hash_val;
    struct bl_hash_t* val = NULL;
-   HASH_FIND_STR(ht, key, val);
+   HASH_FIND_PTR(ht, &key, val);
    if(!val) {
       if(ctx->parent != NULL) {
 	 bl_val_t* V = bl_ctx_get(ctx->parent, key);
@@ -239,21 +243,16 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, char* key) {
    return NULL;
 }
 
-bl_val_t* bl_ctx_set(bl_val_t* ctx, char* key, bl_val_t* val) {
+bl_val_t* bl_ctx_set(bl_val_t* ctx, bl_val_t* key, bl_val_t* val) {
    if(ctx->parent != NULL) {
       if(ctx->write_to_parent) ctx = ctx->parent;
    }
 
-   struct bl_hash_t* cur_val = NULL;
-   HASH_FIND_STR(ctx->hash_val, key, cur_val);
-   if(!cur_val) {
-           struct bl_hash_t* ht_val = (struct bl_hash_t*)GC_MALLOC(sizeof(struct bl_hash_t));
-           snprintf(ht_val->key,32,"%s",key);
-           ht_val->val = val;
-     	   HASH_ADD_STR(ctx->hash_val, key, ht_val);
-   } else {
-      cur_val->val = val;
-   }
+   struct bl_hash_t* ignored = NULL;
+   struct bl_hash_t* cur_val = (struct bl_hash_t*)GC_MALLOC(sizeof(struct bl_hash_t));
+   cur_val->key = key;
+   cur_val->val = val;
+   HASH_REPLACE_PTR(ctx->hash_val, key, cur_val,ignored);
 
    return val;
 }

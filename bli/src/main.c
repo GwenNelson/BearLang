@@ -17,14 +17,14 @@ void run_file(char* filename, int argc, char** argv) {
      bl_val_t* STDLIB_CTX = bl_ctx_new_std();
      bl_val_t* FILE_CTX   = bl_ctx_new(STDLIB_CTX);
 
-     bl_ctx_set(FILE_CTX, "*MAINFILE*", bl_mk_str(basename(filename)));
+     bl_ctx_set(FILE_CTX, bl_mk_symbol("*MAINFILE*"), bl_mk_str(basename(filename)));
 
      int i=0;
      bl_val_t* argv_cons = NULL;
      for(i=0; i<argc; i++) {
          argv_cons = bl_list_append(argv_cons, bl_mk_str(argv[i]));
      }
-     bl_ctx_set(FILE_CTX, "*ARGV*", argv_cons);
+     bl_ctx_set(FILE_CTX, bl_mk_symbol("*ARGV*"), argv_cons);
 
      FILE* fd = fopen(filename,"r");
 

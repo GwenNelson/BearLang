@@ -133,7 +133,9 @@ char* bl_ser_type(bl_val_type_t t) {
 	 case BL_VAL_TYPE_ANY:
 	      return "ANY";
 	 break;
-
+	 default:
+	      return "UNKNOWN";
+	 break;
       }
 }
 

@@ -73,7 +73,7 @@ typedef struct bl_err_t {
 } bl_err_t;
 
 struct bl_hash_t {
-       char           key[32];
+       bl_val_t*      key;
        bl_val_t*      val;
        UT_hash_handle hh;
 };

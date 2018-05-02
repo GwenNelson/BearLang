@@ -163,6 +163,7 @@ bl_val_t* bl_oper_mod(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
+   mpz_init(retval->i_val);
    mpz_mod(retval->i_val, first->i_val, second->i_val);
    return retval;
 }
@@ -210,7 +211,7 @@ bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {
    retval = bl_ctx_eval(ctx,bl_list_second(params));
    bl_val_t* name   = bl_list_first(params); // TODO: Handle the case where this isn't a symbol
 
-   bl_ctx_set(ctx, name->s_val, retval);
+   bl_ctx_set(ctx, name, retval);
    return retval;
 }
 
@@ -255,7 +256,7 @@ bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) {
    retval->lexical_closure = ctx;
    retval->sym = bl_list_first(params);
 
-   bl_ctx_set(ctx, retval->sym->s_val, retval);
+   bl_ctx_set(ctx, retval->sym, retval);
    return retval;
 }
 
@@ -266,7 +267,7 @@ bl_val_t* bl_oper_oper(bl_val_t* ctx, bl_val_t* params) {
    retval->bl_oper_ptr     = bl_list_rest(bl_list_rest(params));
 
    bl_val_t* name = bl_list_first(params);
-   bl_ctx_set(ctx, name->s_val, retval);
+   bl_ctx_set(ctx, name, retval);
    return retval;
 }
 
@@ -375,7 +376,7 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
       bl_val_t* new_ctx = bl_ctx_new(ctx);
       bl_eval_file(new_ctx, filename, fd);
       fclose(fd);
-      bl_ctx_set(ctx, module_name->s_val, new_ctx);
+      bl_ctx_set(ctx, bl_mk_symbol(module_name->s_val), new_ctx);
       return new_ctx;
    } else {
       snprintf(filename,1024,"%s.so",module_name->s_val);
@@ -393,14 +394,14 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
       char* err = dlerror();
       if(err) fprintf(stderr,"dlsym failed: %s\n", err);
       bl_val_t* new_ctx = mod_init(ctx);
-      bl_ctx_set(ctx, module_name->s_val, new_ctx);
+      bl_ctx_set(ctx, bl_mk_symbol(module_name->s_val), new_ctx);
       return new_ctx;
    }
 }
 
 bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* sym    = bl_list_first(params);
-   bl_val_t* symval = bl_ctx_get(ctx, sym->s_val);
+   bl_val_t* symval = bl_ctx_get(ctx, sym);
    if(symval == NULL) return bl_mk_bool(false);
    return bl_mk_bool(true);
 }
@@ -441,7 +442,7 @@ static mpz_t integer_one;
 bl_val_t* bl_oper_inc(bl_val_t* ctx, bl_val_t* params) {
    if(!has_init_integer_one) mpz_init_set_ui(integer_one,1);
    bl_val_t* symname = bl_list_first(params);
-   bl_val_t* symval  = bl_ctx_get(ctx,symname->s_val);
+   bl_val_t* symval  = bl_ctx_get(ctx,symname);
    mpz_add(symval->i_val, symval->i_val, integer_one);
    return symval;
 }
@@ -449,7 +450,7 @@ bl_val_t* bl_oper_inc(bl_val_t* ctx, bl_val_t* params) {
 bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) {
    if(!has_init_integer_one) mpz_init_set_ui(integer_one,1);
    bl_val_t* symname = bl_list_first(params);
-   bl_val_t* symval  = bl_ctx_get(ctx,symname->s_val);
+   bl_val_t* symval  = bl_ctx_get(ctx,symname);
    mpz_sub(symval->i_val, symval->i_val, integer_one);
    return symval;
 }
