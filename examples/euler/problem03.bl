@@ -3,7 +3,7 @@
 
 (= n 600851475143)
 (= div 2)
-(while (gt n 1)
+(while (gt n 2)
        (if (eq (% n div) 0) 
  	   (do (= n (/ n div))
 	       (dec div)))

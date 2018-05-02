@@ -1,0 +1,30 @@
+; BearLang implementation of project euler problem 4
+; See https://projecteuler.net/problem=4
+
+(fun is-palindrome (x) 
+     (= div 1)
+     (while (gt (/ x div) 10)
+         (= div (* div 10)))
+     (= retval True)
+     (while (not (eq x 0))
+	    (= l (/ x div))
+	    (= r (% x 10))
+	    (if (not (eq l r)) 
+	      (do (= retval False) (= x 0))
+	      (do (= x (/ (% x div) 10))
+	          (= div (/ div 100)))))
+     retval)
+
+(= max 0)
+(= i 999)
+(= j 990)
+(while (gt i 900)
+        (= j 990)
+	(while (gt j 900)
+	        (= product (* i j))
+	        (if (gt product max)
+		    (if (is-palindrome product) (= max product)))
+		(= j (- j 11)))
+	(dec i))
+
+(print max "\n")

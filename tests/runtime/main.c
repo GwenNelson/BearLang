@@ -475,7 +475,7 @@ int test_while_oper() {
 
     bl_val_t* x_val = bl_ctx_get(ctx,"x");
 
-    ASSERT("while works correctly", strcmp(bl_ser_sexp(x_val),"0")==0)
+    ASSERT("while works correctly", strcmp(bl_ser_sexp(x_val),"-1")==0)
 
     bl_ctx_close(ctx);
     return 0;

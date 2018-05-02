@@ -152,7 +152,7 @@ bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
    mpz_init(retval->i_val);
-   mpz_divexact(retval->i_val, first->i_val, second->i_val);
+   mpz_tdiv_q(retval->i_val, first->i_val, second->i_val);
    return retval;
 }
 
@@ -207,7 +207,7 @@ bl_val_t* bl_oper_gt(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   if(mpz_cmp(first->i_val,second->i_val)<=0) return bl_mk_bool(false);
+   if(mpz_cmp(first->i_val,second->i_val)<0) return bl_mk_bool(false);
    return bl_mk_bool(true);
 }
 
