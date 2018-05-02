@@ -3,11 +3,14 @@
 #include <bearlang/ctx.h>
 #include <bearlang/sexp.h>
 #include <bearlang/list_ops.h>
+#include <bearlang/utarray.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
 
 #include <gmp.h>
+
+
 
 bl_val_t* bl_mk_val(bl_val_type_t type) {
    bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
@@ -34,8 +37,38 @@ bl_val_t* bl_mk_symbol(char* sym) {
    return retval;
 }
 
+UT_icd gmp_int_icd = {sizeof(mpz_t), NULL, NULL, NULL};
+
+static UT_array *int_pool = NULL;
+size_t int_pool_size = 0;
+
+void grow_intpool() {
+     int i=0;
+     for(i=0; i<15; i++) {
+         mpz_t* n = GC_MALLOC(sizeof(mpz_t));
+	 mpz_init2(*n,32);
+	 utarray_push_back(int_pool,&n);
+     }
+     int_pool_size += 15;
+}
+
+void init_intpool() {
+     utarray_new(int_pool, &gmp_int_icd);
+     grow_intpool();
+}
+
+mpz_t* get_int_frompool() {
+     if(int_pool==NULL) init_intpool();
+     if(int_pool_size<=10) grow_intpool();
+     mpz_t* retval = (mpz_t*)utarray_back(int_pool);
+     utarray_pop_back(int_pool);
+     int_pool_size -= 1;
+     return retval;
+}
+
 bl_val_t* bl_mk_integer(char* s) {
    bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
+   memcpy(&(retval->i_val), get_int_frompool(), sizeof(mpz_t));
    if(mpz_init_set_str(retval->i_val,s,10)==-1) {
       fprintf(stderr,"Error in gmp!\n");
    }

@@ -107,14 +107,12 @@ bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
      
-   retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-
-   retval->type     = BL_VAL_TYPE_NUMBER;
+   retval = bl_mk_integer("0");
 
    bl_val_t* first  = bl_list_first(params);
    bl_val_t* second = bl_list_second(params);
 
-   mpz_init(retval->i_val);
+
    mpz_sub(retval->i_val, first->i_val, second->i_val);
    return retval;
 }
@@ -125,13 +123,11 @@ bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
 
-   retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   retval->type     = BL_VAL_TYPE_NUMBER;
+   retval = bl_mk_integer("0");
 
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   mpz_init(retval->i_val);
    mpz_mul(retval->i_val, first->i_val, second->i_val);
    return retval;
 }
@@ -145,13 +141,10 @@ bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) {
    retval = bl_errif_invalid_len(params,2,2);
    if(retval != NULL) return retval;
 
-   retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   retval->type     = BL_VAL_TYPE_NUMBER;
-
+    retval = bl_mk_integer("0");
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   mpz_init(retval->i_val);
    mpz_tdiv_q(retval->i_val, first->i_val, second->i_val);
    return retval;
 }
@@ -165,13 +158,11 @@ bl_val_t* bl_oper_mod(bl_val_t* ctx, bl_val_t* params) {
    retval = bl_errif_invalid_len(params,2,2);
    if(retval != NULL) return retval;
 
-   retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   retval->type     = BL_VAL_TYPE_NUMBER;
+   retval = bl_mk_integer("0");
 
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   mpz_init(retval->i_val);
    mpz_mod(retval->i_val, first->i_val, second->i_val);
    return retval;
 }
