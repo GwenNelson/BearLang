@@ -3,6 +3,7 @@
 #include <gc.h>
 #include <gmp.h>
 
+//LCOV_EXCL_START
 void* gmp_malloc(size_t size) {
       return GC_malloc(size);
 }
@@ -14,7 +15,7 @@ void* gmp_realloc(void* ptr, size_t old_size, size_t new_size) {
 void gmp_free(void* ptr, size_t size) {
 //     GC_free(ptr);
 }
-
+//LCOV_EXCL_STOP
 int bl_init() {
     GC_INIT();
     mp_set_memory_functions(&gmp_malloc, &gmp_realloc, &gmp_free);

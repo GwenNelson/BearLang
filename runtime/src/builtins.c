@@ -234,6 +234,7 @@ bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {
    return retval;
 }
 
+//LCOV_EXCL_START
 bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* i = bl_ctx_eval(ctx,params);
    if(i->type == BL_VAL_TYPE_ERROR) return i;
@@ -256,6 +257,7 @@ bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
    }
    return bl_mk_null();
 }
+//LCOV_EXCL_STOP
 
 bl_val_t* bl_oper_fn(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* retval        = bl_mk_val(BL_VAL_TYPE_FUNC_BL);
@@ -279,6 +281,7 @@ bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) {
    return retval;
 }
 
+//LCOV_EXCL_START
 bl_val_t* bl_oper_oper(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* retval        = bl_mk_val(BL_VAL_TYPE_OPER_BL);
    retval->bl_operargs_ptr = bl_list_second(params);
@@ -288,6 +291,7 @@ bl_val_t* bl_oper_oper(bl_val_t* ctx, bl_val_t* params) {
    bl_ctx_set(ctx, name, retval);
    return retval;
 }
+//LCOV_EXCL_STOP
 
 bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
@@ -383,6 +387,7 @@ bl_val_t* bl_oper_include(bl_val_t* ctx, bl_val_t* params) {
 }
 
 typedef bl_val_t* (*mod_init_fn)(bl_val_t*);
+//LCOV_EXCL_START
 
 bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* module_name = bl_ctx_eval(ctx,bl_list_first(params));
@@ -418,6 +423,7 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
       return new_ctx;
    }
 }
+//LCOV_EXCL_STOP
 
 bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* sym    = bl_list_first(params);

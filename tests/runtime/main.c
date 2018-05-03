@@ -742,6 +742,27 @@ int test_mk_sym() {
 
 }
 
+int test_pool_alloc() {
+    // basically just allocate a whole pile of values in a loop
+    int i=0;
+    for(i=0; i<6000000; i++) bl_mk_val(BL_VAL_TYPE_NULL);
+    GC_gcollect();
+    return 0;
+}
+
+int test_ctx_stress() {
+    bl_val_t* new_ctx = bl_ctx_new(NULL);
+    int i=0;
+    char sbuf[100];
+    for(i=0; i<10000; i++) {
+        snprintf(sbuf,100,"%d",i);
+	bl_val_t* new_sym = bl_mk_symbol(sbuf);
+	bl_ctx_set(new_ctx,new_sym,bl_mk_integer(sbuf));
+    }
+    GC_gcollect();
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -790,6 +811,8 @@ int main(int argc, char** argv) {
     TEST("include oper                               ", test_include_oper)
     TEST("bl_mk_list                                 ", test_mk_list)
     TEST("bl_mk_symbol                               ", test_mk_sym)
+    TEST("pool allocation                            ", test_pool_alloc)
+    TEST("ctx stress test                            ", test_ctx_stress)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

@@ -37,6 +37,7 @@ COMMENT_START   \;
 
 %%
 
+//LCOV_EXCL_START
 void* yyalloc(size_t bytes, void* yyscanner) {
       return GC_MALLOC(bytes);
 }
@@ -48,3 +49,4 @@ void* yyrealloc(void* ptr, size_t bytes, void* yyscanner) {
 void yyfree(void* ptr, void* yyscanner) {
      GC_FREE(ptr);
 }
+//LCOV_EXCL_STOP

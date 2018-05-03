@@ -48,7 +48,9 @@ uint16_t last_sym_id = 0;
 bl_val_t* bl_mk_symbol(char* sym) {
    struct sym_hash_t* symobj = NULL;
    bl_val_t* retval = NULL;
+//LCOV_EXCL_START
    HASH_FIND_STR(symbol_table, sym, symobj);
+//LCOV_EXCL_STOP
    if(!symobj) {
       retval           = bl_mk_val(BL_VAL_TYPE_SYMBOL);
       size_t count     = strlen(sym)*sizeof(char)+1;
@@ -59,7 +61,9 @@ bl_val_t* bl_mk_symbol(char* sym) {
       symobj = (struct sym_hash_t*)GC_MALLOC(sizeof(struct sym_hash_t));
       snprintf(symobj->key,32,"%s", sym);
       symobj->sym = retval;
+//LCOV_EXCL_START
       HASH_ADD_STR(symbol_table, key, symobj);
+//LCOV_EXCL_STOP
    } else {
       retval = symobj->sym;
    }
@@ -117,7 +121,7 @@ bl_val_t* bl_mk_list(size_t count,...) {
 
    int i=0;
    for (i=0; i < count; i++ ) {
-      retval = bl_list_prepend(retval,va_arg(ap,bl_val_t*));
+      retval = bl_list_prepend(retval,va_arg(ap,bl_val_t*)); // LCOV_EXCL_LINE
    }
    va_end(ap);
    return bl_list_reverse(retval);

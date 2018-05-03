@@ -231,10 +231,6 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) {
      return bl_ctx_get(other_ctx,bl_mk_symbol(sym_key));
 
    }*/
-   if(ctx->secondary != NULL) {
-      bl_val_t* s_V = bl_ctx_get(ctx->secondary, key);
-      if(s_V != NULL) return s_V;
-   }
    bl_val_t* retval = NULL;
    if(key->sym_id < ctx->vals_count) {
     	   retval = ctx->vals[key->sym_id];
@@ -250,11 +246,11 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) {
 }
 
 bl_val_t* bl_ctx_set(bl_val_t* ctx, bl_val_t* key, bl_val_t* val) {
-   if(ctx->write_to_parent) {
+/*   if(ctx->write_to_parent) {
       if(ctx->parent != NULL) {
          if(ctx->write_to_parent) ctx = ctx->parent;
       }
-   }
+   }*/
    if(key->sym_id >= ctx->vals_count) {
      uint16_t old_count = ctx->vals_count;
      ctx->vals_count = key->sym_id+8;
