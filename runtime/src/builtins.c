@@ -49,8 +49,8 @@ bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
-
-   bl_val_t* L = bl_eval_cons(ctx,params,true);
+    bl_val_t* L = params;
+//   bl_val_t* L = bl_eval_cons(ctx,params,true);
 /*   bl_val_t* retval = bl_errif_invalid_len(L,1,BL_LONGEST_LIST);
    if(retval != NULL) return retval;*/
    bl_val_t* retval = NULL;
@@ -60,7 +60,7 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
       params = first;
       first  = bl_list_first(params);
    }
-
+   bl_val_t* x = NULL;
    switch(first->type) {
       case BL_VAL_TYPE_NUMBER:
            retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
@@ -69,12 +69,26 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
       case BL_VAL_TYPE_STRING:
            retval = bl_mk_str("");
       break;
+      case BL_VAL_TYPE_CONS:
+           retval = NULL;
+	   for(L=params; L != NULL; L=L->cdr) {
+              x = bl_ctx_eval(ctx,L->car);
+              if(x->type == BL_VAL_TYPE_CONS) {
+                for(; x != NULL; x=x->cdr) {
+                    retval = bl_list_prepend(retval, x->car);
+		}
+	      } else {
+                retval = bl_list_prepend(retval,x);
+	      }
+	   }
+	   return bl_list_reverse(retval);
+      break;
       default:
-         return bl_mk_str(""); // TODO - add support for adding together lists
+         retval = bl_mk_str("");
       break;
    }
 
-   bl_val_t* x = NULL;
+
    char*     s = NULL;
    size_t    c = 0;
    char*     buf = NULL;
@@ -353,13 +367,9 @@ bl_val_t* bl_oper_third(bl_val_t* ctx, bl_val_t* params) {
 bl_val_t* bl_oper_rest(bl_val_t* ctx, bl_val_t* params) {
 
    params = bl_ctx_eval(ctx,params);
-   if(params->type == BL_VAL_TYPE_ERROR) return params;
 
    if(bl_list_len(params)==1) params = bl_ctx_eval(ctx,bl_list_first(params));
-   if(params->type == BL_VAL_TYPE_NULL) return bl_mk_null();
-   if(bl_list_len(params)==0) return bl_mk_null();
    bl_val_t* retval = bl_list_rest(params);
-   if(retval==NULL) retval = bl_mk_null();
    return retval;
 }
 
@@ -436,13 +446,9 @@ bl_val_t* bl_oper_prepend(bl_val_t* ctx, bl_val_t* params) {
 bl_val_t* bl_oper_reverse(bl_val_t* ctx, bl_val_t* params) {
 
    params = bl_ctx_eval(ctx,params);
-   if(params->type == BL_VAL_TYPE_ERROR) return params;
 
    if(bl_list_len(params)==1) params = bl_ctx_eval(ctx,bl_list_first(params));
-   if(params->type == BL_VAL_TYPE_NULL) return bl_mk_null();
-   if(bl_list_len(params)==0) return bl_mk_null();
    bl_val_t* retval = bl_list_reverse(params);
-   if(retval==NULL) retval = bl_mk_null();
    return retval;
 }
 

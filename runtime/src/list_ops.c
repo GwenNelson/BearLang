@@ -49,14 +49,14 @@ bl_val_t* bl_list_append(bl_val_t* L, bl_val_t* val) {
 }
 
 uint64_t bl_list_len(bl_val_t* L) {
-   uint64_t retval = 0;
    if(L==NULL) return 0;
+   if(L->car==NULL) return 0;
+   uint64_t retval = 0;
+
    bl_val_t* i = L;
-   while(L->cdr != NULL) {
-      if(L->car != NULL) retval++;
-      L = L->cdr;
+   for(i=L; i != NULL; i=i->cdr) {
+       retval++;
    }
-   if(L->car != NULL) retval++;
    return retval;
 }
 

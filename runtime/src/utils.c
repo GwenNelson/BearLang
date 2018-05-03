@@ -82,12 +82,6 @@ bl_val_t* bl_mk_integer(char* s) {
    return retval;
 }
 
-bl_val_t* bl_mk_float(char* s) {
-   bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
-   mpf_init_set_str(retval->f_val,s,10);
-   retval->is_float = true;
-   return retval;
-}
 
 bl_val_t* bl_mk_str(char* s) {
    bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_STRING);
@@ -114,7 +108,14 @@ bl_val_t* bl_mk_bool(bool b) {
 }
 
 bl_val_t* bl_mk_list(size_t count,...) {
+
    bl_val_t* retval = NULL;
+   if(count==0) {
+      retval = bl_mk_val(BL_VAL_TYPE_CONS);
+      retval->car=NULL;
+      retval->cdr=NULL;
+      return retval;
+   }
 
    va_list ap;
    bl_val_t* E;
@@ -124,6 +125,7 @@ bl_val_t* bl_mk_list(size_t count,...) {
    for (i=0; i < count; i++ ) {
       retval = bl_list_prepend(retval,va_arg(ap,bl_val_t*));
    }
+   va_end(ap);
    return bl_list_reverse(retval);
 }
 

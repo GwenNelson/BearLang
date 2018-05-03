@@ -7,8 +7,6 @@
 #include <stdio.h>
 #include <gc.h>
 
-void bl_init_parser() {
-}
 
 bl_val_t* read_form(yyscan_t scanner);
 
@@ -16,7 +14,8 @@ bl_val_t* read_list(yyscan_t scanner) {
     bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_CONS);
     retval->car = read_form(scanner);
     retval->cdr = NULL;
-    if(retval->car == NULL) return retval; 
+//    if(retval == NULL) return retval; 
+    if(retval->car == NULL) return retval;
     if(retval->car->type == BL_VAL_TYPE_LIST_END) {
        retval->car = NULL;
        return retval;
@@ -89,9 +88,6 @@ bl_val_t* read_form(yyscan_t scanner) {
 	break;
 	case BL_TOKEN_RPAREN:
 		return &end_list_val;
-	break;
-	case BL_TOKEN_FLOAT:
-		return bl_mk_float(yyget_text(scanner));
 	break;
 	case BL_TOKEN_INTEGER:
 		return bl_mk_integer(yyget_text(scanner));
@@ -173,28 +169,19 @@ char* bl_ser_sexp(bl_val_t* expr) {
 	   snprintf(retval,1024,"(fn %s %s)",bl_ser_sexp(expr->bl_funcargs_ptr), bl_ser_sexp(expr->bl_func_ptr));
 	 break;
          case BL_VAL_TYPE_OPER_NATIVE:
-	   snprintf(retval,5,"OPER");
+	   snprintf(retval,32,"<nativeoper>");
 	 break;
 	 case BL_VAL_TYPE_CONS:
 	   snprintf(retval,2,"%s","(");
-           if((expr->car == NULL) && (expr->cdr == NULL)) {
+           if(expr->car == NULL)  {
      	       snprintf(retval,4,"%s","()");
 	   } else {
                bl_val_t* L=expr;
-	       while(L->cdr != NULL) {
-                  if(L->car != NULL) {
+	       for(L=expr; L!=NULL; L=L->cdr) {
                      char* newval = bl_ser_sexp(L->car);
 		     retval = GC_REALLOC(retval,strlen(retval)+strlen(newval)+4);
 		     retval = strcat(retval,newval);
 		     retval = strcat(retval," ");
-		  }
-                  L = L->cdr;
-	       }
-               if(L->car != NULL) {
-                  char* newval = bl_ser_sexp(L->car);
-		     retval = GC_REALLOC(retval,strlen(retval)+strlen(newval)+4);
-                     retval = strcat(retval,newval);
-                     retval = strcat(retval," ");
 	       }
 	       retval[strlen(retval)-1]=')';
 	   }

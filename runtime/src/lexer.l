@@ -17,7 +17,6 @@ IF_OPER		"if"
 DO_OPER		"do"
 WHILE_OPER	"while"
 STRING          \"(\\.|[^"\\])*\"
-NUMBER_FLOAT    [0-9]+\.[0-9]+
 NUMBER_INTEGER  [0-9]+ 
 WHITESPACE      [ \t\n\r]
 SYMBOL          [\%\:\=\*\-\/\+a-zA-Z0-9]+
@@ -30,7 +29,6 @@ COMMENT_START   \;
 {COMMENT_START}.*$ { /* do nothing */ }
 {LEFT_PAREN}       { return BL_TOKEN_LPAREN; }
 {RIGHT_PAREN}      { return BL_TOKEN_RPAREN; }
-{NUMBER_FLOAT}     { return BL_TOKEN_FLOAT; }
 {NUMBER_INTEGER}   { return BL_TOKEN_INTEGER; }
 {IF_OPER}	   { return BL_TOKEN_IF; }
 {DO_OPER}	   { return BL_TOKEN_DO; }

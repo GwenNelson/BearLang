@@ -10,7 +10,6 @@ bl_val_t* bl_mk_null();
 bl_val_t* bl_mk_val(bl_val_type_t type);
 bl_val_t* bl_mk_symbol(char* sym);
 bl_val_t* bl_mk_integer(char* s);
-bl_val_t* bl_mk_float(char* s);
 bl_val_t* bl_mk_str(char* s);
 bl_val_t* bl_mk_native_oper(void* func_ptr);
 bl_val_t* bl_mk_bool(bool b);

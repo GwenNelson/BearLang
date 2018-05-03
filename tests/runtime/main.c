@@ -10,13 +10,16 @@
 #include <bearlang/error_tools.h>
 #include <bearlang/ctx.h>
 #include <bearlang/utils.h>
+#include <bl_lexer.h>
 
 #define TEST(desc,f) fprintf(stderr,"Testing: %s \t",desc); if(f()==0) { passed_tests++; fprintf(stderr,"PASS\n");} else { failed_tests++; fprintf(stderr,"FAIL\n");}; total_tests++;
 
 #define ASSERT(desc,cond) if(! (cond)) { fprintf(stderr,"Assert %s failed\t",desc); return 1;}
 
+bl_val_t* read_form(yyscan_t scanner);
+bl_val_t* read_list(yyscan_t scanner);
 
-int test_sexp_parse_list() {
+int test_sexp_parse() {
     char* test_list = "(+ 1 2)";
 
     bl_val_t* sexp = bl_parse_sexp(test_list);
@@ -24,6 +27,18 @@ int test_sexp_parse_list() {
     ASSERT("first item is symbol", sexp->car->type           == BL_VAL_TYPE_SYMBOL)
     ASSERT("second item is int",   sexp->cdr->car->type      == BL_VAL_TYPE_NUMBER)
     ASSERT("second item is int",   sexp->cdr->cdr->car->type == BL_VAL_TYPE_NUMBER)
+
+    sexp = bl_parse_sexp("");
+    ASSERT("empty string", sexp==NULL)
+
+    char* empty_str="  ";
+    yyscan_t scanner;
+    yylex_init(&scanner);
+    yy_scan_string(empty_str,scanner);
+    sexp = read_list(scanner);
+    yylex_destroy(scanner);
+
+    ASSERT("empty string with read_list", bl_list_len(sexp)==0)
 
     return 0;
 }
@@ -35,6 +50,26 @@ int test_ser_sexp() {
 
     ASSERT("strcmp(sexp,\"(+ 1 2)\")==0", strcmp(serialised_sexp,"(+ 1 2)")==0)
 
+    bl_val_t* empty_cons = bl_mk_val(BL_VAL_TYPE_CONS);
+    empty_cons->car = NULL;
+    empty_cons->cdr = NULL;
+    serialised_sexp = bl_ser_sexp(empty_cons);
+    ASSERT("empty cons ser_exp", strcmp(serialised_sexp,"()")==0)
+
+    bl_val_t* invalid_cons = bl_mk_val(BL_VAL_TYPE_CONS);
+    invalid_cons->car = NULL;
+    invalid_cons->cdr = bl_parse_sexp("(1)");
+    serialised_sexp = bl_ser_sexp(invalid_cons);
+
+    ASSERT("invalid cons ser_exp", strcmp(serialised_sexp,"()")==0)
+
+    bl_val_t* t = bl_mk_bool(true);
+    serialised_sexp = bl_ser_sexp(t);
+    ASSERT("True ser_exp", strcmp(serialised_sexp,"True")==0)
+
+    bl_val_t* f = bl_mk_bool(false);
+    serialised_sexp = bl_ser_sexp(f);
+    ASSERT("False ser_exp", strcmp(serialised_sexp,"False")==0)
     return 0;
 }
 
@@ -86,6 +121,20 @@ int test_prepend_null() {
 
     ASSERT("bl_list_prepend returns the correct val type for first item",       bl_list_first(empty)->type==BL_VAL_TYPE_STRING)
     ASSERT("bl_list_prepend returns the correct val number for the first item", strcmp(bl_list_first(empty)->s_val, "foo")==0)
+
+    return 0;
+}
+
+int test_append_null() {
+    bl_val_t* empty      = NULL;
+    bl_val_t* first_item = bl_mk_str("foo");
+
+    empty = bl_list_append(empty,first_item);
+
+    ASSERT("bl_list_append returns a valid cons cell", empty->type==BL_VAL_TYPE_CONS)
+
+    ASSERT("bl_list_append returns the correct val type for first item",       bl_list_first(empty)->type==BL_VAL_TYPE_STRING)
+    ASSERT("bl_list_append returns the correct val number for the first item", strcmp(bl_list_first(empty)->s_val, "foo")==0)
 
     return 0;
 }
@@ -287,6 +336,17 @@ int test_list_len() {
     uint64_t multi_len = bl_list_len(sexp);
     ASSERT("length of (1337 42 666)==3",multi_len==3)
 
+    ASSERT("length of NULL==0", bl_list_len(NULL)==0)
+    bl_val_t* empty_cons = bl_mk_val(BL_VAL_TYPE_CONS);
+    empty_cons->car = NULL;
+    empty_cons->cdr = NULL;
+    ASSERT("length of NULL==0", bl_list_len(empty_cons)==0)
+
+    bl_val_t* invalid_cons = bl_mk_val(BL_VAL_TYPE_CONS);
+    invalid_cons->car = NULL;
+    invalid_cons->cdr = bl_mk_val(BL_VAL_TYPE_CONS);
+    ASSERT("length of invalid cons==0", bl_list_len(invalid_cons)==0)
+
     return 0;
 }
 
@@ -441,31 +501,70 @@ int test_xor_oper() {
 int test_list_opers() {
     bl_val_t* ctx = bl_ctx_new_std();
 
-    char* first_str   = "(first 1 2 3 4 5)";
-    char* second_str  = "(second 1 2 3 4 5)";
-    char* third_str   = "(third 1 2 3 4 5)";
-    char* rest_str    = "(rest 1 2 3 4 5)";
-    char* reverse_str = "(reverse 1 2 3 4 5)";
-    char* append_str  = "(append (1 2 3 4) 5";
-    char* prepend_str = "(prepend (1 2 3 4) 5";
+    char* first_str     = "(first 1 2 3 4 5)";
+    char* first_str_b   = "(first (1 2 3 4 5))";
+    char* second_str    = "(second 1 2 3 4 5)";
+    char* second_str_b  = "(second (1 2 3 4 5))";
+    char* third_str     = "(third 1 2 3 4 5)";
+    char* third_str_b   = "(third (1 2 3 4 5))";
+    char* rest_str      = "(rest 1 2 3 4 5)";
+    char* rest_str_b    = "(rest (1 2 3 4 5))";
+    char* reverse_str   = "(reverse 1 2 3 4 5)";
+    char* reverse_str_b = "(reverse (1 2 3 4 5))";
+    char* append_str    = "(append (1 2 3 4) 5";
+    char* prepend_str   = "(prepend (1 2 3 4) 5";
 
-    bl_val_t* first_result   = bl_ctx_eval(ctx,bl_parse_sexp(first_str));
-    bl_val_t* second_result  = bl_ctx_eval(ctx,bl_parse_sexp(second_str));
-    bl_val_t* third_result   = bl_ctx_eval(ctx,bl_parse_sexp(third_str));
-    bl_val_t* rest_result    = bl_ctx_eval(ctx,bl_parse_sexp(rest_str));
-    bl_val_t* reverse_result = bl_ctx_eval(ctx,bl_parse_sexp(reverse_str));
-    bl_val_t* append_result  = bl_ctx_eval(ctx,bl_parse_sexp(append_str));
-    bl_val_t* prepend_result = bl_ctx_eval(ctx,bl_parse_sexp(prepend_str));
+    bl_val_t* first_result     = bl_ctx_eval(ctx,bl_parse_sexp(first_str));
+    bl_val_t* first_result_b   = bl_ctx_eval(ctx,bl_parse_sexp(first_str_b));
+    bl_val_t* second_result    = bl_ctx_eval(ctx,bl_parse_sexp(second_str));
+    bl_val_t* second_result_b  = bl_ctx_eval(ctx,bl_parse_sexp(second_str_b));
+    bl_val_t* third_result     = bl_ctx_eval(ctx,bl_parse_sexp(third_str));
+    bl_val_t* third_result_b   = bl_ctx_eval(ctx,bl_parse_sexp(third_str_b));
+    bl_val_t* rest_result      = bl_ctx_eval(ctx,bl_parse_sexp(rest_str));
+    bl_val_t* rest_result_b    = bl_ctx_eval(ctx,bl_parse_sexp(rest_str_b));
+    bl_val_t* reverse_result   = bl_ctx_eval(ctx,bl_parse_sexp(reverse_str));
+    bl_val_t* reverse_result_b = bl_ctx_eval(ctx,bl_parse_sexp(reverse_str_b));
+    bl_val_t* append_result    = bl_ctx_eval(ctx,bl_parse_sexp(append_str));
+    bl_val_t* prepend_result   = bl_ctx_eval(ctx,bl_parse_sexp(prepend_str));
+
+    ASSERT("(first 1 2 3 4 5)  returns 1", strcmp(bl_ser_sexp(first_result),"1")==0)
+    ASSERT("(first (1 2 3 4 5))  returns 1", strcmp(bl_ser_sexp(first_result_b),"1")==0)
+    ASSERT("(second 1 2 3 4 5) returns 2", strcmp(bl_ser_sexp(second_result),"2")==0)
+    ASSERT("(second (1 2 3 4 5)) returns 2", strcmp(bl_ser_sexp(second_result_b),"2")==0)
+    ASSERT("(third 1 2 3 4 5)  returns 3", strcmp(bl_ser_sexp(third_result),"3")==0)
+    ASSERT("(third (1 2 3 4 5))  returns 3", strcmp(bl_ser_sexp(third_result_b),"3")==0)
+
+    ASSERT("(rest 1 2 3 4 5)  returns (2 3 4 5)", strcmp(bl_ser_sexp(rest_result),"(2 3 4 5)")==0)
+    ASSERT("(rest (1 2 3 4 5))  returns (2 3 4 5)", strcmp(bl_ser_sexp(rest_result_b),"(2 3 4 5)")==0)
+
+    ASSERT("(reverse 1 2 3 4 5)  returns (5 4 3 2 1)", strcmp(bl_ser_sexp(reverse_result),"(5 4 3 2 1)")==0)
+    ASSERT("(reverse (1 2 3 4 5))  returns (5 4 3 2 1)", strcmp(bl_ser_sexp(reverse_result_b),"(5 4 3 2 1)")==0)
+
+    ASSERT("(append (1 2 3 4) 5)  returns (1 2 3 4 5)", strcmp(bl_ser_sexp(append_result),"(1 2 3 4 5)")==0)
+    ASSERT("(prepend (1 2 3 4) 5)  returns (5 1 2 3 4)", strcmp(bl_ser_sexp(prepend_result),"(5 1 2 3 4)")==0)
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+
+int test_list_ops() {
+    bl_val_t* ctx = bl_ctx_new_std();
+
+    bl_val_t* first_result    = bl_list_first(bl_parse_sexp("(1 2 3 4 5)"));
+    bl_val_t* second_result   = bl_list_second(bl_parse_sexp("(1 2 3 4 5)"));
+    bl_val_t* third_result    = bl_list_third(bl_parse_sexp("(1 2 3 4 5)"));
+    bl_val_t* rest_result     = bl_list_rest(bl_parse_sexp("(1 2 3 4 5)"));
+    bl_val_t* reverse_result  = bl_list_reverse(bl_parse_sexp("(1 2 3 4 5)"));
 
     ASSERT("(first 1 2 3 4 5)  returns 1", strcmp(bl_ser_sexp(first_result),"1")==0)
     ASSERT("(second 1 2 3 4 5) returns 2", strcmp(bl_ser_sexp(second_result),"2")==0)
     ASSERT("(third 1 2 3 4 5)  returns 3", strcmp(bl_ser_sexp(third_result),"3")==0)
-
     ASSERT("(rest 1 2 3 4 5)  returns (2 3 4 5)", strcmp(bl_ser_sexp(rest_result),"(2 3 4 5)")==0)
-
     ASSERT("(reverse 1 2 3 4 5)  returns (5 4 3 2 1)", strcmp(bl_ser_sexp(reverse_result),"(5 4 3 2 1)")==0)
-    ASSERT("(append (1 2 3 4) 5)  returns (1 2 3 4 5)", strcmp(bl_ser_sexp(append_result),"(1 2 3 4 5)")==0)
-    ASSERT("(prepend (1 2 3 4) 5)  returns (5 1 2 3 4)", strcmp(bl_ser_sexp(prepend_result),"(5 1 2 3 4)")==0)
+
+    ASSERT("first(NULL) is NULL", bl_list_first(NULL)==NULL)
+    ASSERT("second(NULL) is NULL", bl_list_second(NULL)==NULL)
+    ASSERT("third(NULL) is NULL", bl_list_third(NULL)==NULL)
     bl_ctx_close(ctx);
     return 0;
 }
@@ -474,6 +573,14 @@ int test_parse_string() {
     char* test_str = "\"Hello world\"";
     bl_val_t* parsed = bl_parse_sexp(test_str);
     ASSERT("String parsed OK", strstr(parsed->s_val,"Hello world"))
+
+    parsed = bl_parse_sexp("\"\\n\"");
+    ASSERT("String parsed OK", strstr(parsed->s_val,"\n"))
+
+
+    parsed = bl_parse_sexp("\"\\t\"");
+    ASSERT("String parsed OK", strstr(parsed->s_val,"\t"))
+
     return 0;
 }
 
@@ -574,11 +681,54 @@ int test_add_strings() {
     bl_val_t* ctx = bl_ctx_new_std();
     bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(+ \"foo\" \"bar\")"));
     ASSERT("(+ \"foo\" \"bar\") returns \"foobar\"", strcmp(bl_ser_naked_sexp(result),"foobar")==0)
-    
+   
+    result = bl_ctx_eval(ctx,bl_parse_sexp("(+ = \"foo\" 20 =)")); 
+    ASSERT("(+ = \"foo\" 20 =)", strcmp(bl_ser_naked_sexp(result),"<nativeoper>foo20<nativeoper>")==0)
 
     bl_ctx_close(ctx);
     return 0;
 
+}
+
+int test_add_lists() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(+ (1) 2 3 4 (5 6))"));
+    ASSERT("(+ (1) 2 3 4 (5 6)) returns (1 2 3 4 5 6)", strcmp(bl_ser_naked_sexp(result),"(1 2 3 4 5 6)")==0)
+
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_serexp_oper() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(serexp (1 2 3))"));
+    ASSERT("(serexp (1 2 3)) returns \"(1 2 3)\"", strcmp(bl_ser_sexp(result),"\"(1 2 3)\"")==0)
+    result = bl_ctx_eval(ctx,bl_parse_sexp("(serexp 1 2 3)"));
+    ASSERT("(serexp 1 2 3) returns \"(1 2 3)\"", strcmp(bl_ser_sexp(result),"\"(1 2 3)\"")==0)
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_include_oper() {
+    char* tmpfile = "/tmp/bearlang-test.bl";
+    FILE* fd = fopen(tmpfile,"w");
+    fprintf(fd,"True\n");
+    fclose(fd);
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(include \"/tmp/bearlang-test.bl\")"));
+    ASSERT("include successfully tested", strcmp(bl_ser_naked_sexp(result),"(True)")==0)
+    return 0;
+}
+
+int test_mk_list() {
+    bl_val_t* L = bl_mk_list(2,bl_mk_integer("1"),bl_mk_integer("2"));
+    ASSERT("bl_mk_list with 2 items", strcmp(bl_ser_sexp(L),"(1 2)")==0)
+
+    L = bl_mk_list(0);
+    ASSERT("bl_mk_list with 0 items", strcmp(bl_ser_sexp(L),"()")==0)
+
+    L = bl_mk_list(1,bl_mk_integer("1"),bl_mk_integer("2"));
+    ASSERT("bl_mk_list with 2 items and incorrect count", strcmp(bl_ser_sexp(L),"(1)")==0)
 }
 
 int main(int argc, char** argv) {
@@ -588,12 +738,14 @@ int main(int argc, char** argv) {
 
     bl_init();
 
-    TEST("Simple s-expression parse                  ", test_sexp_parse_list)
+    TEST("Simple s-expression parse                  ", test_sexp_parse)
     TEST("Serialise an s-expression                  ", test_ser_sexp)
     TEST("List ops: first, second and rest           ", test_first_second_rest)
     TEST("List ops: third                            ", test_third)
     TEST("List ops: prepend to NULL                  ", test_prepend_null)
+    TEST("List ops: append to NULL                   ", test_append_null)
     TEST("List ops: get list length                  ", test_list_len)
+    TEST("List ops: first,second,third,rest          ", test_list_ops)
     TEST("Create an empty context and get/set        ", test_empty_ctx)
     TEST("Create a child context and lookup in parent", test_child_ctx)
     TEST("Simple arithmetic (addition)               ", test_simple_arithmetic)
@@ -622,6 +774,10 @@ int main(int argc, char** argv) {
     TEST("map oper                                   ", test_map)
     TEST("modulo oper (%)                            ", test_modulo)
     TEST("add strings                                ", test_add_strings)
+    TEST("add lists                                  ", test_add_lists)
+    TEST("serexp oper                                ", test_serexp_oper)
+    TEST("include oper                               ", test_include_oper)
+    TEST("bl_mk_list                                 ", test_mk_list)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
