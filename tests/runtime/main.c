@@ -753,11 +753,19 @@ int test_pool_alloc() {
 int test_ctx_stress() {
     bl_val_t* new_ctx = bl_ctx_new(NULL);
     int i=0;
+#ifdef DEBUG 
+#define STRESS_ITER 1000
+#else
+#define STRESS_ITER 100000
+#endif
+    printf("%d iterations\n",STRESS_ITER);
     char sbuf[100];
-    for(i=0; i<10000; i++) {
+    for(i=0; i<STRESS_ITER; i++) {
         snprintf(sbuf,100,"%d",i);
 	bl_val_t* new_sym = bl_mk_symbol(sbuf);
-	bl_ctx_set(new_ctx,new_sym,bl_mk_integer(sbuf));
+	bl_val_t* new_int = bl_mk_integer(sbuf);
+	bl_ctx_set(new_ctx,new_sym,new_int);
+        
     }
     GC_gcollect();
     return 0;

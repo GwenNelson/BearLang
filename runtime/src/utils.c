@@ -21,7 +21,6 @@ uint64_t val_pool_size = POOL_DEFAULT_SIZE;
 
 bl_val_t* bl_mk_val(bl_val_type_t type) {
    if(last_alloc >= val_pool_size) {
-      val_pool_size = POOL_DEFAULT_SIZE;
       val_pool = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t)*val_pool_size);
       last_alloc = 0;
    }
@@ -43,7 +42,7 @@ struct sym_hash_t {
 };
 
 struct sym_hash_t* symbol_table = NULL;
-uint16_t last_sym_id = 0;
+uint64_t last_sym_id = 0;
 
 bl_val_t* bl_mk_symbol(char* sym) {
    struct sym_hash_t* symobj = NULL;
@@ -57,9 +56,9 @@ bl_val_t* bl_mk_symbol(char* sym) {
       retval->s_val    = (char*)GC_MALLOC_ATOMIC(count);
       retval->sym_id   = last_sym_id;
       last_sym_id++;
-      snprintf(retval->s_val,count,"%s",sym);
+      snprintf(retval->s_val,count+1,"%s",sym);
       symobj = (struct sym_hash_t*)GC_MALLOC(sizeof(struct sym_hash_t));
-      snprintf(symobj->key,32,"%s", sym);
+      snprintf(symobj->key,32,"%s", retval->s_val);
       symobj->sym = retval;
 //LCOV_EXCL_START
       HASH_ADD_STR(symbol_table, key, symobj);

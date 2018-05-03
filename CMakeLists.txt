@@ -13,6 +13,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
 endif (CMAKE_BUILD_TYPE STREQUAL "Release")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	add_compile_options("-DHASH_DEBUG=1")
+	add_compile_options("-DDEBUG")
 	include(CodeCoverage)
 	APPEND_COVERAGE_COMPILER_FLAGS()
 endif  (CMAKE_BUILD_TYPE STREQUAL "Debug")

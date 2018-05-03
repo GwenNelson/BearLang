@@ -80,10 +80,10 @@ typedef unsigned char uint8_t;
 #endif
 
 #ifndef uthash_malloc
-#define uthash_malloc(sz) malloc(sz)      /* malloc fcn                      */
+#define uthash_malloc(sz) GC_MALLOC(sz)      /* malloc fcn                      */
 #endif
 #ifndef uthash_free
-#define uthash_free(ptr,sz) free(ptr)     /* free fcn                        */
+#define uthash_free(ptr,sz) GC_FREE(ptr)     /* free fcn                        */
 #endif
 #ifndef uthash_bzero
 #define uthash_bzero(a,n) memset(a,'\0',n)
@@ -120,7 +120,7 @@ typedef unsigned char uint8_t;
 /* malloc failures result in lost memory, hash tables are unusable */
 
 #ifndef uthash_fatal
-#define uthash_fatal(msg) exit(-1)        /* fatal OOM error */
+#define uthash_fatal(msg) _Exit(-1)        /* fatal OOM error */
 #endif
 
 #define HASH_RECORD_OOM(oomed) uthash_fatal("out of memory")
@@ -129,8 +129,8 @@ typedef unsigned char uint8_t;
 #endif
 
 /* initial number of buckets */
-#define HASH_INITIAL_NUM_BUCKETS 32U     /* initial number of buckets        */
-#define HASH_INITIAL_NUM_BUCKETS_LOG2 5U /* lg2 of initial number of buckets */
+#define HASH_INITIAL_NUM_BUCKETS 128U     /* initial number of buckets        */
+#define HASH_INITIAL_NUM_BUCKETS_LOG2 7U /* lg2 of initial number of buckets */
 #define HASH_BKT_CAPACITY_THRESH 10U     /* expand when bucket count reaches */
 
 /* calculate the element whose hash handle address is hhp */
@@ -511,7 +511,7 @@ do {                                                                            
  * This is for uthash developer only; it compiles away if HASH_DEBUG isn't defined.
  */
 #ifdef HASH_DEBUG
-#define HASH_OOPS(...) do { fprintf(stderr,__VA_ARGS__); exit(-1); } while (0)
+#define HASH_OOPS(...) do { fprintf(stderr,__VA_ARGS__); _Exit(-1); } while (0)
 #define HASH_FSCK(hh,head,where)                                                 \
 do {                                                                             \
   struct UT_hash_handle *_thh;                                                   \
