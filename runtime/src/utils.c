@@ -31,12 +31,6 @@ bl_val_t* bl_mk_val(bl_val_type_t type) {
    return retval;
 }
 
-bl_val_t* bl_mk_val_atomic(bl_val_type_t type) {
-   bl_val_t* retval = (bl_val_t*)GC_MALLOC_ATOMIC(sizeof(bl_val_t));
-   retval->type     = type;
-   return retval;
-}
-
 bl_val_t null_val = {.type = BL_VAL_TYPE_NULL};
 bl_val_t* bl_mk_null() {
    return &null_val;

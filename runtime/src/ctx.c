@@ -84,12 +84,12 @@ void bl_set_params(bl_val_t* ctx, bl_val_t* param_names, bl_val_t* param_vals) {
     }
 }
 
-bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr, bool build_new_list) {
+bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
     bl_val_t* retval = NULL;
     bl_val_t* L_start = NULL;
     bl_val_t* L      = NULL;
     bl_val_t* i = NULL;
-    if(build_new_list) {
+//    if(build_new_list) {
 	    for(i=expr; i != NULL; i=i->cdr) {
 	        retval = bl_ctx_eval(ctx,i->car);
 	        if(retval->type == BL_VAL_TYPE_ERROR) return retval;
@@ -105,13 +105,13 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr, bool build_new_list) {
 		}
 	    }
 	    return L_start;
-    } else {
+  /*  } else {
 	    for(i=expr; i != NULL; i=i->cdr) {
 	        retval = bl_ctx_eval(ctx,i->car);
 	        if(retval->type == BL_VAL_TYPE_ERROR) return retval;
 
 	    }
-    }
+    }*/
     return NULL;
 }
 
@@ -192,7 +192,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 				default:
 				
 
-					retval = bl_eval_cons(ctx, expr, true);
+					retval = bl_eval_cons(ctx, expr);
 					if(retval==NULL) return bl_mk_null();
 					return retval;
 				break;

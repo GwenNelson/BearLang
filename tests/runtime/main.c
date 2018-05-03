@@ -70,6 +70,8 @@ int test_ser_sexp() {
     bl_val_t* f = bl_mk_bool(false);
     serialised_sexp = bl_ser_sexp(f);
     ASSERT("False ser_exp", strcmp(serialised_sexp,"False")==0)
+
+    ASSERT("NULL ser_sexp", strcmp(bl_ser_sexp(NULL),"")==0)
     return 0;
 }
 
@@ -729,6 +731,15 @@ int test_mk_list() {
 
     L = bl_mk_list(1,bl_mk_integer("1"),bl_mk_integer("2"));
     ASSERT("bl_mk_list with 2 items and incorrect count", strcmp(bl_ser_sexp(L),"(1)")==0)
+    return 0;
+}
+
+int test_mk_sym() {
+    bl_val_t* A_a = bl_mk_symbol("A");
+    bl_val_t* A_b = bl_mk_symbol("A");
+    ASSERT("bl_mk_symbol working", A_a==A_b);
+    return 0;
+
 }
 
 int main(int argc, char** argv) {
@@ -778,6 +789,7 @@ int main(int argc, char** argv) {
     TEST("serexp oper                                ", test_serexp_oper)
     TEST("include oper                               ", test_include_oper)
     TEST("bl_mk_list                                 ", test_mk_list)
+    TEST("bl_mk_symbol                               ", test_mk_sym)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

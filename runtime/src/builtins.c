@@ -15,7 +15,7 @@
 #include <stdbool.h>
 
 bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) {
-   params = bl_eval_cons(ctx,params,true);
+   params = bl_eval_cons(ctx,params);
 
    bl_val_t* func = bl_list_first(params);
    bl_val_t* L    = bl_list_second(params);
