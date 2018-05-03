@@ -13,20 +13,17 @@ bl_val_t* val_pool;
 uint64_t last_alloc = 0;
 uint64_t val_pool_size = 0;
 
+#define POOL_DEFAULT_SIZE 10000
+
 bl_val_t* bl_mk_val(bl_val_type_t type) {
-   if(last_alloc >= val_pool_size) {
-      val_pool_size=0;
+   if(val_pool_size==0 || last_alloc >= val_pool_size) {
+      val_pool_size = POOL_DEFAULT_SIZE;
+      val_pool = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t)*val_pool_size);
       last_alloc = 0;
    }
-   if(val_pool_size==0) {
-      val_pool_size = 5000;
-      val_pool = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t)*val_pool_size);
-   }
 
-
-   bl_val_t* retval = &(val_pool[last_alloc]);
+   bl_val_t* retval = &(val_pool[last_alloc++]);
    retval->type = type;
-   last_alloc++;
    return retval;
 }
 
