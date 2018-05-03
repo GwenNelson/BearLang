@@ -13,6 +13,9 @@
 
 LEFT_PAREN      "("
 RIGHT_PAREN     ")"
+IF_OPER		"if"
+DO_OPER		"do"
+WHILE_OPER	"while"
 STRING          \"(\\.|[^"\\])*\"
 NUMBER_FLOAT    [0-9]+\.[0-9]+
 NUMBER_INTEGER  [0-9]+ 
@@ -29,6 +32,9 @@ COMMENT_START   \;
 {RIGHT_PAREN}      { return BL_TOKEN_RPAREN; }
 {NUMBER_FLOAT}     { return BL_TOKEN_FLOAT; }
 {NUMBER_INTEGER}   { return BL_TOKEN_INTEGER; }
+{IF_OPER}	   { return BL_TOKEN_IF; }
+{DO_OPER}	   { return BL_TOKEN_DO; }
+{WHILE_OPER}	   { return BL_TOKEN_WHILE; }
 {SYMBOL}           { return BL_TOKEN_SYMBOL; }
 
 %%

@@ -45,6 +45,7 @@ typedef enum bl_err_type_t {
 	BL_ERR_SYMBOL_NOTFOUND=6,
 } bl_err_type_t;
 
+// TODO: add all builtins as tokens to the lexer
 typedef enum bl_token_type_t {
 	BL_TOKEN_LPAREN  = 1,
 	BL_TOKEN_RPAREN  = 2,
@@ -52,6 +53,9 @@ typedef enum bl_token_type_t {
 	BL_TOKEN_FLOAT   = 4,
 	BL_TOKEN_INTEGER = 5,
 	BL_TOKEN_SYMBOL  = 6,
+	BL_TOKEN_IF      = 7,
+	BL_TOKEN_DO      = 8,
+	BL_TOKEN_WHILE   = 9,
 } bl_token_type_t;
 
 typedef struct bl_val_t bl_val_t;

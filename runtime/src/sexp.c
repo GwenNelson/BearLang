@@ -98,10 +98,16 @@ bl_val_t* read_form(yyscan_t scanner) {
 	break;
 	case BL_TOKEN_SYMBOL:
 		s = yyget_text(scanner);
-		if(strncmp(s,"if",2)==0) return    &if_oper_val;
-		if(strncmp(s,"do",2)==0) return    &do_oper_val;
-		if(strncmp(s,"while",5)==0) return &while_oper_val;
 		return bl_mk_symbol(yyget_text(scanner));
+	break;
+	case BL_TOKEN_IF:
+		return &if_oper_val;
+	break;
+	case BL_TOKEN_DO:
+		return &do_oper_val;
+	break;
+	case BL_TOKEN_WHILE:
+		return &while_oper_val;
 	break;
    }
 }
