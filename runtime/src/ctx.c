@@ -29,7 +29,6 @@ bl_val_t* bl_ctx_new_std() {
    bl_ctx_set(retval,      bl_mk_symbol("eq"), bl_mk_native_oper(&bl_oper_eq));
    bl_ctx_set(retval,      bl_mk_symbol("lt"), bl_mk_native_oper(&bl_oper_lt));
    bl_ctx_set(retval,      bl_mk_symbol("gt"), bl_mk_native_oper(&bl_oper_gt));
-   bl_ctx_set(retval,   bl_mk_symbol("while"), bl_mk_native_oper(&bl_oper_while));
    bl_ctx_set(retval,      bl_mk_symbol("=="), bl_mk_native_oper(&bl_oper_eq));
    bl_ctx_set(retval,   bl_mk_symbol("print"), bl_mk_native_oper(&bl_oper_print));
    bl_ctx_set(retval,     bl_mk_symbol("and"), bl_mk_native_oper(&bl_oper_and));
