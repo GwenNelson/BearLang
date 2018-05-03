@@ -25,7 +25,6 @@ bl_val_t* bl_mk_val(bl_val_type_t type) {
 
 
    bl_val_t* retval = &(val_pool[last_alloc]);
-   bzero(retval, sizeof(bl_val_t));
    retval->type = type;
    last_alloc++;
    return retval;
