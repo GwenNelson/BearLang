@@ -65,7 +65,7 @@ bl_val_t* bl_ctx_new(bl_val_t* parent) {
    retval->parent     = parent;
    retval->secondary  = NULL;
    retval->hash_val   = NULL;
-   retval->vals_count = 32;
+   retval->vals_count = 64;
    retval->vals       = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*retval->vals_count);
    retval->write_to_parent = false;
    return retval;
@@ -212,7 +212,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 
 bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) {
 
-   if(strstr(key->s_val,"::")) {
+/*   if(strstr(key->s_val,"::")) {
      char* tmp = strdup(key->s_val);
      strstr(tmp,"::")[0]='\0';
      char* ctx_key = tmp;
@@ -225,7 +225,7 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) {
    
      return bl_ctx_get(other_ctx,bl_mk_symbol(sym_key));
 
-   }
+   }*/
    if(ctx->secondary != NULL) {
       bl_val_t* s_V = bl_ctx_get(ctx->secondary, key);
       if(s_V != NULL) return s_V;
