@@ -91,7 +91,8 @@ typedef struct bl_val_t {
 			 bool is_float;	};
 
 		// BL_VAL_TYPE_SYMBOL | BL_VAL_TYPE_STRING
-		struct { char*   s_val; };
+		struct { char*   s_val;
+	                 uint16_t sym_id; };
 
 		// BL_VAL_TYPE_CONS
 		struct { bl_val_t* car;
@@ -99,7 +100,9 @@ typedef struct bl_val_t {
 
 		// BL_VAL_TYPE_CTX
 		struct { struct bl_hash_t *hash_val;
-	                 bl_val_t* parent;
+			 bl_val_t** vals;
+			 uint16_t vals_count;
+			 bl_val_t* parent;
 	                 bl_val_t* secondary;
 	                 bool write_to_parent; };
 

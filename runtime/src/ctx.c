@@ -60,11 +60,13 @@ bl_val_t* bl_ctx_new_std() {
 }
 
 bl_val_t* bl_ctx_new(bl_val_t* parent) {
-   bl_val_t* retval  = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   retval->type      = BL_VAL_TYPE_CTX;
-   retval->parent    = parent;
-   retval->secondary = NULL;
-   retval->hash_val  = NULL;
+   bl_val_t* retval   = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
+   retval->type       = BL_VAL_TYPE_CTX;
+   retval->parent     = parent;
+   retval->secondary  = NULL;
+   retval->hash_val   = NULL;
+   retval->vals_count = 32;
+   retval->vals       = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*retval->vals_count);
    retval->write_to_parent = false;
    return retval;
 }
@@ -209,6 +211,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 
 
 bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) {
+
    if(strstr(key->s_val,"::")) {
      char* tmp = strdup(key->s_val);
      strstr(tmp,"::")[0]='\0';
@@ -227,32 +230,37 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) {
       bl_val_t* s_V = bl_ctx_get(ctx->secondary, key);
       if(s_V != NULL) return s_V;
    }
-   struct bl_hash_t* ht = ctx->hash_val;
-   struct bl_hash_t* val = NULL;
-   HASH_FIND_PTR(ht, &key, val);
-   if(!val) {
-      if(ctx->parent != NULL) {
-	 bl_val_t* V = bl_ctx_get(ctx->parent, key);
-	 if(V != NULL) return V;
-      } else {
-         return NULL;
-      }
-   } else {
-      return val->val;
+   bl_val_t* retval = NULL;
+   if(key->sym_id < ctx->vals_count) {
+    	   retval = ctx->vals[key->sym_id];
+
    }
-   return NULL;
+   if(retval != NULL) {
+      return retval;
+   } else {
+      if(ctx->parent != NULL) return bl_ctx_get(ctx->parent, key);
+   }
+
+
 }
 
 bl_val_t* bl_ctx_set(bl_val_t* ctx, bl_val_t* key, bl_val_t* val) {
-   if(ctx->parent != NULL) {
-      if(ctx->write_to_parent) ctx = ctx->parent;
+   if(ctx->write_to_parent) {
+      if(ctx->parent != NULL) {
+         if(ctx->write_to_parent) ctx = ctx->parent;
+      }
    }
+   if(key->sym_id >= ctx->vals_count) {
+     uint16_t old_count = ctx->vals_count;
+     ctx->vals_count = key->sym_id+8;
+     bl_val_t** old_vals = ctx->vals;
+     ctx->vals = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*ctx->vals_count);
+     int i=0;
+     for(i=0; i<old_count; i++) ctx->vals[i] = old_vals[i];
 
-   struct bl_hash_t* ignored = NULL;
-   struct bl_hash_t* cur_val = (struct bl_hash_t*)GC_MALLOC(sizeof(struct bl_hash_t));
-   cur_val->key = key;
-   cur_val->val = val;
-   HASH_REPLACE_PTR(ctx->hash_val, key, cur_val,ignored);
-
+   }
+   ctx->vals[key->sym_id] = val;
    return val;
+
+
 }

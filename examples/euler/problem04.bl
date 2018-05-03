@@ -21,7 +21,7 @@
 (while (gt i 100)
         (= j 990)
 	(while (gt j 100)
-	        (= product (* i j))
+	       (= product (* i j))
 	        (if (gt product max)
 		    (if (is-palindrome product) (= max product)))
 		(= j (- j 11)))

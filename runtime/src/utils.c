@@ -35,6 +35,7 @@ struct sym_hash_t {
 };
 
 struct sym_hash_t* symbol_table = NULL;
+uint16_t last_sym_id = 0;
 
 bl_val_t* bl_mk_symbol(char* sym) {
    struct sym_hash_t* symobj = NULL;
@@ -44,6 +45,8 @@ bl_val_t* bl_mk_symbol(char* sym) {
       retval           = bl_mk_val(BL_VAL_TYPE_SYMBOL);
       size_t count     = strlen(sym)*sizeof(char)+1;
       retval->s_val    = (char*)GC_MALLOC_ATOMIC(count);
+      retval->sym_id   = last_sym_id;
+      last_sym_id++;
       snprintf(retval->s_val,count,"%s",sym);
       symobj = (struct sym_hash_t*)GC_MALLOC(sizeof(struct sym_hash_t));
       snprintf(symobj->key,32,"%s", sym);
