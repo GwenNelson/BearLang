@@ -85,43 +85,26 @@ void bl_set_params(bl_val_t* ctx, bl_val_t* param_names, bl_val_t* param_vals) {
 	argsv_i = argsv_i->cdr;
 	if(argsv_i == NULL) return;
     }
-
-/*    while(argsk_i->cdr != NULL) {
-       if(argsk_i->car != NULL) {
-	       bl_ctx_set(ctx, argsk_i->car, argsv_i->car);
-       }
-       argsk_i = argsk_i -> cdr;
-       argsv_i = argsv_i -> cdr;
-    }
-    if(argsk_i->car != NULL) {
-       bl_ctx_set(ctx, argsk_i->car, argsv_i->car);
-    }*/
 }
 
 bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr, bool build_new_list) {
-    bl_val_t* meta   = NULL;
     bl_val_t* retval = NULL;
-    bl_val_t* i = expr;
-    while(i->cdr != NULL) {
-          if(i->car != NULL) {
-		meta = bl_ctx_eval(ctx,i->car);
-		if(meta == NULL) return retval;
-		if(meta->type == BL_VAL_TYPE_ERROR) return meta;
-		if(build_new_list) retval = bl_list_append(retval,meta);
-          }
-     	  i = i->cdr;
+    bl_val_t* L      = NULL;
+    bl_val_t* i = NULL;
+    if(build_new_list) {
+	    for(i=expr; i != NULL; i=i->cdr) {
+	        retval = bl_ctx_eval(ctx,i->car);
+	        if(retval->type == BL_VAL_TYPE_ERROR) return retval;
+		L = bl_list_append(L,retval);
+	    }
+    } else {
+	    for(i=expr; i != NULL; i=i->cdr) {
+	        retval = bl_ctx_eval(ctx,i->car);
+	        if(retval->type == BL_VAL_TYPE_ERROR) return retval;
+
+	    }
     }
-    if(i->car != NULL) {
-		meta = bl_ctx_eval(ctx,i->car);
-		if(meta->type == BL_VAL_TYPE_ERROR) return meta;
-		if(build_new_list) retval = bl_list_append(retval,meta);
-    }
-    if(!build_new_list && (retval==NULL)) {
-        retval = bl_mk_null();
-	retval->eval_last = meta;
-    }
-    if(retval) retval->eval_last = meta;
-    return retval;
+    return L;
 }
 
 bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
@@ -200,11 +183,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 				break;
 				default:
 				
-/*						retval = bl_eval_cons(ctx,expr,false);
-						if(retval != NULL) {
-							if(retval->type==BL_VAL_TYPE_ERROR) return retval;
-							return retval->eval_last;
-						}*/
+
 					retval = bl_eval_cons(ctx, expr, true);
 					if(retval==NULL) return bl_mk_null();
 					return retval;
