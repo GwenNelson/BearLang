@@ -153,7 +153,8 @@ char* bl_ser_sexp(bl_val_t* expr) {
            snprintf(retval,strlen(expr->s_val)+3,"\"%s\"",expr->s_val);
          break;
          case BL_VAL_TYPE_NUMBER:
-            retval = mpz_get_str(NULL, 10, expr->i_val);
+	   snprintf(retval,10,"%lld", expr->fix_int);
+	 //            retval = mpz_get_str(NULL, 10, expr->i_val);
          break;
 	 case BL_VAL_TYPE_BOOL:
            if(expr->b_val) {

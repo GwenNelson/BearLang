@@ -87,7 +87,8 @@ typedef struct bl_val_t {
 		struct { bool b_val; };
 
 		// BL_VAL_TYPE_NUMBER
-		struct { mpz_t i_val;
+		struct { int64_t fix_int;
+			 mpz_t i_val;
 	                 mpf_t f_val;
 			 bool is_float;	};
 

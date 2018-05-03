@@ -1,13 +1,11 @@
 ; BearLang implementation of project euler problem 1
 ; See https://projecteuler.net/problem=1 
-
 (fun getmults (n) 
      (= retval 0)
      (while (gt n 0)
-            (if (or (eq (% n 5) 0)
+	    (if (or (eq (% n 5) 0)
            	    (eq (% n 3) 0))
 	        (= retval (+ retval n)))
-	    (= n (- n 1)))
+	    (dec n))
      retval)
-
 (print (getmults 999) "\n")

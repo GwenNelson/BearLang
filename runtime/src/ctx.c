@@ -157,9 +157,9 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 				break;
 				case BL_VAL_TYPE_OPER_WHILE:
 					cond = bl_list_first(expr->cdr);
-					while(bl_ctx_eval(ctx, cond)->b_val) {
+					while(bl_ctx_eval(ctx, cond)->b_val==true) {
 						for(i=bl_list_rest(expr->cdr); i != NULL; i=i->cdr) {
-						    retval = bl_ctx_eval(ctx,i->car);
+    							retval = bl_ctx_eval(ctx,i->car);
 						    if(retval->type == BL_VAL_TYPE_ERROR) return retval;
 						}
 					}
