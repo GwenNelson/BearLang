@@ -8,6 +8,7 @@ add_compile_options("-finline-functions")
 add_compile_options("-funsafe-math-optimizations")
 add_compile_options("-ffast-math")
 add_compile_options("-funroll-loops")
+add_compile_options("-march=native")
 
 #include(CodeCoverage)
 
