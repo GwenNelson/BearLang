@@ -3,7 +3,11 @@ cmake_minimum_required(VERSION 3.0)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 add_compile_options("-DHASH_FUNCTION=HASH_OAT")
-#add_compile_options("-O3")
+add_compile_options("-Ofast")
+add_compile_options("-finline-functions")
+add_compile_options("-funsafe-math-optimizations")
+add_compile_options("-ffast-math")
+add_compile_options("-funroll-loops")
 
 #include(CodeCoverage)
 
