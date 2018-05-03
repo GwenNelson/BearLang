@@ -70,7 +70,7 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
            retval = bl_mk_str("");
       break;
       default:
-         return bl_mk_null(); // TODO - return type error here
+         return bl_mk_str(""); // TODO - add support for adding together lists
       break;
    }
 
