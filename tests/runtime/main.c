@@ -481,7 +481,6 @@ int test_while_oper() {
 }
 
 int main(int argc, char** argv) {
-    GC_INIT();
     int passed_tests = 0;
     int failed_tests = 0;
     int total_tests  = 0;

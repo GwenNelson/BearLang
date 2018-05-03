@@ -1,5 +1,6 @@
 #include <bearlang/common.h>
 #include <bearlang/list_ops.h>
+#include <bearlang/utils.h>
 
 #include <stdio.h>
 
@@ -26,8 +27,7 @@ bl_val_t* bl_list_third(bl_val_t* L) {
 }
 
 bl_val_t* bl_list_prepend(bl_val_t* L, bl_val_t* val) {
-   bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   retval->type = BL_VAL_TYPE_CONS;
+   bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_CONS);
    retval->car  = val;
    retval->cdr  = L;
    return retval;
@@ -42,8 +42,7 @@ bl_val_t* bl_list_append(bl_val_t* L, bl_val_t* val) {
    while(L->cdr != NULL) {
       L = L->cdr;
    }
-   L->cdr = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   L->cdr->type = BL_VAL_TYPE_CONS;
+   L->cdr = bl_mk_val(BL_VAL_TYPE_CONS);
    L->cdr->car  = val;
    L->cdr->cdr  = NULL;
    return retval;

@@ -16,8 +16,8 @@ void gmp_free(void* ptr, size_t size) {
 }
 
 int bl_init() {
+    GC_all_interior_pointers=1;
     GC_init();
-    GC_enable_incremental();
     mp_set_memory_functions(&gmp_malloc, &gmp_realloc, &gmp_free);
     return 0;
 }

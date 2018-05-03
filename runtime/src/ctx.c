@@ -71,7 +71,7 @@ bl_val_t* bl_ctx_new(bl_val_t* parent) {
 }
 
 void bl_ctx_close(bl_val_t* ctx) {
-    GC_FREE(ctx);
+     GC_FREE(ctx->vals);
 }
 
 // binds variables into a context by copying them
