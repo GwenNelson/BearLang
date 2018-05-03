@@ -318,7 +318,8 @@ bl_val_t* bl_oper_or(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
-   if((first->b_val) || (second->b_val)) return bl_mk_bool(true);
+   if(first->b_val) return bl_mk_bool(true);
+   if(second->b_val) return bl_mk_bool(true);
    return bl_mk_bool(false);
 }
 

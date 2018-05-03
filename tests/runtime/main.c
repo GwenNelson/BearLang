@@ -303,8 +303,17 @@ int test_eq_oper() {
     bl_val_t* is_eq_result  = bl_ctx_eval(ctx,equal_exp);
     bl_val_t* not_eq_result = bl_ctx_eval(ctx,not_equal_exp);
 
-    ASSERT("(eq 2 2) is #t", is_eq_result->b_val == true)
-    ASSERT("(eq 2 3) is #f", not_eq_result->b_val == false)
+    ASSERT("(eq 2 2) is #t", is_eq_result->b_val)
+    ASSERT("(eq 2 3) is #f", !not_eq_result->b_val)
+
+    is_eq_result = bl_ctx_eval(ctx,bl_parse_sexp("(eq \"foo\" \"foo\")"));
+    ASSERT("(eq \"foo\" \"foo\") is #t", is_eq_result->b_val)
+
+    not_eq_result = bl_ctx_eval(ctx,bl_parse_sexp("(eq \"foo\" \"bar\")"));
+    ASSERT("(eq \"foo\" \"bar\") is #f", !not_eq_result->b_val)
+
+    not_eq_result = bl_ctx_eval(ctx,bl_parse_sexp("(eq \"foo\" 2)"));
+    ASSERT("(eq \"foo\" 2) is #f", !not_eq_result->b_val)
 
     bl_ctx_close(ctx);
     return 0;
@@ -394,14 +403,17 @@ int test_or_oper() {
     char* tt_str = "(or True True)";
     char* ff_str = "(or False False)";
     char* tf_str = "(or True False)";
+    char* ft_str = "(or False True)";
 
     bl_val_t* tt_result = bl_ctx_eval(ctx,bl_parse_sexp(tt_str));
     bl_val_t* ff_result = bl_ctx_eval(ctx,bl_parse_sexp(ff_str));
     bl_val_t* tf_result = bl_ctx_eval(ctx,bl_parse_sexp(tf_str));
+    bl_val_t* ft_result = bl_ctx_eval(ctx,bl_parse_sexp(ft_str));
 
-    ASSERT("(or True True) returns True",    tt_result->b_val==true)
-    ASSERT("(or False False) returns False", ff_result->b_val==false)
-    ASSERT("(or True False) returns False",  tf_result->b_val==true)
+    ASSERT("(or True True) returns True",    tt_result->b_val)
+    ASSERT("(or False False) returns False", !ff_result->b_val)
+    ASSERT("(or True False) returns True",  tf_result->b_val)
+    ASSERT("(or False True) returns True",  ft_result->b_val)
 
     bl_ctx_close(ctx);
     return 0;
