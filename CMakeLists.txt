@@ -12,10 +12,11 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_compile_options("-march=native")
 endif (CMAKE_BUILD_TYPE STREQUAL "Release")
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	include(CodeCoverage)
+	APPEND_COVERAGE_COMPILER_FLAGS()
+endif  (CMAKE_BUILD_TYPE STREQUAL "Debug")
 
-#include(CodeCoverage)
-
-#APPEND_COVERAGE_COMPILER_FLAGS()
 find_package (LibGc REQUIRED)
 find_package (Readline REQUIRED)
 find_package (FLEX REQUIRED)
@@ -61,7 +62,6 @@ llvm_map_components_to_libnames(llvm_libs core executionengine mcjit interpreter
 target_link_libraries(blc blruntime)
 target_link_libraries(blc ${llvm_libs})
 
-#APPEND_COVERAGE_COMPILER_FLAGS()
 
 add_executable(test_blruntime ${RUNTIME_TEST_SRC})
 target_link_libraries(test_blruntime blruntime)
@@ -71,9 +71,12 @@ add_test(NAME blruntime
 add_executable(test_parser ${PARSER_TEST_SRC})
 target_link_libraries(test_parser blruntime)
 
-#set(COVERAGE_EXCLUDES "tests/*" "runtime/src/mpc.c")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	set(COVERAGE_EXCLUDES "tests/*" )
 
-#SETUP_TARGET_FOR_COVERAGE(NAME test_coverage
-#                          EXECUTABLE test_blruntime
-#                          DEPENDENCIES test_blruntime)
+	SETUP_TARGET_FOR_COVERAGE(NAME test_coverage
+                          EXECUTABLE test_blruntime
+                          DEPENDENCIES test_blruntime)
+
+endif  (CMAKE_BUILD_TYPE STREQUAL "Debug")
 

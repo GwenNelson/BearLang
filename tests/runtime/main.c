@@ -134,6 +134,8 @@ int test_simple_arithmetic() {
     bl_val_t* result = bl_ctx_eval(ctx,sexp);
     ASSERT("simple addition (+ 2 3)", (result->type==BL_VAL_TYPE_NUMBER) && (strcmp(bl_ser_sexp(result),"5")==0))
 
+    result = bl_ctx_eval(ctx,bl_parse_sexp("(+ (2 3 1))"));
+    ASSERT("simple addition (+ (2 3 1))", (result->type==BL_VAL_TYPE_NUMBER) && (strcmp(bl_ser_sexp(result),"6")==0))
     bl_ctx_close(ctx);
     return 0;
 }
@@ -427,23 +429,31 @@ int test_xor_oper() {
 int test_list_opers() {
     bl_val_t* ctx = bl_ctx_new_std();
 
-    char* first_str  = "(first 1 2 3 4 5)";
-    char* second_str = "(second 1 2 3 4 5)";
-    char* third_str  = "(third 1 2 3 4 5)";
-    char* rest_str   = "(rest 1 2 3 4 5)";
+    char* first_str   = "(first 1 2 3 4 5)";
+    char* second_str  = "(second 1 2 3 4 5)";
+    char* third_str   = "(third 1 2 3 4 5)";
+    char* rest_str    = "(rest 1 2 3 4 5)";
+    char* reverse_str = "(reverse 1 2 3 4 5)";
+    char* append_str  = "(append (1 2 3 4) 5";
+    char* prepend_str = "(prepend (1 2 3 4) 5";
 
-
-    bl_val_t* first_result  = bl_ctx_eval(ctx,bl_parse_sexp(first_str));
-    bl_val_t* second_result = bl_ctx_eval(ctx,bl_parse_sexp(second_str));
-    bl_val_t* third_result  = bl_ctx_eval(ctx,bl_parse_sexp(third_str));
-    bl_val_t* rest_result   = bl_ctx_eval(ctx,bl_parse_sexp(rest_str));
+    bl_val_t* first_result   = bl_ctx_eval(ctx,bl_parse_sexp(first_str));
+    bl_val_t* second_result  = bl_ctx_eval(ctx,bl_parse_sexp(second_str));
+    bl_val_t* third_result   = bl_ctx_eval(ctx,bl_parse_sexp(third_str));
+    bl_val_t* rest_result    = bl_ctx_eval(ctx,bl_parse_sexp(rest_str));
+    bl_val_t* reverse_result = bl_ctx_eval(ctx,bl_parse_sexp(reverse_str));
+    bl_val_t* append_result  = bl_ctx_eval(ctx,bl_parse_sexp(append_str));
+    bl_val_t* prepend_result = bl_ctx_eval(ctx,bl_parse_sexp(prepend_str));
 
     ASSERT("(first 1 2 3 4 5)  returns 1", strcmp(bl_ser_sexp(first_result),"1")==0)
     ASSERT("(second 1 2 3 4 5) returns 2", strcmp(bl_ser_sexp(second_result),"2")==0)
     ASSERT("(third 1 2 3 4 5)  returns 3", strcmp(bl_ser_sexp(third_result),"3")==0)
 
-    ASSERT("(rest 1 2 3 4 5)  returns (b c d e)", strcmp(bl_ser_sexp(rest_result),"(2 3 4 5)")==0)
+    ASSERT("(rest 1 2 3 4 5)  returns (2 3 4 5)", strcmp(bl_ser_sexp(rest_result),"(2 3 4 5)")==0)
 
+    ASSERT("(reverse 1 2 3 4 5)  returns (5 4 3 2 1)", strcmp(bl_ser_sexp(reverse_result),"(5 4 3 2 1)")==0)
+    ASSERT("(append (1 2 3 4) 5)  returns (1 2 3 4 5)", strcmp(bl_ser_sexp(append_result),"(1 2 3 4 5)")==0)
+    ASSERT("(prepend (1 2 3 4) 5)  returns (5 1 2 3 4)", strcmp(bl_ser_sexp(prepend_result),"(5 1 2 3 4)")==0)
     bl_ctx_close(ctx);
     return 0;
 }
@@ -478,6 +488,85 @@ int test_while_oper() {
 
     bl_ctx_close(ctx);
     return 0;
+}
+
+int test_inc_dec() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_ctx_eval(ctx,bl_parse_sexp("(= x 10)"));
+    bl_ctx_eval(ctx,bl_parse_sexp("(inc x)"));
+    bl_val_t* x_val = bl_ctx_get(ctx,bl_mk_symbol("x"));
+    ASSERT("inc works correctly", strcmp(bl_ser_sexp(x_val),"11")==0)
+
+    bl_ctx_eval(ctx,bl_parse_sexp("(= y 10)"));
+    bl_ctx_eval(ctx,bl_parse_sexp("(dec y)"));
+    bl_val_t* y_val = bl_ctx_get(ctx,bl_mk_symbol("y"));
+    ASSERT("dec works correctly", strcmp(bl_ser_sexp(y_val),"9")==0)
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_lt_gt() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* lt_true_result = bl_ctx_eval(ctx,bl_parse_sexp("(lt 2 3)"));
+    bl_val_t* gt_true_result = bl_ctx_eval(ctx,bl_parse_sexp("(gt 3 2)"));
+    ASSERT("(lt 2 3) returns true", lt_true_result->b_val)
+    ASSERT("(gt 3 2) returns true", gt_true_result->b_val)
+
+    bl_val_t* lt_false_result = bl_ctx_eval(ctx,bl_parse_sexp("(lt 2 2)"));
+    bl_val_t* gt_false_result = bl_ctx_eval(ctx,bl_parse_sexp("(gt 3 3)"));
+    ASSERT("(lt 2 2) returns false", !lt_false_result->b_val)
+    ASSERT("(gt 3 3) returns false", !gt_false_result->b_val)
+
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_isset() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_ctx_eval(ctx,bl_parse_sexp("(= x 10)"));
+
+    bl_val_t* set_true_result = bl_ctx_eval(ctx,bl_parse_sexp("(isset x)"));
+    bl_val_t* set_false_result = bl_ctx_eval(ctx,bl_parse_sexp("(isset doesnotexist)"));
+    ASSERT("(isset x) returns true", set_true_result->b_val)
+
+    ASSERT("(isset doesnotexist) returns false", !set_false_result->b_val)
+
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_map() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* map_result = bl_ctx_eval(ctx,bl_parse_sexp("(map (fn (x) (+ x 1)) (1 2 3 4))"));
+
+    ASSERT("(map (fn (x) (+ x 1)) (1 2 3 4) returns (2 3 4 5)", strcmp(bl_ser_sexp(map_result),"(2 3 4 5)")==0)
+
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_modulo() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* modulo_result = bl_ctx_eval(ctx,bl_parse_sexp("(% 5 3)"));
+    ASSERT("(% 5 3) returns 2", strcmp(bl_ser_sexp(modulo_result),"2")==0)
+    
+    modulo_result = bl_ctx_eval(ctx,bl_parse_sexp("(% 15 5)"));
+    ASSERT("(% 15 5) returns 0", strcmp(bl_ser_sexp(modulo_result),"0")==0)
+
+    bl_ctx_close(ctx);
+    return 0;
+
+}
+
+int test_add_strings() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(+ \"foo\" \"bar\")"));
+    ASSERT("(+ \"foo\" \"bar\") returns \"foobar\"", strcmp(bl_ser_naked_sexp(result),"foobar")==0)
+    
+
+    bl_ctx_close(ctx);
+    return 0;
+
 }
 
 int main(int argc, char** argv) {
@@ -515,6 +604,12 @@ int main(int argc, char** argv) {
     TEST("parse a string                             ", test_parse_string)
     TEST("evaluate file                              ", test_eval_file)
     TEST("while oper                                 ", test_while_oper)
+    TEST("inc and dec opers                          ", test_inc_dec)
+    TEST("lt and gt opers                            ", test_lt_gt)
+    TEST("isset oper                                 ", test_isset)
+    TEST("map oper                                   ", test_map)
+    TEST("modulo oper (%)                            ", test_modulo)
+    TEST("add strings                                ", test_add_strings)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

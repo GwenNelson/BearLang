@@ -14,16 +14,6 @@
 #include <gmp.h>
 #include <stdbool.h>
 
-bl_val_t* bl_oper_while(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* cond = bl_list_first(params);
-   bl_val_t* body = bl_list_rest(params);
-   while(bl_ctx_eval(ctx,cond)->b_val) {
-      bl_val_t* retval = bl_ctx_eval(ctx,body);
-      if(retval->type == BL_VAL_TYPE_ERROR) return retval;
-   }
-   return bl_mk_null();
-}
-
 bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) {
    params = bl_eval_cons(ctx,params,true);
 
@@ -454,7 +444,7 @@ bool has_init_integer_one = false;
 static mpz_t integer_one;
 
 bl_val_t* bl_oper_inc(bl_val_t* ctx, bl_val_t* params) {
-   if(!has_init_integer_one) mpz_init_set_ui(integer_one,1);
+//   if(!has_init_integer_one) mpz_init_set_ui(integer_one,1);
    bl_val_t* symname = bl_list_first(params);
    bl_val_t* symval  = bl_ctx_get(ctx,symname);
    symval->fix_int++;
@@ -463,7 +453,7 @@ bl_val_t* bl_oper_inc(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) {
-   if(!has_init_integer_one) mpz_init_set_ui(integer_one,1);
+//   if(!has_init_integer_one) mpz_init_set_ui(integer_one,1);
    bl_val_t* symname = bl_list_first(params);
    bl_val_t* symval  = bl_ctx_get(ctx,symname);
    symval->fix_int--;

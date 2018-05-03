@@ -245,7 +245,7 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) {
    } else {
       if(ctx->parent != NULL) return bl_ctx_get(ctx->parent, key);
    }
-
+   return NULL;
 
 }
 
@@ -261,6 +261,7 @@ bl_val_t* bl_ctx_set(bl_val_t* ctx, bl_val_t* key, bl_val_t* val) {
      bl_val_t** old_vals = ctx->vals;
      ctx->vals = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*ctx->vals_count);
      int i=0;
+     
      for(i=0; i<old_count; i++) ctx->vals[i] = old_vals[i];
 
    }
