@@ -33,6 +33,7 @@ typedef enum bl_val_type_t {
         BL_VAL_TYPE_LIST_END=15,    // used by the parser
 	BL_VAL_TYPE_OPER_DO=16,     // special form
 	BL_VAL_TYPE_OPER_IF=17,     // special form
+	BL_VAL_TYPE_OPER_WHILE=18,  // special form
 } bl_val_type_t;
 
 typedef enum bl_err_type_t {
@@ -120,6 +121,7 @@ typedef struct bl_val_t {
 		struct { bl_val_t* bl_func_ptr;
 		         bl_val_t* bl_funcargs_ptr;
 	                 bl_val_t* lexical_closure;
+			 bl_val_t* inner_closure;
 	       		 bl_val_t* sym;	};
 
 		// BL_VAL_TYPE_FUNC_NATIVE

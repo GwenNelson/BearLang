@@ -244,6 +244,7 @@ bl_val_t* bl_oper_fn(bl_val_t* ctx, bl_val_t* params) {
    retval->bl_funcargs_ptr = bl_list_first(params);
    retval->bl_func_ptr     = bl_list_rest(params);
    retval->lexical_closure = ctx;
+   retval->inner_closure   = bl_ctx_new(ctx);
    retval->sym = bl_mk_symbol("anonymous-lambda");
    return retval;
 }
@@ -254,6 +255,7 @@ bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) {
    retval->bl_funcargs_ptr = bl_list_second(params);
    retval->bl_func_ptr     = bl_list_rest(bl_list_rest(params)); // the rest of the rest is better than the rest
    retval->lexical_closure = ctx;
+   retval->inner_closure   = bl_ctx_new(ctx);
    retval->sym = bl_list_first(params);
 
    bl_ctx_set(ctx, retval->sym, retval);

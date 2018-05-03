@@ -74,6 +74,8 @@ bl_val_t if_oper_val  = {.type = BL_VAL_TYPE_OPER_IF};
 bl_val_t do_oper_val  = {.type = BL_VAL_TYPE_OPER_DO};
 bl_val_t end_list_val = {.type = BL_VAL_TYPE_LIST_END};
 
+bl_val_t while_oper_val = {.type = BL_VAL_TYPE_OPER_WHILE};
+
 bl_val_t* read_form(yyscan_t scanner) {
     char* s = NULL;
     bl_token_type_t tok = yylex(scanner);
@@ -96,8 +98,9 @@ bl_val_t* read_form(yyscan_t scanner) {
 	break;
 	case BL_TOKEN_SYMBOL:
 		s = yyget_text(scanner);
-		if(strncmp(s,"if",2)==0) return &if_oper_val;
-		if(strncmp(s,"do",2)==0) return &do_oper_val;
+		if(strncmp(s,"if",2)==0) return    &if_oper_val;
+		if(strncmp(s,"do",2)==0) return    &do_oper_val;
+		if(strncmp(s,"while",5)==0) return &while_oper_val;
 		return bl_mk_symbol(yyget_text(scanner));
 	break;
    }
