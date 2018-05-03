@@ -19,7 +19,7 @@ bl_val_t* bl_mk_val(bl_val_type_t type) {
       last_alloc = 0;
    }
    if(val_pool_size==0) {
-      val_pool_size = 200000;
+      val_pool_size = 5000;
       val_pool = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t)*val_pool_size);
    }
 
