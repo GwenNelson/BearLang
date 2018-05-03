@@ -22,8 +22,30 @@ bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) {
 
    bl_val_t* func_expr = NULL;
    bl_val_t* retval = NULL;
+   bl_val_t* retval_L = NULL;
 
-   while(L != NULL) {
+   // TODO - make this support native functions etc
+   bl_val_t* i = NULL;
+   bl_val_t* j = NULL;
+   bl_val_t* tmp=bl_mk_val(BL_VAL_TYPE_CONS);
+   for(i=L; i != NULL; i=i->cdr) {
+       bl_ctx_set(func->inner_closure,func->bl_funcargs_ptr->car,i->car);
+       for(j = func->bl_func_ptr; j != NULL; j=j->cdr) {
+           if(retval_L == NULL) {
+              retval_L = bl_mk_val(BL_VAL_TYPE_CONS);
+	      retval_L->car = bl_ctx_eval(func->inner_closure,j->car);
+	      retval_L->cdr = NULL;
+	      retval = retval_L;
+	   } else {
+              retval_L->cdr = bl_mk_val(BL_VAL_TYPE_CONS);
+	      retval_L->cdr->car = bl_ctx_eval(func->inner_closure,j->car);
+	      retval_L=retval_L->cdr;
+	   }
+       }
+   }
+   return retval;
+
+   /*while(L != NULL) {
      if(L->car != NULL) {
         func_expr = NULL;
 	func_expr = bl_list_append(func_expr,func);
@@ -32,7 +54,7 @@ bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) {
      }
      L = L->cdr;
    }
-   return retval;
+   return retval;*/
 
 }
 
