@@ -71,7 +71,6 @@ bl_val_t* bl_ctx_new(bl_val_t* parent) {
 }
 
 void bl_ctx_close(bl_val_t* ctx) {
-     GC_FREE(ctx->vals);
 }
 
 // binds variables into a context by copying them
@@ -88,14 +87,25 @@ void bl_set_params(bl_val_t* ctx, bl_val_t* param_names, bl_val_t* param_vals) {
 
 bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr, bool build_new_list) {
     bl_val_t* retval = NULL;
+    bl_val_t* L_start = NULL;
     bl_val_t* L      = NULL;
     bl_val_t* i = NULL;
     if(build_new_list) {
 	    for(i=expr; i != NULL; i=i->cdr) {
 	        retval = bl_ctx_eval(ctx,i->car);
 	        if(retval->type == BL_VAL_TYPE_ERROR) return retval;
-		L = bl_list_append(L,retval);
+		if(L==NULL) {
+		   L=bl_mk_val(BL_VAL_TYPE_CONS);
+		   L->car = retval;
+		   L->cdr = NULL;
+		   L_start = L;
+		} else {
+		   L->cdr = bl_mk_val(BL_VAL_TYPE_CONS);
+		   L->cdr->car = retval;
+		   L=L->cdr;
+		}
 	    }
+	    return L_start;
     } else {
 	    for(i=expr; i != NULL; i=i->cdr) {
 	        retval = bl_ctx_eval(ctx,i->car);
@@ -103,7 +113,7 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr, bool build_new_list) {
 
 	    }
     }
-    return L;
+    return NULL;
 }
 
 bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {

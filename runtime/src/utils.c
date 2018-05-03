@@ -9,14 +9,16 @@
 
 #include <gmp.h>
 
-bl_val_t* val_pool;
+bl_val_t val_pool_static[100000];
+
+bl_val_t* val_pool = &val_pool_static;
 uint64_t last_alloc = 0;
-uint64_t val_pool_size = 0;
+uint64_t val_pool_size = 100000;
 
 #define POOL_DEFAULT_SIZE 10000
 
 bl_val_t* bl_mk_val(bl_val_type_t type) {
-   if(val_pool_size==0 || last_alloc >= val_pool_size) {
+   if(last_alloc >= val_pool_size) {
       val_pool_size = POOL_DEFAULT_SIZE;
       val_pool = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t)*val_pool_size);
       last_alloc = 0;
@@ -79,7 +81,7 @@ bl_val_t* bl_mk_integer(char* s) {
 }
 
 bl_val_t* bl_mk_float(char* s) {
-   bl_val_t* retval = bl_mk_val_atomic(BL_VAL_TYPE_NUMBER);
+   bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
    mpf_init_set_str(retval->f_val,s,10);
    retval->is_float = true;
    return retval;
@@ -118,9 +120,9 @@ bl_val_t* bl_mk_list(size_t count,...) {
 
    int i=0;
    for (i=0; i < count; i++ ) {
-      retval = bl_list_append(retval,va_arg(ap,bl_val_t*));
+      retval = bl_list_prepend(retval,va_arg(ap,bl_val_t*));
    }
-   return retval;
+   return bl_list_reverse(retval);
 }
 
 bl_val_t* bl_eval_file(bl_val_t* ctx, char* filename, FILE* fd) {
