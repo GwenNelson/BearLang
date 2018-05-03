@@ -45,16 +45,6 @@ bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) {
    }
    return retval;
 
-   /*while(L != NULL) {
-     if(L->car != NULL) {
-        func_expr = NULL;
-	func_expr = bl_list_append(func_expr,func);
-	func_expr = bl_list_append(func_expr,L->car);
-        retval = bl_list_append(retval,bl_ctx_eval(ctx,func_expr));
-     }
-     L = L->cdr;
-   }
-   return retval;*/
 
 }
 
@@ -71,11 +61,17 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
       first  = bl_list_first(params);
    }
 
-   if(first->type == BL_VAL_TYPE_NUMBER) {
-      retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
-      retval->fix_int = 0;
-   } else {
-      retval = bl_mk_str("");
+   switch(first->type) {
+      case BL_VAL_TYPE_NUMBER:
+           retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
+	   retval->fix_int = 0;
+      break;
+      case BL_VAL_TYPE_STRING:
+           retval = bl_mk_str("");
+      break;
+      default:
+         return bl_mk_null(); // TODO - return type error here
+      break;
    }
 
    bl_val_t* x = NULL;
@@ -85,32 +81,19 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
 
    L = params;
 
-   while(L->cdr != NULL) {
-        if(L->car != NULL) {
+   for(L=params; L!= NULL; L=L->cdr) {
            x = bl_ctx_eval(ctx,L->car);
-	   if(retval->type == BL_VAL_TYPE_NUMBER) {
-		retval->fix_int = retval->fix_int + x->fix_int;
-	   } else {
-             s = bl_ser_naked_sexp(x);
-	     c = strlen(s) + strlen(retval->s_val)+5;
-             retval->s_val = GC_REALLOC(retval->s_val,c);
-             snprintf(retval->s_val,c,"%s%s", retval->s_val,s);
-	   }
+        switch(retval->type) {
+            case BL_VAL_TYPE_NUMBER:
+           	 retval->fix_int = retval->fix_int + x->fix_int;
+	    break;
+	    default:
+                 s = bl_ser_naked_sexp(x);
+		 c = strlen(s) + strlen(retval->s_val)+5;
+                 retval->s_val = GC_REALLOC(retval->s_val,c);
+                 snprintf(retval->s_val,c,"%s%s", retval->s_val,s);
+	    break;
 	}
-	L = L->cdr;
-   }
-   if(L->car != NULL) {
-        x = bl_ctx_eval(ctx,L->car);
-	   if(retval->type == BL_VAL_TYPE_NUMBER) {
-		retval->fix_int = retval->fix_int + x->fix_int;
-	//             mpz_add(retval->i_val, retval->i_val, x->i_val);
-	   } else {
-             s = bl_ser_naked_sexp(x);
-	     c = strlen(s) + strlen(retval->s_val)+5;
-             retval->s_val = GC_REALLOC(retval->s_val,c);
-             snprintf(retval->s_val,c,"%s%s", retval->s_val,s);
-
-	   }
    }
    return retval;
 }
