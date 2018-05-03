@@ -60,8 +60,7 @@ bl_val_t* bl_ctx_new_std() {
 }
 
 bl_val_t* bl_ctx_new(bl_val_t* parent) {
-   bl_val_t* retval   = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   retval->type       = BL_VAL_TYPE_CTX;
+   bl_val_t* retval   = bl_mk_val(BL_VAL_TYPE_CTX);
    retval->parent     = parent;
    retval->secondary  = NULL;
    retval->hash_val   = NULL;

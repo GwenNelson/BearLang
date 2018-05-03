@@ -9,11 +9,25 @@
 
 #include <gmp.h>
 
-
+bl_val_t* val_pool;
+uint64_t last_alloc = 0;
+uint64_t val_pool_size = 0;
 
 bl_val_t* bl_mk_val(bl_val_type_t type) {
-   bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   retval->type     = type;
+   if(last_alloc >= val_pool_size) {
+      val_pool_size=0;
+      last_alloc = 0;
+   }
+   if(val_pool_size==0) {
+      val_pool_size = 200000;
+      val_pool = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t)*val_pool_size);
+   }
+
+
+   bl_val_t* retval = &(val_pool[last_alloc]);
+   bzero(retval, sizeof(bl_val_t));
+   retval->type = type;
+   last_alloc++;
    return retval;
 }
 

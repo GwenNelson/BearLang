@@ -199,8 +199,6 @@ bl_val_t* bl_oper_gt(bl_val_t* ctx, bl_val_t* params) {
    retval = bl_errif_invalid_len(params,2,2);
    if(retval != NULL) return retval;*/
 
-   bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   retval->type     = BL_VAL_TYPE_NUMBER;
 
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
@@ -246,8 +244,7 @@ bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_fn(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* retval        = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   retval->type            = BL_VAL_TYPE_FUNC_BL;
+   bl_val_t* retval        = bl_mk_val(BL_VAL_TYPE_FUNC_BL);
    retval->bl_funcargs_ptr = bl_list_first(params);
    retval->bl_func_ptr     = bl_list_rest(params);
    retval->lexical_closure = ctx;
@@ -257,8 +254,7 @@ bl_val_t* bl_oper_fn(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* retval        = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   retval->type            = BL_VAL_TYPE_FUNC_BL;
+   bl_val_t* retval        = bl_mk_val(BL_VAL_TYPE_FUNC_BL);
    retval->bl_funcargs_ptr = bl_list_second(params);
    retval->bl_func_ptr     = bl_list_rest(bl_list_rest(params)); // the rest of the rest is better than the rest
    retval->lexical_closure = ctx;
@@ -270,8 +266,7 @@ bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* bl_oper_oper(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* retval        = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
-   retval->type            = BL_VAL_TYPE_OPER_BL;
+   bl_val_t* retval        = bl_mk_val(BL_VAL_TYPE_OPER_BL);
    retval->bl_operargs_ptr = bl_list_second(params);
    retval->bl_oper_ptr     = bl_list_rest(bl_list_rest(params));
 
