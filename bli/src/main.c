@@ -37,7 +37,6 @@ void run_file(char* filename, int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
-    GC_INIT();
     bl_init();
 
     if(argc>=2) {

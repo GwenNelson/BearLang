@@ -12,12 +12,11 @@ void* gmp_realloc(void* ptr, size_t old_size, size_t new_size) {
 }
 
 void gmp_free(void* ptr, size_t size) {
-     GC_free(ptr);
+//     GC_free(ptr);
 }
 
 int bl_init() {
-    GC_all_interior_pointers=1;
-    GC_init();
+    GC_INIT();
     mp_set_memory_functions(&gmp_malloc, &gmp_realloc, &gmp_free);
     return 0;
 }

@@ -9,13 +9,15 @@
 
 #include <gmp.h>
 
-bl_val_t val_pool_static[100000];
+
+#define POOL_DEFAULT_SIZE 10000
+
+bl_val_t val_pool_static[POOL_DEFAULT_SIZE];
 
 bl_val_t* val_pool = &val_pool_static;
 uint64_t last_alloc = 0;
-uint64_t val_pool_size = 100000;
+uint64_t val_pool_size = POOL_DEFAULT_SIZE;
 
-#define POOL_DEFAULT_SIZE 10000
 
 bl_val_t* bl_mk_val(bl_val_type_t type) {
    if(last_alloc >= val_pool_size) {
