@@ -1,0 +1,13 @@
+(fun test () 
+     (= x 2) 
+     (fun inside ()
+           (print "x from inside func is " x "\n") )
+      inside)
+
+(= x 1)
+(print "x is " x "\n")
+
+(= internalfunc (test))
+(internalfunc)
+
+(print "x after calling internalfunc is " x "\n")

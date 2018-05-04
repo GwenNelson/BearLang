@@ -1,0 +1,7 @@
+(fun fac1 (n a)
+     (if (eq n 1) a
+                (fac1 (- n 1) (* n a))))
+
+(fun fac (n) (fac1 n 1))
+
+(print (fac 8) "\n")
