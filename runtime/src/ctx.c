@@ -175,6 +175,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 				break;
 				case BL_VAL_TYPE_FUNC_BL:
 					args        = bl_ctx_eval(ctx,expr->cdr);
+					car->inner_closure = bl_ctx_new(car->lexical_closure);
 					if(bl_list_len(expr) > 1) bl_set_params(car->inner_closure,car->bl_funcargs_ptr,args);
 					ctx = car->inner_closure;
 					expr = car->bl_func_ptr;

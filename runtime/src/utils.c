@@ -10,7 +10,7 @@
 #include <gmp.h>
 
 
-#define POOL_DEFAULT_SIZE 10000
+#define POOL_DEFAULT_SIZE 100000
 
 bl_val_t val_pool_static[POOL_DEFAULT_SIZE];
 
