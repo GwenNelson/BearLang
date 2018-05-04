@@ -16,7 +16,7 @@ void gmp_free(void* ptr, size_t size) {
 //     GC_free(ptr);
 }
 //LCOV_EXCL_STOP
-int bl_init() {
+int bl_init() { // LCOV_EXCL_LINE
     GC_INIT();
     mp_set_memory_functions(&gmp_malloc, &gmp_realloc, &gmp_free);
     return 0;

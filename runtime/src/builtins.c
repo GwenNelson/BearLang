@@ -14,7 +14,8 @@
 #include <gmp.h>
 #include <stdbool.h>
 
-bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    params = bl_eval_cons(ctx,params);
 
    bl_val_t* func = bl_list_first(params);
@@ -48,7 +49,8 @@ bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) {
 
 }
 
-bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
     bl_val_t* L = params;
 //   bl_val_t* L = bl_eval_cons(ctx,params,true);
 /*   bl_val_t* retval = bl_errif_invalid_len(L,1,BL_LONGEST_LIST);
@@ -112,7 +114,8 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) {
    return retval;
 }
 
-bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    params = bl_ctx_eval(ctx,params);
 /*   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
@@ -130,7 +133,8 @@ bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) {
    return retval;
 }
 
-bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
 //   params = bl_ctx_eval(ctx, params);
 /*   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
@@ -147,7 +151,8 @@ bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) {
    return retval;
 }
 
-bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    params = bl_ctx_eval(ctx, params);
 /*     	bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
@@ -166,7 +171,8 @@ bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) {
    return retval;
 }
 
-bl_val_t* bl_oper_mod(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_mod(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
 //   params = bl_ctx_eval(ctx,params);
 /*   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
@@ -187,7 +193,8 @@ bl_val_t* bl_oper_mod(bl_val_t* ctx, bl_val_t* params) {
    return retval;
 }
 
-bl_val_t* bl_oper_lt(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_lt(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
 //   params = bl_ctx_eval(ctx,params);
 /*   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
@@ -204,7 +211,8 @@ bl_val_t* bl_oper_lt(bl_val_t* ctx, bl_val_t* params) {
    return bl_mk_bool(false);
 }
 
-bl_val_t* bl_oper_gt(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_gt(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
 //   params = bl_ctx_eval(ctx,params);
 /*   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
@@ -222,7 +230,8 @@ bl_val_t* bl_oper_gt(bl_val_t* ctx, bl_val_t* params) {
    return bl_mk_bool(false);
 }
 
-bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
 /*   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_SYMBOL,BL_VAL_TYPE_ANY};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;*/
@@ -259,7 +268,8 @@ bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
 }
 //LCOV_EXCL_STOP
 
-bl_val_t* bl_oper_fn(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_fn(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    bl_val_t* retval        = bl_mk_val(BL_VAL_TYPE_FUNC_BL);
    retval->bl_funcargs_ptr = bl_list_first(params);
    retval->bl_func_ptr     = bl_list_rest(params);
@@ -269,7 +279,8 @@ bl_val_t* bl_oper_fn(bl_val_t* ctx, bl_val_t* params) {
    return retval;
 }
 
-bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    bl_val_t* retval        = bl_mk_val(BL_VAL_TYPE_FUNC_BL);
    retval->bl_funcargs_ptr = bl_list_second(params);
    retval->bl_func_ptr     = bl_list_rest(bl_list_rest(params)); // the rest of the rest is better than the rest
@@ -293,7 +304,8 @@ bl_val_t* bl_oper_oper(bl_val_t* ctx, bl_val_t* params) {
 }
 //LCOV_EXCL_STOP
 
-bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
@@ -317,7 +329,8 @@ bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) {
    }*/
 }
 
-bl_val_t* bl_oper_and(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_and(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
@@ -325,14 +338,16 @@ bl_val_t* bl_oper_and(bl_val_t* ctx, bl_val_t* params) {
    return bl_mk_bool(false);
 }
 
-bl_val_t* bl_oper_not(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_not(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
 
    if(first->b_val) return bl_mk_bool(false);
    return bl_mk_bool(true);
 }
 
-bl_val_t* bl_oper_or(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_or(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
@@ -341,7 +356,8 @@ bl_val_t* bl_oper_or(bl_val_t* ctx, bl_val_t* params) {
    return bl_mk_bool(false);
 }
 
-bl_val_t* bl_oper_xor(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_xor(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
@@ -349,26 +365,30 @@ bl_val_t* bl_oper_xor(bl_val_t* ctx, bl_val_t* params) {
    return bl_mk_bool(false);
 }
 
-bl_val_t* bl_oper_first(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_first(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    params = bl_ctx_eval(ctx,params);
    if(bl_list_len(params)==1) return bl_list_first(bl_list_first(params));
    return bl_list_first(params);
 }
 
-bl_val_t* bl_oper_second(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_second(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    params = bl_ctx_eval(ctx,params);
    if(bl_list_len(params)==1) return bl_list_second(bl_list_first(params));
    bl_val_t* retval = bl_list_second(params);
    return retval;
 }
 
-bl_val_t* bl_oper_third(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_third(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    if(bl_list_len(params)==1) params = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* retval = bl_list_third(params);
    return retval;
 }
 
-bl_val_t* bl_oper_rest(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_rest(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
 
    params = bl_ctx_eval(ctx,params);
 
@@ -377,7 +397,8 @@ bl_val_t* bl_oper_rest(bl_val_t* ctx, bl_val_t* params) {
    return retval;
 }
 
-bl_val_t* bl_oper_include(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_include(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    bl_val_t* filename = bl_ctx_eval(ctx,bl_list_first(params));
 
    FILE* fd         = fopen(filename->s_val,"r");
@@ -425,7 +446,8 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
 }
 //LCOV_EXCL_STOP
 
-bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    bl_val_t* sym    = bl_list_first(params);
    bl_val_t* symval = bl_ctx_get(ctx, sym);
    if(symval == NULL) return bl_mk_bool(false);
@@ -433,23 +455,27 @@ bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) {
 }
 
 
-bl_val_t* bl_oper_serexp (bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_serexp (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    if(bl_list_len(params)==1) params = bl_list_first(params);
    bl_val_t* retval = bl_mk_str(bl_ser_sexp(params));
    return retval;
 }
 
-bl_val_t* bl_oper_append(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_append(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    bl_val_t* L = bl_ctx_eval(ctx,bl_list_first(params));
    return bl_list_append(L, bl_ctx_eval(ctx,bl_list_second(params)));
 }
 
-bl_val_t* bl_oper_prepend(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_prepend(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
    bl_val_t* L = bl_ctx_eval(ctx,bl_list_first(params));
    return bl_list_prepend(L, bl_ctx_eval(ctx,bl_list_second(params)));
 }
 
-bl_val_t* bl_oper_reverse(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_reverse(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
 
    params = bl_ctx_eval(ctx,params);
 
@@ -461,7 +487,8 @@ bl_val_t* bl_oper_reverse(bl_val_t* ctx, bl_val_t* params) {
 bool has_init_integer_one = false;
 static mpz_t integer_one;
 
-bl_val_t* bl_oper_inc(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_inc(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
 //   if(!has_init_integer_one) mpz_init_set_ui(integer_one,1);
    bl_val_t* symname = bl_list_first(params);
    bl_val_t* symval  = bl_ctx_get(ctx,symname);
@@ -470,7 +497,8 @@ bl_val_t* bl_oper_inc(bl_val_t* ctx, bl_val_t* params) {
    return symval;
 }
 
-bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+
 //   if(!has_init_integer_one) mpz_init_set_ui(integer_one,1);
    bl_val_t* symname = bl_list_first(params);
    bl_val_t* symval  = bl_ctx_get(ctx,symname);

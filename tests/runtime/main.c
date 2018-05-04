@@ -1,3 +1,4 @@
+// LCOV_EXCL_START
 #include <gc.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -830,3 +831,5 @@ int main(int argc, char** argv) {
        return 0;
     }
 }
+
+// LCOV_EXCL_STOP

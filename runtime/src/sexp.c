@@ -10,7 +10,8 @@
 
 bl_val_t* read_form(yyscan_t scanner);
 
-bl_val_t* read_list(yyscan_t scanner) {
+bl_val_t* read_list(yyscan_t scanner) { // LCOV_EXCL_LINE
+
     bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_CONS);
     retval->car = read_form(scanner);
     retval->cdr = NULL;
@@ -38,7 +39,8 @@ bl_val_t* read_list(yyscan_t scanner) {
     return retval;
 }
 
-char* unescape(char* s) {
+char* unescape(char* s) { // LCOV_EXCL_LINE
+
     size_t count = strlen(s);
     char* retval = GC_MALLOC_ATOMIC(sizeof(s) * count+1);
     bool slash;
@@ -75,7 +77,8 @@ bl_val_t end_list_val = {.type = BL_VAL_TYPE_LIST_END};
 
 bl_val_t while_oper_val = {.type = BL_VAL_TYPE_OPER_WHILE};
 
-bl_val_t* read_form(yyscan_t scanner) {
+bl_val_t* read_form(yyscan_t scanner) { // LCOV_EXCL_LINE
+
     char* s = NULL;
     bl_token_type_t tok = yylex(scanner);
     if(tok == 0) return NULL;
@@ -108,7 +111,8 @@ bl_val_t* read_form(yyscan_t scanner) {
    }
 }
 
-bl_val_t* bl_parse_sexp(char* sexp) {
+bl_val_t* bl_parse_sexp(char* sexp) { // LCOV_EXCL_LINE
+
    yyscan_t scanner;
    yylex_init(&scanner);
    yy_scan_string(sexp,scanner);
@@ -117,7 +121,8 @@ bl_val_t* bl_parse_sexp(char* sexp) {
    return retval;
 }
 
-bl_val_t* bl_parse_file(char* filename, FILE* fd) {
+bl_val_t* bl_parse_file(char* filename, FILE* fd) { // LCOV_EXCL_LINE
+
    yyscan_t scanner;
    yylex_init(&scanner);
    yyset_in(fd,scanner);
@@ -126,7 +131,8 @@ bl_val_t* bl_parse_file(char* filename, FILE* fd) {
    return retval;
 }
 
-char* bl_ser_sexp(bl_val_t* expr) {
+char* bl_ser_sexp(bl_val_t* expr) { // LCOV_EXCL_LINE
+
       if(expr == NULL) return "";
       char* retval=GC_MALLOC_ATOMIC(4096);
       char* s="";
@@ -191,7 +197,8 @@ char* bl_ser_sexp(bl_val_t* expr) {
       return retval;
 }
 
-char* bl_ser_naked_sexp(bl_val_t* expr) {
+char* bl_ser_naked_sexp(bl_val_t* expr) { // LCOV_EXCL_LINE
+
       char* retval = bl_ser_sexp(expr);
       if(expr->type == BL_VAL_TYPE_STRING) {
          retval++;

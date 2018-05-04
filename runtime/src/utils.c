@@ -19,7 +19,8 @@ uint64_t last_alloc = 0;
 uint64_t val_pool_size = POOL_DEFAULT_SIZE;
 
 
-bl_val_t* bl_mk_val(bl_val_type_t type) {
+bl_val_t* bl_mk_val(bl_val_type_t type) { // LCOV_EXCL_LINE
+
    if(last_alloc >= val_pool_size) {
       val_pool = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t)*val_pool_size);
       last_alloc = 0;
@@ -31,7 +32,8 @@ bl_val_t* bl_mk_val(bl_val_type_t type) {
 }
 
 bl_val_t null_val = {.type = BL_VAL_TYPE_NULL};
-bl_val_t* bl_mk_null() {
+bl_val_t* bl_mk_null() { // LCOV_EXCL_LINE
+
    return &null_val;
 }
 
@@ -44,7 +46,8 @@ struct sym_hash_t {
 struct sym_hash_t* symbol_table = NULL;
 uint64_t last_sym_id = 0;
 
-bl_val_t* bl_mk_symbol(char* sym) {
+bl_val_t* bl_mk_symbol(char* sym) { // LCOV_EXCL_LINE
+
    struct sym_hash_t* symobj = NULL;
    bl_val_t* retval = NULL;
 //LCOV_EXCL_START
@@ -69,7 +72,8 @@ bl_val_t* bl_mk_symbol(char* sym) {
    return retval;
 }
 
-bl_val_t* bl_mk_integer(char* s) {
+bl_val_t* bl_mk_integer(char* s) { // LCOV_EXCL_LINE
+
    bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
 /*   if(mpz_init_set_str(retval->i_val,s,10)==-1) {
       fprintf(stderr,"Error in gmp!\n");
@@ -80,7 +84,8 @@ bl_val_t* bl_mk_integer(char* s) {
 }
 
 
-bl_val_t* bl_mk_str(char* s) {
+bl_val_t* bl_mk_str(char* s) { // LCOV_EXCL_LINE
+
    bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_STRING);
    size_t count     = strlen(s)*sizeof(char)+1;
    retval->s_val    = (char*)GC_MALLOC_ATOMIC(count);
@@ -88,7 +93,8 @@ bl_val_t* bl_mk_str(char* s) {
    return retval;
 }
 
-bl_val_t* bl_mk_native_oper(void* func_ptr) {
+bl_val_t* bl_mk_native_oper(void* func_ptr) { // LCOV_EXCL_LINE
+
    bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_OPER_NATIVE);
    retval->code_ptr = func_ptr;
    return retval;
@@ -99,12 +105,14 @@ bl_val_t true_val = {.type = BL_VAL_TYPE_BOOL,
 bl_val_t false_val = {.type = BL_VAL_TYPE_BOOL,
 	              .b_val = false};
 
-bl_val_t* bl_mk_bool(bool b) {
+bl_val_t* bl_mk_bool(bool b) { // LCOV_EXCL_LINE
+
    if(b) return &true_val;
    return &false_val;
 }
 
-bl_val_t* bl_mk_list(size_t count,...) {
+bl_val_t* bl_mk_list(size_t count,...) { // LCOV_EXCL_LINE
+
 
    bl_val_t* retval = NULL;
    if(count==0) {
@@ -126,7 +134,8 @@ bl_val_t* bl_mk_list(size_t count,...) {
    return bl_list_reverse(retval);
 }
 
-bl_val_t* bl_eval_file(bl_val_t* ctx, char* filename, FILE* fd) {
+bl_val_t* bl_eval_file(bl_val_t* ctx, char* filename, FILE* fd) { // LCOV_EXCL_LINE
+
    bl_val_t*     sexp = bl_parse_file(filename, fd);
    bl_val_t*   retval = bl_ctx_eval(ctx, sexp);
    return retval;

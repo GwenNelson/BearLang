@@ -10,7 +10,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-bl_val_t* bl_ctx_new_std() {
+bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
+
    bl_val_t* retval = bl_ctx_new(NULL);
 
    bl_ctx_set(retval,bl_mk_symbol("*VERSION*"), bl_mk_str("0.WHATEVER")); // TODO - change this and use a real versioning system
@@ -58,7 +59,8 @@ bl_val_t* bl_ctx_new_std() {
    return retval;
 }
 
-bl_val_t* bl_ctx_new(bl_val_t* parent) {
+bl_val_t* bl_ctx_new(bl_val_t* parent) { // LCOV_EXCL_LINE
+
    bl_val_t* retval   = bl_mk_val(BL_VAL_TYPE_CTX);
    retval->parent     = parent;
    retval->secondary  = NULL;
@@ -69,11 +71,13 @@ bl_val_t* bl_ctx_new(bl_val_t* parent) {
    return retval;
 }
 
-void bl_ctx_close(bl_val_t* ctx) {
+void bl_ctx_close(bl_val_t* ctx) { // LCOV_EXCL_LINE
+
 }
 
 // binds variables into a context by copying them
-void bl_set_params(bl_val_t* ctx, bl_val_t* param_names, bl_val_t* param_vals) {
+void bl_set_params(bl_val_t* ctx, bl_val_t* param_names, bl_val_t* param_vals) { // LCOV_EXCL_LINE
+
     bl_val_t* argsk_i = param_names;
     bl_val_t* argsv_i = param_vals;
     
@@ -84,7 +88,8 @@ void bl_set_params(bl_val_t* ctx, bl_val_t* param_names, bl_val_t* param_vals) {
     }
 }
 
-bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
+bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
+
     bl_val_t* retval = NULL;
     bl_val_t* L_start = NULL;
     bl_val_t* L      = NULL;
@@ -115,7 +120,8 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) {
     return NULL;
 }
 
-bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
+bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
+
     bl_val_t* retval = NULL;
     bool in_func = false;
     bool in_oper = false;
@@ -216,7 +222,8 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) {
 }
 
 
-bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) {
+bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) { // LCOV_EXCL_LINE
+
 
 /*   if(strstr(key->s_val,"::")) {
      char* tmp = strdup(key->s_val);
@@ -246,7 +253,8 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) {
 
 }
 
-bl_val_t* bl_ctx_set(bl_val_t* ctx, bl_val_t* key, bl_val_t* val) {
+bl_val_t* bl_ctx_set(bl_val_t* ctx, bl_val_t* key, bl_val_t* val) { // LCOV_EXCL_LINE
+
 /*   if(ctx->write_to_parent) {
       if(ctx->parent != NULL) {
          if(ctx->write_to_parent) ctx = ctx->parent;

@@ -74,7 +74,7 @@ add_executable(test_parser ${PARSER_TEST_SRC})
 target_link_libraries(test_parser blruntime)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	set(COVERAGE_EXCLUDES "tests/*" )
+	set(COVERAGE_EXCLUDES ${CMAKE_CURRENT_BINARY_DIR} )
 
 	SETUP_TARGET_FOR_COVERAGE(NAME test_coverage
                           EXECUTABLE test_blruntime
