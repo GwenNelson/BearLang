@@ -843,6 +843,22 @@ int test_simple_oper() {
     return 0;
 }
 
+int test_map_error() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(map foo)"));
+    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
+
+    bl_ctx_eval(ctx,bl_parse_sexp("(fun errfunc (x) True bar)"));
+    result = bl_ctx_eval(ctx,bl_parse_sexp("(map errfunc (1 2 3))"));
+    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
+
+    bl_ctx_eval(ctx,bl_parse_sexp("(fun errfunc (x) foobar True)"));
+    result = bl_ctx_eval(ctx,bl_parse_sexp("(map errfunc (1 2 3))"));
+    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
+
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -899,6 +915,7 @@ int main(int argc, char** argv) {
     TEST("eval list of numbers                       ", test_eval_numberlist)
     TEST("error inside while oper                    ", test_while_error)
     TEST("simple custom oper                         ", test_simple_oper)
+    TEST("error inside map oper                      ", test_map_error)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

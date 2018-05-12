@@ -18,6 +18,8 @@ bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
    params = bl_eval_cons(ctx,params);
 
+   if(params->type == BL_VAL_TYPE_ERROR) return params;
+
    bl_val_t* func = bl_list_first(params);
    bl_val_t* L    = bl_list_second(params);
 
@@ -35,11 +37,13 @@ bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
            if(retval_L == NULL) {
               retval_L = bl_mk_val(BL_VAL_TYPE_CONS);
 	      retval_L->car = bl_ctx_eval(func->inner_closure,j->car);
+              if(retval_L->car->type == BL_VAL_TYPE_ERROR) return retval_L->car;
 	      retval_L->cdr = NULL;
 	      retval = retval_L;
 	   } else {
               retval_L->cdr = bl_mk_val(BL_VAL_TYPE_CONS);
 	      retval_L->cdr->car = bl_ctx_eval(func->inner_closure,j->car);
+              if(retval_L->cdr->car->type == BL_VAL_TYPE_ERROR) return retval_L->cdr->car;
 	      retval_L=retval_L->cdr;
 	   }
        }
