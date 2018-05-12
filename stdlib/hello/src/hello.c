@@ -1,5 +1,9 @@
 // This is a sample of how to compile an extension module, a hello world essentially
-
+//
+// To use this module, do this:
+//   (import hello)
+//   (hello::hello)
+//
 #include <bearlang/common.h>
 #include <bearlang/types.h>
 #include <bearlang/ctx.h>
@@ -7,7 +11,7 @@
 
 bl_val_t* hello_bearlang(bl_val_t* ctx, bl_val_t* params) {
      printf("Hello from an external C module!\n");
-     return bl_mk_null();
+     return bl_mk_str("This is the return value!");
 }
 
 // every module must contain this symbol
