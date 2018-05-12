@@ -7,6 +7,7 @@
 #include <bearlang/utils.h>
 #include <bearlang/error_tools.h>
 #include <bearlang/list_ops.h>
+#include <bearlang/sexp.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -98,12 +99,32 @@ bl_val_t* bl_fclose(bl_val_t* ctx, bl_val_t* params) {
      return bl_mk_null();
 }
 
+// utility function to convert arbitrary values into hexdump
+char* bl_hexdump(bl_val_t* V) {
+    char* retval = NULL;
+    if(V->type == BL_VAL_TYPE_NUMBER) {
+       retval = (char*)GC_MALLOC_ATOMIC(sizeof(char)*24);
+       snprintf(retval,20,"0x%llx", V->fix_int);
+       return retval;
+    }
+    char* buf = bl_ser_naked_sexp(V);
+    size_t buflen = (strlen(buf)*2)+4;
+    retval = GC_MALLOC_ATOMIC(sizeof(char)*buflen);
+    snprintf(buf,2,"%s","0x");
+    int i=0;
+    for(i=0; i<strlen(buf); i++) {
+        snprintf(buf,buflen,"%s%x",buf,(uint8_t)buf[i]);
+    }
+    return retval;
+}
+
 // (fprintf FD format-string ...)
 // format-string accepts the following format characters:
 //    %s string (or a string representation of the value)
 //    %x converts to hex representation, always has a leading 0x
 //    %% literal % character
-// any other format characters are ignored
+// any other format characters will be ignored
+// if not enough arguments are provided, (null) or 0x00 will be printed in place of the format character
 bl_val_t* bl_fprintf(bl_val_t* ctx, bl_val_t* params) {
     params = bl_eval_cons(ctx, params);
     bl_val_t* retval = bl_errif_invalid_firstarg(params,BL_VAL_TYPE_CPTR);
@@ -111,9 +132,54 @@ bl_val_t* bl_fprintf(bl_val_t* ctx, bl_val_t* params) {
     retval = bl_errif_invalid_firstarg(params->cdr,BL_VAL_TYPE_STRING);
     if(retval != NULL) return retval;
 
-    bl_val_t* fd         = bl_list_first(params);
+    bl_val_t* bl_fd      = bl_list_first(params);
     bl_val_t* format_str = bl_list_second(params);
     bl_val_t* vars       = bl_list_rest(bl_list_rest(params));
+
+    FILE* fd = (FILE*)bl_fd->c_ptr;
+    char*  s = format_str->s_val;
+
+    bl_val_t* var_iter = vars;
+
+    bool format_sym;
+    int i;
+    char* buf = NULL;;
+    for(i=0; s[i] != '\0'; i++) {
+        switch(s[i]) {
+	   case '%':
+             if(format_sym) {
+               if(fputc('%',fd) == EOF) return &generic_error;
+               format_sym = false;
+             } else {
+               format_sym = true;
+             }
+	   break;
+	   case 's':
+	      if(format_sym) {
+                 buf = bl_ser_naked_sexp(bl_list_first(var_iter));
+                 if(strlen(buf)==0) buf="(null)";
+                 if(fprintf(fd,"%s",buf) == EOF) return &generic_error;
+		 format_sym = false;
+                 var_iter = bl_list_rest(var_iter);
+	      } else {
+                 if(fputc('s',fd) == EOF) return &generic_error;
+              }
+              break;
+	   case 'x':
+	      if(format_sym) {
+                 buf = bl_hexdump(bl_list_first(var_iter));
+                 if(fprintf(fd,"%s",buf) == EOF) return &generic_error;
+                 format_sym = false;
+                 var_iter = bl_list_rest(var_iter);
+	      } else {
+                 if(fputc('s',fd) == EOF) return &generic_error;
+              }
+              break;
+	   default:
+             if(fputc(s[i],fd) == EOF) return &generic_error;
+           break;
+	}
+    }
 
     return bl_mk_null();
 }
@@ -123,5 +189,7 @@ bl_val_t* bl_mod_init(bl_val_t* ctx) {
      bl_ctx_set(my_ctx,bl_mk_symbol("fopen"),  bl_mk_native_oper(&bl_fopen));
      bl_ctx_set(my_ctx,bl_mk_symbol("fclose"), bl_mk_native_oper(&bl_fclose));
      bl_ctx_set(my_ctx,bl_mk_symbol("fprintf"),bl_mk_native_oper(&bl_fprintf));
+     bl_ctx_set(my_ctx,bl_mk_symbol("STDIN"),  bl_mk_ptr((void*)stdin));
+     bl_ctx_set(my_ctx,bl_mk_symbol("STDOUT"), bl_mk_ptr((void*)stdout));
      return my_ctx;
 }
