@@ -147,6 +147,7 @@ char* bl_ser_types(uint64_t count, bl_val_type_t* types) {
       int i=0;
       size_t maxlen = sizeof(char)*32*count;
       char* retbuf = (char*)GC_MALLOC_ATOMIC(maxlen);
+      retbuf[0] = NULL;
       for(i=0; i<count; i++) {
           char* s = bl_ser_type(types[i]);
           snprintf(retbuf + strlen(retbuf),maxlen,"%s,",s);
