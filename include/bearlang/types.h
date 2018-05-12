@@ -42,8 +42,11 @@ typedef enum bl_err_type_t {
 	BL_ERR_INSUFFICIENT_ARGS=3,  // Not enough arguments were provided
         BL_ERR_TOOMANY_ARGS=4,       // Too many arguments were provided
 	BL_ERR_INVALID_ARGTYPE=5,    // Invalid argument type(s) was/were provided
-	BL_ERR_SYMBOL_NOTFOUND=6,
-	BL_ERR_DIVIDE_BY_ZERO=7,
+	BL_ERR_SYMBOL_NOTFOUND=6,    // Attempted to evaluate an expression containing a symbol that wasn't found
+	BL_ERR_DIVIDE_BY_ZERO=7,     // Attempted to divide by zero
+	BL_ERR_CUSTOM=8,             // Custom error type - contains a human-readable string and a numeric error code
+	BL_ERR_IO=9,                 // Generic I/O error
+	BL_ERR_MODULE_NOTFOUND=10,   // Failed to find a module
 } bl_err_type_t;
 
 // TODO: add all builtins as tokens to the lexer
@@ -71,6 +74,8 @@ typedef struct bl_err_t {
         bl_val_type_t* provided_types; // actually provided argument types (as bl_val_type_t array)
 	
 	char* symbol_name; // only set if relevant to the error
+	char* errmsg;      // for BL_ERR_CUSTOM
+	uint64_t errnum;    // for BL_ERR_CUSTOM
 } bl_err_t;
 
 struct bl_hash_t {

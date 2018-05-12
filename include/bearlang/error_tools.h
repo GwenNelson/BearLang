@@ -27,8 +27,13 @@ char* bl_errmsg(bl_val_t* E);
 // return a symbol not found error for the specified symbol
 bl_val_t* bl_err_symnotfound(char* sym);
 
+// return a module not found error for the specified module
+bl_val_t* bl_err_modnotfound(char* mod);
 
 // return divide by zero error
 bl_val_t* bl_err_divzero();
+
+// return invalid first argument error if the first argument doesn't match, assumes rest of the args are ANY
+bl_val_t* bl_errif_invalid_firstarg(bl_val_t* params, const bl_val_type_t expected_type);
 
 char* bl_ser_type(bl_val_type_t t);

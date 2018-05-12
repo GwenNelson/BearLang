@@ -418,8 +418,11 @@ typedef bl_val_t* (*mod_init_fn)(bl_val_t*);
 
 bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
      bl_val_t* first = bl_list_first(params);
-     bl_val_t* module_name = bl_ctx_get(ctx,first);
-     if(module_name == NULL) module_name = first;
+     bl_val_t* module_name = first;
+     if(first->type == BL_VAL_TYPE_SYMBOL) {
+        module_name = bl_ctx_get(ctx,first);
+	if(module_name == NULL) module_name = first;
+     }
 
      glob_t globbuf;
 
@@ -446,7 +449,10 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
              }
 	 }
 	 globfree(&globbuf);
-     
+     if(strlen(found_path)==0) {
+        return bl_err_modnotfound(module_name->s_val);
+     }
+
      char* fname = GC_MALLOC_ATOMIC(4096);
      snprintf(fname,4096,"%s", found_path);
      fname = basename(fname);

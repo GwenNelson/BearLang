@@ -140,3 +140,9 @@ bl_val_t* bl_eval_file(bl_val_t* ctx, char* filename, FILE* fd) { // LCOV_EXCL_L
    bl_val_t*   retval = bl_ctx_eval(ctx, sexp);
    return retval;
 }
+
+bl_val_t* bl_mk_ptr(void* ptr) { // LCOV_EXCL_LINE
+   bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_CPTR);
+   retval->c_ptr    = ptr;
+   return retval;
+}
