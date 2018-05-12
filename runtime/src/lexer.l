@@ -19,7 +19,7 @@ WHILE_OPER	"while"
 STRING          \"(\\.|[^"\\])*\"
 NUMBER_INTEGER  [-]*[0-9]+ 
 WHITESPACE      [ \t\n\r]
-SYMBOL          [\%\:\=\*\-\/\+a-zA-Z0-9]+
+SYMBOL          [\_\%\:\=\*\-\/\+a-zA-Z0-9]+
 COMMENT_START   \;
 
 %%
