@@ -139,7 +139,8 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 	    bl_val_t* i    = NULL;
 	    switch(expr->type) {
 	      case BL_VAL_TYPE_CONS:
-			   if(expr->car->type == BL_VAL_TYPE_SYMBOL) {
+                          if(expr->car == NULL) return bl_mk_null();
+                          if(expr->car->type == BL_VAL_TYPE_SYMBOL) {
 	 			car = bl_ctx_get(ctx, expr->car);
 				if(car == NULL)  return bl_err_symnotfound(expr->car->s_val);
 			   } else {

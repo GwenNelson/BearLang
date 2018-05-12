@@ -778,7 +778,59 @@ int test_symnotfound() {
 
     ASSERT("get non-existent symbol error", result->type==BL_VAL_TYPE_ERROR)
 
+    result = bl_ctx_eval(ctx,bl_parse_sexp("(foobar 1 2 3)"));
+
+    ASSERT("get non-existent symbol error", result->type==BL_VAL_TYPE_ERROR)
+
     bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_eval_invalid() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("()"));
+
+    ASSERT("eval(None) returns None", result->type==BL_VAL_TYPE_NULL)
+
+    result = bl_ctx_eval(ctx,NULL);
+    ASSERT("eval(None) returns None", result->type==BL_VAL_TYPE_NULL)
+
+    bl_val_t* err = bl_mk_val(BL_VAL_TYPE_ERROR);
+    result = bl_ctx_eval(ctx,err);
+    ASSERT("eval(error) returns error", result==err)
+
+    bl_val_t* err_list = bl_mk_list(2,err,bl_mk_str("bla"));
+    result = bl_ctx_eval(ctx,err_list);
+    ASSERT("eval(error) returns error", result==err)
+	
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_zeroparam_func() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_ctx_eval(ctx,bl_parse_sexp("(fun myfunc () True)"));
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(myfunc)"));
+
+    ASSERT("Zero-param function returns correct value", result->b_val)
+
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_eval_numberlist() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(1 2 3 )"));
+    ASSERT("Return value is a list", result->type==BL_VAL_TYPE_CONS)
+    ASSERT("Return value is the correct list",  strcmp(bl_ser_sexp(result),"(1 2 3)")==0)
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_while_error() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(while True foo)"));
+    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
     return 0;
 }
 
@@ -833,6 +885,10 @@ int main(int argc, char** argv) {
     TEST("pool allocation                            ", test_pool_alloc)
     TEST("ctx stress test                            ", test_ctx_stress)
     TEST("symbol not found error                     ", test_symnotfound)
+    TEST("eval invalid expression                    ", test_eval_invalid)
+    TEST("0-params function                          ", test_zeroparam_func)
+    TEST("eval list of numbers                       ", test_eval_numberlist)
+    TEST("error inside while oper                    ", test_while_error)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
