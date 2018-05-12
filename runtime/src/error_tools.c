@@ -9,21 +9,21 @@
 #include <bearlang/error_tools.h>
 
 
-bool bl_is_valid_len(bl_val_t* L, uint64_t min, uint64_t max) {
+bool bl_is_valid_len(bl_val_t* L, uint64_t min, uint64_t max) { // LCOV_EXCL_LINE
      uint64_t L_len = bl_list_len(L);
      if(L_len < min) return false;
      if(L_len > max) return false;
      return true;
 }
 
-bool bl_is_valid_funcarg_len(bl_val_t* f, bl_val_t* L) {
+bool bl_is_valid_funcarg_len(bl_val_t* f, bl_val_t* L) {  // LCOV_EXCL_LINE
      uint64_t L_len = bl_list_len(L);
      uint64_t funcargs_len = bl_list_len(f->bl_funcargs_ptr);
      if(L_len == funcargs_len) return true;
      return false;
 }
 
-bl_val_t* bl_errif_invalid_len(bl_val_t* L, uint64_t min, uint64_t max) {
+bl_val_t* bl_errif_invalid_len(bl_val_t* L, uint64_t min, uint64_t max) {  // LCOV_EXCL_LINE
      if(L->type == BL_VAL_TYPE_ERROR) return L;
    	uint64_t L_len = bl_list_len(L);
      if((L_len >= min) && (L_len <= max)) return NULL;
@@ -45,7 +45,7 @@ bl_val_t* bl_errif_invalid_len(bl_val_t* L, uint64_t min, uint64_t max) {
      return retval;
 }
 
-bl_val_t* bl_errif_invalid_fixed_args(bl_val_t* params, const bl_val_type_t* expected_types, uint64_t args_len) {
+bl_val_t* bl_errif_invalid_fixed_args(bl_val_t* params, const bl_val_type_t* expected_types, uint64_t args_len) {  // LCOV_EXCL_LINE
       bl_val_t* retval = bl_errif_invalid_len(params, args_len, args_len);
       if(retval != NULL) return retval;
 

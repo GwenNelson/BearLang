@@ -17,14 +17,16 @@
 bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
    params = bl_eval_cons(ctx,params);
-
    if(params->type == BL_VAL_TYPE_ERROR) return params;
+
+   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_FUNC_BL,BL_VAL_TYPE_CONS};
+   bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
+   if(retval != NULL) return retval;
 
    bl_val_t* func = bl_list_first(params);
    bl_val_t* L    = bl_list_second(params);
 
    bl_val_t* func_expr = NULL;
-   bl_val_t* retval = NULL;
    bl_val_t* retval_L = NULL;
 
    // TODO - make this support native functions etc

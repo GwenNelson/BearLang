@@ -34,6 +34,9 @@ COMMENT_START   \;
 {DO_OPER}	   { return BL_TOKEN_DO; }
 {WHILE_OPER}	   { return BL_TOKEN_WHILE; }
 {SYMBOL}           { return BL_TOKEN_SYMBOL; }
+[ \t\n]+          /* do nothing */
+.+                /* do nothing */
+
 
 %%
 
