@@ -1,6 +1,7 @@
 ; vim: filetype=Lisp
 (import os)
 (import stdio)
+(import error)
 
 (fun quit () (os::exit 0))
 
@@ -10,12 +11,9 @@
 	(= input-line (try (stdio::readline "REPL> ")
                            (catch ERR_IO None)))
 	(= sexp (try (parse input-line)
-                     (catch ERR_ANY (quote print "\n"))))
-        (try (= result (eval sexp))
-             (catch ERR_ANY             (print "Generic error!\n"))
-             (catch ERR_SYMBOL_NOTFOUND (print "Missing symbol!\n"))
-        )
-
-	(if (not (eq result None)) (print (serexp result) "\n"))
-
-	)
+                     (catch ERR_ANY "\nUse (quit) to quit")))
+        (if (eq sexp None) (= sexp ""))
+        (print (try (eval sexp)
+                    (catch ERR_ANY             (+ "Generic error!"))
+                    (catch ERR_SYMBOL_NOTFOUND (+ "Missing symbol " (error::getsym *ERR*) "")))
+                "\n"))

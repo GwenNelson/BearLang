@@ -88,6 +88,7 @@ struct bl_hash_t {
 typedef struct bl_val_t {
         bl_val_type_t type;
 	bl_val_t* eval_last; // used by bl_eval_cons
+	bool quoted;
 	union {
 
 		// BL_VAL_TYPE_ERROR

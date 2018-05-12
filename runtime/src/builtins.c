@@ -28,6 +28,7 @@ bl_val_t* bl_oper_parse(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 }
 
 bl_val_t* bl_oper_quote(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   params->quoted = true;
    return params;
 }
 
@@ -39,6 +40,7 @@ bl_val_t* bl_oper_quote(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 //
 // the SOME_ERR types are defined in the default environment as ERR_* symbols
 // e.g ERR_INSUFFICIENT_ARGS ERR_TOOMANY_ARGS etc
+// while evaluating the catch blocks, *ERR* is set to the actual error
 bl_val_t* bl_oper_try(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* try_expr    = bl_list_first(params);
    bl_val_t* try_result  = bl_ctx_eval(ctx, try_expr);
@@ -51,6 +53,8 @@ bl_val_t* bl_oper_try(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* catch_err    = NULL;
    bl_val_t* catch_expr   = try_result;
    bl_val_t* finally_expr = NULL;
+
+   bl_ctx_set(ctx,bl_mk_symbol("*ERR*"),try_result);
 
    for(i=other_exprs; i != NULL; i=i->cdr) {
        if(i->car->type != BL_VAL_TYPE_CONS) {
@@ -76,7 +80,7 @@ bl_val_t* bl_oper_try(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 }
 
 bl_val_t* bl_oper_eval(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   params = bl_eval_cons(ctx,params);
+   params = bl_ctx_eval(ctx,params);
    if(params->type == BL_VAL_TYPE_ERROR) return params;
    if(bl_list_len(params)==1) return bl_ctx_eval(ctx,bl_list_first(params));
    return bl_ctx_eval(ctx,params);
@@ -546,7 +550,9 @@ bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_serexp (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    params = bl_ctx_eval(ctx,params);
-   if(bl_list_len(params)==1) params = bl_list_first(params);
+   if(params->type == BL_VAL_TYPE_CONS) {
+      if(bl_list_len(params)==1) params = bl_list_first(params);
+   }
    bl_val_t* retval = bl_mk_str(bl_ser_sexp(params));
    return retval;
 }

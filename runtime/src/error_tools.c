@@ -204,7 +204,6 @@ char* bl_errmsg(bl_val_t* E) {
       // TODO - nested errors - return an error if E is not an error ;)
 
       char* retval = (char*)GC_MALLOC_ATOMIC(sizeof(char)*1024);
-	printf("ERROR %d\n", E->err_val.type);
       switch(E->err_val.type) {
           case BL_ERR_UNKNOWN:
    		  snprintf(retval,1023,"Unknown error!");
