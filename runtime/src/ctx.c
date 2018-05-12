@@ -54,10 +54,23 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
    bl_ctx_set(retval,     bl_mk_symbol("dec"), bl_mk_native_oper(&bl_oper_dec));
    bl_ctx_set(retval,   bl_mk_symbol("parse"), bl_mk_native_oper(&bl_oper_parse));
    bl_ctx_set(retval,    bl_mk_symbol("eval"), bl_mk_native_oper(&bl_oper_eval));
+   bl_ctx_set(retval,     bl_mk_symbol("try"), bl_mk_native_oper(&bl_oper_try));
 
 
    bl_ctx_set(retval, bl_mk_symbol("True"),  bl_mk_bool(true));
    bl_ctx_set(retval, bl_mk_symbol("False"), bl_mk_bool(false));
+
+   bl_ctx_set(retval, bl_mk_symbol("ERR_ANY"),              bl_mk_err(BL_ERR_ANY));
+   bl_ctx_set(retval, bl_mk_symbol("ERR_UNKNOWN"),          bl_mk_err(BL_ERR_UNKNOWN));
+   bl_ctx_set(retval, bl_mk_symbol("ERR_PARSE"),            bl_mk_err(BL_ERR_PARSE));
+   bl_ctx_set(retval, bl_mk_symbol("ERR_INSUFFICIENT_ARGS"),bl_mk_err(BL_ERR_INSUFFICIENT_ARGS));
+   bl_ctx_set(retval, bl_mk_symbol("ERR_TOOMANY_ARGS"),     bl_mk_err(BL_ERR_TOOMANY_ARGS));
+   bl_ctx_set(retval, bl_mk_symbol("ERR_INVALID_ARGTYPE"),  bl_mk_err(BL_ERR_INVALID_ARGTYPE));
+   bl_ctx_set(retval, bl_mk_symbol("ERR_SYMBOL_NOTFOUND"),  bl_mk_err(BL_ERR_SYMBOL_NOTFOUND));
+   bl_ctx_set(retval, bl_mk_symbol("ERR_DIVIDE_BY_ZERO"),   bl_mk_err(BL_ERR_DIVIDE_BY_ZERO));
+   bl_ctx_set(retval, bl_mk_symbol("ERR_CUSTOM"),           bl_mk_err(BL_ERR_CUSTOM));
+   bl_ctx_set(retval, bl_mk_symbol("ERR_IO"),               bl_mk_err(BL_ERR_IO));
+   bl_ctx_set(retval, bl_mk_symbol("ERR_MODULE_NOTFOUND"),  bl_mk_err(BL_ERR_MODULE_NOTFOUND));
 
    return retval;
 }

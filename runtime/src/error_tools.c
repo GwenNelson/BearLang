@@ -101,6 +101,12 @@ bl_val_t* bl_err_divzero() { // LCOV_EXCL_LINE
       return retval;
 }
 
+bl_val_t* bl_mk_err(bl_err_type_t T) { // LCOV_EXCL_LINE
+      bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_ERROR);
+      retval->err_val.type = T;
+      return retval;
+}
+
 bl_val_t* bl_errif_invalid_firstarg(bl_val_t* params, bl_val_type_t expected_type) { // LCOV_EXCL_LINE
       bl_val_t* retval = bl_errif_invalid_len(params,1,BL_LONGEST_LIST);
       if(retval != NULL) return retval;

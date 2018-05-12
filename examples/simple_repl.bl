@@ -9,6 +9,8 @@
 (while True
 	(= input-line (stdio::readline "REPL> "))
 	(= sexp (parse input-line))
-        (if (isset sexp) (do (= result (eval sexp))
-                             (print result "\n")))
-	)
+        (try (do (= result (eval sexp))
+                 (print result "\n"))
+             (catch ERR_ANY             (print "Generic error!\n"))
+             (catch ERR_SYMBOL_NOTFOUND (print "Missing symbol!\n"))
+        ))

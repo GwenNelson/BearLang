@@ -27,6 +27,50 @@ bl_val_t* bl_oper_parse(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    return bl_parse_sexp(params->car->s_val);
 }
 
+// basic syntax:
+// (try SOME_EXPR   ; optionally could be a (do) type expression
+//      (catch SOME_ERR SOME_EXPR)
+//      (catch SOME_OTHER_ERR SOME_EXPR)
+//      (finally SOME_EXPR))
+//
+// the SOME_ERR types are defined in the default environment as ERR_* symbols
+// e.g ERR_INSUFFICIENT_ARGS ERR_TOOMANY_ARGS etc
+bl_val_t* bl_oper_try(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   bl_val_t* try_expr    = bl_list_first(params);
+   bl_val_t* try_result  = bl_ctx_eval(ctx, try_expr);
+   if(try_result->type != BL_VAL_TYPE_ERROR) return try_result;
+
+   bl_val_t* other_exprs = bl_list_rest(params);
+   bl_val_t* i=other_exprs;
+   bl_val_t* catch_sym   = bl_mk_symbol("catch");
+   bl_val_t* finally_sym = bl_mk_symbol("finally");
+   bl_val_t* catch_err    = NULL;
+   bl_val_t* catch_expr   = bl_mk_null();
+   bl_val_t* finally_expr = NULL;
+
+   for(i=other_exprs; i != NULL; i=i->cdr) {
+       if(i->car->type != BL_VAL_TYPE_CONS) {
+          return bl_mk_err(BL_ERR_PARSE);
+       }
+       if(bl_list_len(i->car) != 3) {
+          return bl_mk_err(BL_ERR_PARSE);
+       }
+       if(i->car->car == catch_sym) {
+     	  catch_err  = bl_ctx_get(ctx,bl_list_second(i->car));
+	  if((catch_err->err_val.type == try_result->err_val.type) || (catch_err->err_val.type == BL_ERR_ANY)) {
+            catch_expr = bl_list_third(i->car);
+	  }
+       } else if (i->car->car == finally_sym) {
+          finally_expr = bl_list_second(i->car);
+       } else {
+	 return bl_mk_err(BL_ERR_PARSE);
+       }
+   }
+   bl_val_t* retval = bl_ctx_eval(ctx,catch_expr);
+   if(finally_expr != NULL) retval = bl_ctx_eval(ctx,finally_expr);
+   return retval;
+}
+
 bl_val_t* bl_oper_eval(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    params = bl_eval_cons(ctx,params);
    if(params->type == BL_VAL_TYPE_ERROR) return params;

@@ -36,4 +36,7 @@ bl_val_t* bl_err_divzero();
 // return invalid first argument error if the first argument doesn't match, assumes rest of the args are ANY
 bl_val_t* bl_errif_invalid_firstarg(bl_val_t* params, const bl_val_type_t expected_type);
 
+// construct an error value
+bl_val_t* bl_mk_err(bl_err_type_t T);
+
 char* bl_ser_type(bl_val_type_t t);

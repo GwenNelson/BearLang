@@ -37,6 +37,7 @@ typedef enum bl_val_type_t {
 } bl_val_type_t;
 
 typedef enum bl_err_type_t {
+	BL_ERR_ANY=0,		     // Matches ANY error type
 	BL_ERR_UNKNOWN=1,            // Generic / unknown error
 	BL_ERR_PARSE=2,              // Failed to parse an s-expression
 	BL_ERR_INSUFFICIENT_ARGS=3,  // Not enough arguments were provided
