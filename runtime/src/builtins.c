@@ -51,9 +51,10 @@ bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-    bl_val_t* L = params;
-//   bl_val_t* L = bl_eval_cons(ctx,params,true);
-/*   bl_val_t* retval = bl_errif_invalid_len(L,1,BL_LONGEST_LIST);
+//    bl_val_t* L = params;
+   bl_val_t* L = bl_eval_cons(ctx,params);
+   if(L->type == BL_VAL_TYPE_ERROR) return L;
+   /*   bl_val_t* retval = bl_errif_invalid_len(L,1,BL_LONGEST_LIST);
    if(retval != NULL) return retval;*/
    bl_val_t* retval = NULL;
    bl_val_t* first = bl_ctx_eval(ctx,bl_list_first(params));

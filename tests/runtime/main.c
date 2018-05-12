@@ -772,6 +772,16 @@ int test_ctx_stress() {
     return 0;
 }
 
+int test_symnotfound() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(+ 1 2 bacon)"));
+
+    ASSERT("get non-existent symbol error", result->type==BL_VAL_TYPE_ERROR)
+
+    bl_ctx_close(ctx);
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -822,6 +832,7 @@ int main(int argc, char** argv) {
     TEST("bl_mk_symbol                               ", test_mk_sym)
     TEST("pool allocation                            ", test_pool_alloc)
     TEST("ctx stress test                            ", test_ctx_stress)
+    TEST("symbol not found error                     ", test_symnotfound)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
