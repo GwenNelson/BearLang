@@ -30,7 +30,7 @@ int test_sexp_parse() {
     ASSERT("second item is int",   sexp->cdr->cdr->car->type == BL_VAL_TYPE_NUMBER)
 
     sexp = bl_parse_sexp("");
-    ASSERT("empty string", sexp==NULL)
+    ASSERT("empty string", sexp->type == BL_VAL_TYPE_NULL)
 
     char* empty_str="  ";
     yyscan_t scanner;

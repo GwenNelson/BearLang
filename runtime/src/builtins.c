@@ -27,6 +27,10 @@ bl_val_t* bl_oper_parse(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    return bl_parse_sexp(params->car->s_val);
 }
 
+bl_val_t* bl_oper_quote(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   return params;
+}
+
 // basic syntax:
 // (try SOME_EXPR   ; optionally could be a (do) type expression
 //      (catch SOME_ERR SOME_EXPR)
@@ -314,24 +318,12 @@ bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 //LCOV_EXCL_START
 bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* i = bl_ctx_eval(ctx,params);
+   bl_val_t* i = bl_eval_cons(ctx,params);
    if(i->type == BL_VAL_TYPE_ERROR) return i;
-   while(i->cdr != NULL) {
-      if(i->car != NULL) {
-	 if(i->car->type == BL_VAL_TYPE_STRING) {
-            printf("%s",i->car->s_val);
-	 } else {
-     	    printf("%s", bl_ser_naked_sexp(i->car));
-	 }
-      }
-      i = i->cdr;
-   }
-   if(i->car != NULL) {
-      if(i->car->type == BL_VAL_TYPE_STRING) {
-         printf("%s", i->car->s_val);
-      } else {
-  	 printf("%s", bl_ser_naked_sexp(i->car));
-      }
+
+   for(i=params; i!= NULL; i=i->cdr) {
+     	printf("%s", bl_ser_naked_sexp(bl_ctx_eval(ctx,i->car)));
+
    }
    return bl_mk_null();
 }
@@ -553,7 +545,7 @@ bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 
 bl_val_t* bl_oper_serexp (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-
+   params = bl_ctx_eval(ctx,params);
    if(bl_list_len(params)==1) params = bl_list_first(params);
    bl_val_t* retval = bl_mk_str(bl_ser_sexp(params));
    return retval;
