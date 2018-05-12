@@ -177,7 +177,9 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 					while(bl_ctx_eval(ctx, cond)->b_val==true) {
 						for(i=bl_list_rest(expr->cdr); i != NULL; i=i->cdr) {
     							retval = bl_ctx_eval(ctx,i->car);
-						    if(retval->type == BL_VAL_TYPE_ERROR) return retval;
+							if(retval != NULL) {
+	    							if(retval->type == BL_VAL_TYPE_ERROR) return retval;
+							}
 						}
 					}
 					return bl_mk_null();

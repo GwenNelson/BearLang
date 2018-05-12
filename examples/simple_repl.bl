@@ -1,0 +1,14 @@
+; vim: filetype=Lisp
+(import os)
+(import stdio)
+
+(fun quit () (os::exit 0))
+
+(print "Simple BearLang REPL!\n")
+
+(while True
+	(= input-line (stdio::readline "REPL> "))
+	(= sexp (parse input-line))
+        (if (isset sexp) (do (= result (eval sexp))
+                             (print result "\n")))
+	)
