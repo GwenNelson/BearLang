@@ -9,13 +9,13 @@
 #include <bearlang/error_tools.h>
 
 
-
+#include <bearlang/utils.h>
 
 bl_val_t* bl_errif_invalid_len(bl_val_t* L, uint64_t min, uint64_t max) {  // LCOV_EXCL_LINE
-     if(L->type == BL_VAL_TYPE_ERROR) return L;
+     if(L->type == BL_VAL_TYPE_ERROR) return L; // LCOV_EXCL_LINE
    	uint64_t L_len = bl_list_len(L);
 
-     if(L_len == min == max) return NULL;
+     if(L_len == min && (min == max)) return NULL;
      if((L_len >= min) && (L_len <= max)) return NULL;
 
 
@@ -28,7 +28,7 @@ bl_val_t* bl_errif_invalid_len(bl_val_t* L, uint64_t min, uint64_t max) {  // LC
 
      if(L_len < min) {
 	retval->err_val.type = BL_ERR_INSUFFICIENT_ARGS;
-     } else if (L_len > max) {
+     } else {
         retval->err_val.type = BL_ERR_TOOMANY_ARGS;
      }
      return retval;
@@ -42,11 +42,11 @@ bl_val_t* bl_errif_invalid_fixed_args(bl_val_t* params, const bl_val_type_t* exp
       bl_val_t* list_iter = params;
       bool is_good        = true;
       for(i=0; i < args_len; i++) {
-          if(list_iter->car->type == BL_VAL_TYPE_ERROR) return list_iter->car;
+          if(list_iter->car->type == BL_VAL_TYPE_ERROR) return list_iter->car; // LCOV_EXCL_LINE
           if(expected_types[i] != list_iter->car->type) {
-            if(expected_types[i] != BL_VAL_TYPE_ANY) { 
+            if(expected_types[i] != BL_VAL_TYPE_ANY) { // LCOV_EXCL_START
 	       is_good=false;
-	    }
+	    } // LCOV_EXCL_STOP
 	  } 
           list_iter = list_iter->cdr;
       }
@@ -83,6 +83,12 @@ bl_val_t* bl_err_symnotfound(char* sym) { // LCOV_EXCL_LINE
       retval->err_val.symbol_name = (char*)GC_MALLOC_ATOMIC(sizeof(char)*(strlen(sym)+1));
 
       snprintf(retval->err_val.symbol_name,strlen(sym)+1,"%s",sym);
+      return retval;
+}
+
+bl_val_t* bl_err_divzero() { // LCOV_EXCL_LINE
+      bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_ERROR);
+      retval->err_val.type = BL_ERR_DIVIDE_BY_ZERO;
       return retval;
 }
 
@@ -171,6 +177,9 @@ char* bl_errmsg(bl_val_t* E) {
 	  break;
 	  case BL_ERR_SYMBOL_NOTFOUND:
 	       snprintf(retval,1023,"Symbol %s not found in current environment or any parent environment", E->err_val.symbol_name);
+	  break;
+	  case BL_ERR_DIVIDE_BY_ZERO:
+	       snprintf(retval,1023,"Divide by zero!");
 	  break;
       }
       return retval;

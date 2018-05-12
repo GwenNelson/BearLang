@@ -43,6 +43,7 @@ typedef enum bl_err_type_t {
         BL_ERR_TOOMANY_ARGS=4,       // Too many arguments were provided
 	BL_ERR_INVALID_ARGTYPE=5,    // Invalid argument type(s) was/were provided
 	BL_ERR_SYMBOL_NOTFOUND=6,
+	BL_ERR_DIVIDE_BY_ZERO=7,
 } bl_err_type_t;
 
 // TODO: add all builtins as tokens to the lexer

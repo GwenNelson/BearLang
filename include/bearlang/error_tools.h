@@ -27,4 +27,8 @@ char* bl_errmsg(bl_val_t* E);
 // return a symbol not found error for the specified symbol
 bl_val_t* bl_err_symnotfound(char* sym);
 
+
+// return divide by zero error
+bl_val_t* bl_err_divzero();
+
 char* bl_ser_type(bl_val_type_t t);

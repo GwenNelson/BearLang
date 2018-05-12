@@ -169,6 +169,8 @@ bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
+   if(second->fix_int == 0) return bl_err_divzero();
+
 //   mpz_tdiv_q(retval->i_val, first->i_val, second->i_val);
    retval->fix_int = first->fix_int / second->fix_int;
    return retval;

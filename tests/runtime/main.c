@@ -848,6 +848,9 @@ int test_map_error() {
     bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(map foo)"));
     ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
 
+    result = bl_ctx_eval(ctx,bl_parse_sexp("(map 1 2)"));
+    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
+
     bl_ctx_eval(ctx,bl_parse_sexp("(fun errfunc (x) True bar)"));
     result = bl_ctx_eval(ctx,bl_parse_sexp("(map errfunc (1 2 3))"));
     ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
@@ -883,6 +886,41 @@ int test_div_stringargs() {
     bl_ctx_close(ctx);
     return 0;
 }
+
+int test_div_onearg() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(/ 1 )"));
+    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR)
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_sub_onearg() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(- 1 )"));
+    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR)
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_mult_onearg() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(* 1 )"));
+    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR)
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_div_zero() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(/ 42 0 )"));
+    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR)
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+
+
 
 int main(int argc, char** argv) {
     int passed_tests = 0;
@@ -944,6 +982,10 @@ int main(int argc, char** argv) {
     TEST("add oper with no arguments                 ", test_add_noargs)
     TEST("div oper with too many arguments           ", test_div_toomanyargs)
     TEST("div oper with string arguments             ", test_div_stringargs)
+    TEST("div oper with only 1 argument              ", test_div_onearg)
+    TEST("sub oper with only 1 argument              ", test_sub_onearg)
+    TEST("mult oper with only 1 argument             ", test_mult_onearg)
+    TEST("divide by zero                             ", test_div_zero)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
