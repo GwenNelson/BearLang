@@ -190,14 +190,12 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 					}
 					return retval;
 				break;
-				// // LCOV_EXCL_START
 				case BL_VAL_TYPE_OPER_BL:
 					ctx = bl_ctx_new(ctx);
 					ctx->write_to_parent = true;
 					expr = car->bl_oper_ptr;
 					in_oper = true;
 				break;
-				// LCOV_EXCL_STOP
 
 				default:
 				
@@ -256,11 +254,9 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_ctx_set(bl_val_t* ctx, bl_val_t* key, bl_val_t* val) { // LCOV_EXCL_LINE
 
-/*   if(ctx->write_to_parent) {
-      if(ctx->parent != NULL) {
-         if(ctx->write_to_parent) ctx = ctx->parent;
-      }
-   }*/
+   if(ctx->write_to_parent) {
+         ctx = ctx->parent;
+   }
    if(key->sym_id >= ctx->vals_count) {
      uint64_t old_count = ctx->vals_count;
      ctx->vals_count = key->sym_id+8;

@@ -834,6 +834,15 @@ int test_while_error() {
     return 0;
 }
 
+int test_simple_oper() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_ctx_eval(ctx,bl_parse_sexp("(oper test () (= x 2))"));
+    bl_ctx_eval(ctx,bl_parse_sexp("(test)"));
+    bl_val_t* result = bl_ctx_eval(ctx, bl_parse_sexp("x"));
+    ASSERT("Return value is correct",  strcmp(bl_ser_sexp(result),"2")==0)
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -889,6 +898,7 @@ int main(int argc, char** argv) {
     TEST("0-params function                          ", test_zeroparam_func)
     TEST("eval list of numbers                       ", test_eval_numberlist)
     TEST("error inside while oper                    ", test_while_error)
+    TEST("simple custom oper                         ", test_simple_oper)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
