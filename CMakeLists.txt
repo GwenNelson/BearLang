@@ -43,7 +43,7 @@ FLEX_TARGET(BLLexer
 	    DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/bl_lexer.h)
 
 add_library(blruntime SHARED ${RUNTIME_SOURCE} ${FLEX_BLLexer_OUTPUTS})
-target_link_libraries(blruntime ${LIBGC_LIBRARIES} ${FLEX_LIBRARIES} dl gmp)
+target_link_libraries(blruntime ${LIBGC_LIBRARIES} ${FLEX_LIBRARIES} ${Readline_LIBRARY} dl gmp)
 
 add_subdirectory(stdlib)
 

@@ -9,6 +9,8 @@
 #include <bearlang/list_ops.h>
 #include <bearlang/sexp.h>
 
+#include <readline/readline.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -222,13 +224,31 @@ bl_val_t* bl_fgets(bl_val_t* ctx, bl_val_t* params) {
      return bl_mk_str(retval_s);
 }
 
+// (readline prompt)
+// simple interface to the readline library, if prompt is provided then it is used as the prompt
+// on success, returns the line that was read, if readline() returned NULL then an error is returned
+bl_val_t* bl_readline(bl_val_t* ctx, bl_val_t* params) {
+     char* prompt = "";
+     if(bl_list_len(params)>0) {
+        prompt = bl_ser_naked_sexp(bl_list_first(params));
+     }
+     char* line = readline(prompt);
+     if(line != NULL) {
+        bl_val_t* retval = bl_mk_str(line);
+	free(line);
+	return retval;
+     }
+     return &generic_error;
+}
+
 bl_val_t* bl_mod_init(bl_val_t* ctx) {
      bl_val_t* my_ctx = bl_ctx_new(ctx);
-     bl_ctx_set(my_ctx,bl_mk_symbol("fopen"),  bl_mk_native_oper(&bl_fopen));
-     bl_ctx_set(my_ctx,bl_mk_symbol("fclose"), bl_mk_native_oper(&bl_fclose));
-     bl_ctx_set(my_ctx,bl_mk_symbol("fprintf"),bl_mk_native_oper(&bl_fprintf));
-     bl_ctx_set(my_ctx,bl_mk_symbol("fgets"),  bl_mk_native_oper(&bl_fgets));
-     bl_ctx_set(my_ctx,bl_mk_symbol("STDIN"),  bl_mk_ptr((void*)stdin));
-     bl_ctx_set(my_ctx,bl_mk_symbol("STDOUT"), bl_mk_ptr((void*)stdout));
+     bl_ctx_set(my_ctx,bl_mk_symbol("fopen"),   bl_mk_native_oper(&bl_fopen));
+     bl_ctx_set(my_ctx,bl_mk_symbol("fclose"),  bl_mk_native_oper(&bl_fclose));
+     bl_ctx_set(my_ctx,bl_mk_symbol("fprintf"), bl_mk_native_oper(&bl_fprintf));
+     bl_ctx_set(my_ctx,bl_mk_symbol("fgets"),   bl_mk_native_oper(&bl_fgets));
+     bl_ctx_set(my_ctx,bl_mk_symbol("readline"),bl_mk_native_oper(&bl_readline));
+     bl_ctx_set(my_ctx,bl_mk_symbol("STDIN"),   bl_mk_ptr((void*)stdin));
+     bl_ctx_set(my_ctx,bl_mk_symbol("STDOUT"),  bl_mk_ptr((void*)stdout));
      return my_ctx;
 }
