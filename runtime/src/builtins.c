@@ -7,12 +7,14 @@
 #include <bearlang/error_tools.h>
 #include <bearlang/utils.h>
 
+#include <glob.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <libgen.h>
 #include <dlfcn.h>
 #include <gmp.h>
 #include <stdbool.h>
+#include <libgen.h>
 
 bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
@@ -415,30 +417,43 @@ typedef bl_val_t* (*mod_init_fn)(bl_val_t*);
 // LCOV_EXCL_START
 
 bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
-     	bl_val_t* module_name = bl_ctx_eval(ctx,bl_list_first(params));
-   // first try to find a BearLang module
-   char filename[1024];
-   snprintf(filename,1024,"%s.bl",module_name->s_val);
+     bl_val_t* first = bl_list_first(params);
+     bl_val_t* module_name = bl_ctx_get(ctx,first);
+     if(module_name == NULL) module_name = first;
 
-   if(access(filename, R_OK) != -1) {
-      // it exists, so let's parse it
-      FILE* fd = fopen(filename,"r");
-      bl_val_t* new_ctx = bl_ctx_new(ctx);
-      bl_eval_file(new_ctx, filename, fd);
-      fclose(fd);
-      bl_ctx_set(ctx, bl_mk_symbol(module_name->s_val), new_ctx);
-      return new_ctx;
-   } else {
-      snprintf(filename,1024,"%s.so",module_name->s_val);
-      if(access(filename, R_OK) == -1) {
-         snprintf(filename,1024,"%s.dylib", module_name->s_val);
-      }
-      if(access(filename, R_OK) == -1) {
-         // TODO - throw error here
-	 return bl_mk_null();
-      }
+     glob_t globbuf;
+
+     bl_val_t* p_i;
+     int i=0;
+     bl_val_t* cur_path = bl_ctx_get(ctx,bl_mk_symbol("*PATH*"));
+     char* pattern = GC_MALLOC_ATOMIC(4096);
+     pattern[0] = NULL;
+     snprintf(pattern,4096,"{");
+     for(p_i=cur_path; p_i != NULL; p_i = p_i->cdr) {
+         snprintf(pattern,4096,"%s%s,",pattern,p_i->car->s_val);
+     }
+     pattern[strlen(pattern)-1] = '}';
+     snprintf(pattern,4096,"%s/{%s.bl,lib%s.so,lib%s.dylib,%s/module.bl,%s/lib%s.so,%s/lib%s.dylib}",pattern,module_name->s_val,
+		                          module_name->s_val,module_name->s_val,module_name->s_val,module_name->s_val,module_name->s_val,
+					  module_name->s_val,module_name->s_val);
+     char* found_path = "";
+     glob(pattern,GLOB_TILDE|GLOB_MARK|GLOB_BRACE,NULL,&globbuf);
+         for(i=0; i<globbuf.gl_pathc; i++) {
+             if(globbuf.gl_pathv[i][strlen(globbuf.gl_pathv[i])-1] != '/') { 
+		     found_path = GC_MALLOC_ATOMIC(4096);
+	             snprintf(found_path,4096,"%s",globbuf.gl_pathv[i]);
+                     break;
+             }
+	 }
+	 globfree(&globbuf);
+     
+     char* fname = GC_MALLOC_ATOMIC(4096);
+     snprintf(fname,4096,"%s", found_path);
+     fname = basename(fname);
+     char* fext = strrchr(fname, '.')+1;
+     if(strcmp(fext,"dylib")==0 || strcmp(fext,"so")==0) { // dlopen time!
       bl_val_t* dylib_val = bl_mk_val(BL_VAL_TYPE_CPTR);
-      dylib_val->c_ptr = dlopen(filename,RTLD_NOW);
+      dylib_val->c_ptr = dlopen(found_path,RTLD_NOW);
       if(!dylib_val->c_ptr) fprintf(stderr, "dlopen error: %s\n", dlerror());
       mod_init_fn mod_init = dlsym(dylib_val->c_ptr, "bl_mod_init");
       char* err = dlerror();
@@ -446,7 +461,16 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
       bl_val_t* new_ctx = mod_init(ctx);
       bl_ctx_set(ctx, bl_mk_symbol(module_name->s_val), new_ctx);
       return new_ctx;
-   }
+     } else { // .bl module time!
+      FILE* fd = fopen(found_path,"r");
+      bl_val_t* new_ctx = bl_ctx_new(ctx);
+      bl_eval_file(new_ctx, fname, fd);
+      fclose(fd);
+      bl_ctx_set(ctx, bl_mk_symbol(module_name->s_val), new_ctx);
+      return new_ctx;
+
+     }
+     return bl_mk_null();
 }
 
 // LCOV_EXCL_STOP
