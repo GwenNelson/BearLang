@@ -106,7 +106,7 @@ typedef struct bl_val_t {
 		// BL_VAL_TYPE_CTX
 		struct { struct bl_hash_t *hash_val;
 			 bl_val_t** vals;
-			 uint64_t vals_count;
+			 size_t vals_count;
 			 bl_val_t* parent;
 	                 bl_val_t* secondary;
 	                 bool write_to_parent; };

@@ -261,7 +261,7 @@ bl_val_t* bl_ctx_set(bl_val_t* ctx, bl_val_t* key, bl_val_t* val) { // LCOV_EXCL
      uint64_t old_count = ctx->vals_count;
      ctx->vals_count = key->sym_id+8;
      bl_val_t** old_vals = ctx->vals;
-     ctx->vals = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*ctx->vals_count);
+     ctx->vals = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*(ctx->vals_count));
      int i=0;
      
      for(i=0; i<old_count; i++) ctx->vals[i] = old_vals[i];

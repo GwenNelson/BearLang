@@ -291,13 +291,12 @@ bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    retval->bl_func_ptr     = bl_list_rest(bl_list_rest(params)); // the rest of the rest is better than the rest
    retval->lexical_closure = ctx;
    retval->inner_closure   = bl_ctx_new(ctx);
-   retval->sym = bl_list_first(params);
-
+   retval->sym = bl_list_first(params); 
+   
    bl_ctx_set(ctx, retval->sym, retval);
    return retval;
 }
 
-//LCOV_EXCL_START
 bl_val_t* bl_oper_oper(bl_val_t* ctx, bl_val_t* params) {
    bl_val_t* retval        = bl_mk_val(BL_VAL_TYPE_OPER_BL);
    retval->bl_operargs_ptr = bl_list_second(params);
@@ -307,7 +306,6 @@ bl_val_t* bl_oper_oper(bl_val_t* ctx, bl_val_t* params) {
    bl_ctx_set(ctx, name, retval);
    return retval;
 }
-//LCOV_EXCL_STOP
 
 bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
@@ -413,10 +411,9 @@ bl_val_t* bl_oper_include(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 }
 
 typedef bl_val_t* (*mod_init_fn)(bl_val_t*);
-//LCOV_EXCL_START
 
 bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
-   bl_val_t* module_name = bl_ctx_eval(ctx,bl_list_first(params));
+     	bl_val_t* module_name = bl_ctx_eval(ctx,bl_list_first(params));
    // first try to find a BearLang module
    char filename[1024];
    snprintf(filename,1024,"%s.bl",module_name->s_val);
@@ -439,7 +436,7 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
 	 return bl_mk_null();
       }
       bl_val_t* dylib_val = bl_mk_val(BL_VAL_TYPE_CPTR);
-      dylib_val->c_ptr = dlopen(filename,RTLD_LAZY);
+      dylib_val->c_ptr = dlopen(filename,RTLD_NOW);
       if(!dylib_val->c_ptr) fprintf(stderr, "dlopen error: %s\n", dlerror());
       mod_init_fn mod_init = dlsym(dylib_val->c_ptr, "bl_mod_init");
       char* err = dlerror();
