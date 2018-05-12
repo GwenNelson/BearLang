@@ -224,7 +224,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) { // LCOV_EXCL_LINE
 
 
-/*   if(strstr(key->s_val,"::")) {
+   if(strstr(key->s_val,"::")) {
      char* tmp = strdup(key->s_val);
      strstr(tmp,"::")[0]='\0';
      char* ctx_key = tmp;
@@ -237,7 +237,7 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) { // LCOV_EXCL_LINE
    
      return bl_ctx_get(other_ctx,bl_mk_symbol(sym_key));
 
-   }*/
+   }
    bl_val_t* retval = NULL;
    if(key->sym_id < ctx->vals_count) {
     	   retval = ctx->vals[key->sym_id];
