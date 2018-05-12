@@ -40,6 +40,13 @@ bl_val_t bad_fd_error = {
               .errnum = (uint64_t)EBADF}
 };
 
+bl_val_t eof_error = {
+  .type=BL_VAL_TYPE_ERROR,
+  .err_val = {.type   = BL_ERR_CUSTOM,
+              .errmsg = "File is closed",
+              .errnum = (uint64_t)EPIPE,}
+};
+
 // (fopen filename mode)
 // filename is a string, the file to open, mode is a mode string
 // returns a C pointer representing the FILE* on success, or an error on failure
@@ -184,11 +191,43 @@ bl_val_t* bl_fprintf(bl_val_t* ctx, bl_val_t* params) {
     return bl_mk_null();
 }
 
+// (fgets FD maxlen)
+// FD is a file descriptor as returned by fopen, maxlen is a number specifying the size of the buffer to use
+// returns a string on success, or an error
+bl_val_t* bl_fgets(bl_val_t* ctx, bl_val_t* params) {
+     params = bl_ctx_eval(ctx,params);
+     bl_val_type_t expected_types[2] = {BL_VAL_TYPE_CPTR,BL_VAL_TYPE_NUMBER};
+     bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
+     if(retval != NULL) return retval;
+
+     bl_val_t* bl_fd     = bl_list_first(params);
+     bl_val_t* bl_maxlen = bl_list_second(params);
+
+     FILE* fd = (FILE*)(bl_fd->c_ptr);
+     int maxlen = (int)bl_maxlen->fix_int;
+
+     if(feof(fd) != 0) return &eof_error; 
+
+     char* retval_s = GC_MALLOC_ATOMIC(sizeof(char)*maxlen);
+     if(fgets(retval_s,maxlen,fd)==NULL) {
+        switch(errno) {
+            case EBADF:
+                 return &bad_fd_error;
+            break;
+            default:
+                 return &generic_error;
+            break;
+        }
+     }
+     return bl_mk_str(retval_s);
+}
+
 bl_val_t* bl_mod_init(bl_val_t* ctx) {
      bl_val_t* my_ctx = bl_ctx_new(ctx);
      bl_ctx_set(my_ctx,bl_mk_symbol("fopen"),  bl_mk_native_oper(&bl_fopen));
      bl_ctx_set(my_ctx,bl_mk_symbol("fclose"), bl_mk_native_oper(&bl_fclose));
      bl_ctx_set(my_ctx,bl_mk_symbol("fprintf"),bl_mk_native_oper(&bl_fprintf));
+     bl_ctx_set(my_ctx,bl_mk_symbol("fgets"),  bl_mk_native_oper(&bl_fgets));
      bl_ctx_set(my_ctx,bl_mk_symbol("STDIN"),  bl_mk_ptr((void*)stdin));
      bl_ctx_set(my_ctx,bl_mk_symbol("STDOUT"), bl_mk_ptr((void*)stdout));
      return my_ctx;

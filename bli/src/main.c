@@ -13,6 +13,26 @@
 
 #include <readline/readline.h>
 
+// shamelessly ripped straight from the readline documentation
+static char *line_read = (char *)NULL;
+
+char *
+rl_gets ()
+{
+  if (line_read)
+    {
+      free (line_read);
+      line_read = (char *)NULL;
+    }
+
+  line_read = readline (">>> ");
+
+  if (line_read && *line_read)
+    add_history (line_read);
+
+  return (line_read);
+}
+
 void run_file(char* filename, int argc, char** argv) {
      bl_val_t* STDLIB_CTX = bl_ctx_new_std();
      bl_val_t* FILE_CTX   = bl_ctx_new(STDLIB_CTX);
@@ -36,6 +56,11 @@ void run_file(char* filename, int argc, char** argv) {
      fclose(fd);
 }
 
+bl_val_t* quit_cmd(bl_val_t* ctx, bl_val_t* params) {
+    printf("Goodbye!\n");
+    exit(0);
+}
+
 int main(int argc, char** argv) {
     bl_init();
 
@@ -50,22 +75,28 @@ int main(int argc, char** argv) {
     bl_val_t* STDLIB_CTX = bl_ctx_new_std();
     bl_val_t* REPL_CTX   = bl_ctx_new(STDLIB_CTX);
 
+    bl_ctx_set(REPL_CTX,bl_mk_symbol("quit"), bl_mk_native_oper(&quit_cmd));
+
     for(;;) {
-        char* input_line = readline(">>> ");
-	bl_val_t* expr    = bl_parse_sexp(input_line);
-	bl_val_t*      result = bl_ctx_eval(REPL_CTX, expr);
-        char*          errmsg = "";
-	switch(result->type) {
-           case BL_VAL_TYPE_NULL:
-              printf("None\n");
-	   break;
-           case BL_VAL_TYPE_ERROR:
-              errmsg = bl_errmsg(result);
-       	      printf("Error occurred:\n%s\n", errmsg);
-	   break;
-	   default:
-              printf("%s\n",bl_ser_sexp(result));
-	   break;
+        char* input_line = rl_gets();
+        if(input_line) {
+		bl_val_t* expr    = bl_parse_sexp(input_line);
+		bl_val_t*      result = bl_ctx_eval(REPL_CTX, expr);
+	        char*          errmsg = "";
+		switch(result->type) {
+	           case BL_VAL_TYPE_NULL:
+	              printf("None\n");
+		   break;
+	           case BL_VAL_TYPE_ERROR:
+	              errmsg = bl_errmsg(result);
+	       	      printf("Error occurred:\n%s\n", errmsg);
+		   break;
+		   default:
+	              printf("%s\n",bl_ser_sexp(result));
+		   break;
+		}
+	} else {
+		printf("\nType (quit) to quit\n");
 	}
 	GC_gcollect();
     }
