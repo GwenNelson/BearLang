@@ -297,7 +297,7 @@ bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    return retval;
 }
 
-bl_val_t* bl_oper_oper(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_oper(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* retval        = bl_mk_val(BL_VAL_TYPE_OPER_BL);
    retval->bl_operargs_ptr = bl_list_second(params);
    retval->bl_oper_ptr     = bl_list_rest(bl_list_rest(params));
@@ -412,6 +412,8 @@ bl_val_t* bl_oper_include(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 typedef bl_val_t* (*mod_init_fn)(bl_val_t*);
 
+// LCOV_EXCL_START
+
 bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
      	bl_val_t* module_name = bl_ctx_eval(ctx,bl_list_first(params));
    // first try to find a BearLang module
@@ -446,7 +448,8 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
       return new_ctx;
    }
 }
-//LCOV_EXCL_STOP
+
+// LCOV_EXCL_STOP
 
 bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 

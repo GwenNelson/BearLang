@@ -131,7 +131,8 @@ bl_val_t* bl_parse_file(char* filename, FILE* fd) { // LCOV_EXCL_LINE
    return retval;
 }
 
-char* bl_ser_sexp(bl_val_t* expr) { // LCOV_EXCL_LINE
+// LCOV_EXCL_START
+char* bl_ser_sexp(bl_val_t* expr) {
 
       if(expr == NULL) return "";
       char* retval=GC_MALLOC_ATOMIC(4096);
@@ -196,6 +197,8 @@ char* bl_ser_sexp(bl_val_t* expr) { // LCOV_EXCL_LINE
       }
       return retval;
 }
+
+// LCOV_EXCL_STOP
 
 char* bl_ser_naked_sexp(bl_val_t* expr) { // LCOV_EXCL_LINE
 
