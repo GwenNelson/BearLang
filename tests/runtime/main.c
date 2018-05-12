@@ -856,6 +856,31 @@ int test_map_error() {
     result = bl_ctx_eval(ctx,bl_parse_sexp("(map errfunc (1 2 3))"));
     ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
 
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_add_noargs() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(+)"));
+    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR)
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_div_toomanyargs() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(/ 1 2 3)"));
+    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR)
+    bl_ctx_close(ctx);
+    return 0;
+}
+
+int test_div_stringargs() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(/ \"a\" \"b\" )"));
+    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR)
+    bl_ctx_close(ctx);
     return 0;
 }
 
@@ -916,6 +941,9 @@ int main(int argc, char** argv) {
     TEST("error inside while oper                    ", test_while_error)
     TEST("simple custom oper                         ", test_simple_oper)
     TEST("error inside map oper                      ", test_map_error)
+    TEST("add oper with no arguments                 ", test_add_noargs)
+    TEST("div oper with too many arguments           ", test_div_toomanyargs)
+    TEST("div oper with string arguments             ", test_div_stringargs)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

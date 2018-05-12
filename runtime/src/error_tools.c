@@ -9,26 +9,15 @@
 #include <bearlang/error_tools.h>
 
 
-bool bl_is_valid_len(bl_val_t* L, uint64_t min, uint64_t max) { // LCOV_EXCL_LINE
-     uint64_t L_len = bl_list_len(L);
-     if(L_len < min) return false;
-     if(L_len > max) return false;
-     return true;
-}
 
-bool bl_is_valid_funcarg_len(bl_val_t* f, bl_val_t* L) {  // LCOV_EXCL_LINE
-     uint64_t L_len = bl_list_len(L);
-     uint64_t funcargs_len = bl_list_len(f->bl_funcargs_ptr);
-     if(L_len == funcargs_len) return true;
-     return false;
-}
 
 bl_val_t* bl_errif_invalid_len(bl_val_t* L, uint64_t min, uint64_t max) {  // LCOV_EXCL_LINE
      if(L->type == BL_VAL_TYPE_ERROR) return L;
    	uint64_t L_len = bl_list_len(L);
-     if((L_len >= min) && (L_len <= max)) return NULL;
 
      if(L_len == min == max) return NULL;
+     if((L_len >= min) && (L_len <= max)) return NULL;
+
 
      bl_val_t* retval = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t));
      retval->type     = BL_VAL_TYPE_ERROR;

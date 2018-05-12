@@ -91,7 +91,7 @@ void bl_set_params(bl_val_t* ctx, bl_val_t* param_names, bl_val_t* param_vals) {
 }
 
 bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
-
+    if(expr==NULL) return bl_mk_null();
     bl_val_t* retval = NULL;
     bl_val_t* L_start = NULL;
     bl_val_t* L      = NULL;
