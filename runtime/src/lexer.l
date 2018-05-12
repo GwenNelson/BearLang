@@ -17,7 +17,7 @@ IF_OPER		"if"
 DO_OPER		"do"
 WHILE_OPER	"while"
 STRING          \"(\\.|[^"\\])*\"
-NUMBER_INTEGER  [0-9]+ 
+NUMBER_INTEGER  [-]*[0-9]+ 
 WHITESPACE      [ \t\n\r]
 SYMBOL          [\%\:\=\*\-\/\+a-zA-Z0-9]+
 COMMENT_START   \;

@@ -55,12 +55,10 @@ bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-//    bl_val_t* L = params;
    bl_val_t* L = bl_eval_cons(ctx,params);
    if(L->type == BL_VAL_TYPE_ERROR) return L;
-   /*   bl_val_t* retval = bl_errif_invalid_len(L,1,BL_LONGEST_LIST);
-   if(retval != NULL) return retval;*/
-   bl_val_t* retval = NULL;
+   bl_val_t* retval = bl_errif_invalid_len(L,1,BL_LONGEST_LIST);
+   if(retval != NULL) return retval;
    bl_val_t* first = bl_ctx_eval(ctx,bl_list_first(params));
 
    if((first->type == BL_VAL_TYPE_CONS) && (bl_list_len(params)==1)) {
@@ -122,12 +120,12 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
    params = bl_ctx_eval(ctx,params);
-/*   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
+   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
-   if(retval != NULL) return retval;*/
+   if(retval != NULL) return retval;
      
-      bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
-      retval->fix_int = 0;
+   retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
+   retval->fix_int = 0;
 
    bl_val_t* first  = bl_list_first(params);
    bl_val_t* second = bl_list_second(params);
@@ -140,13 +138,13 @@ bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-//   params = bl_ctx_eval(ctx, params);
-/*   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
+   params = bl_ctx_eval(ctx, params);
+   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
-   if(retval != NULL) return retval;*/
+   if(retval != NULL) return retval;
 
-     bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
-      retval->fix_int = 0;
+   retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
+   retval->fix_int = 0;
 
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
@@ -159,14 +157,12 @@ bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
    params = bl_ctx_eval(ctx, params);
-/*     	bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
+   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
-   if(retval != NULL) return retval;*/
+   if(retval != NULL) return retval;
 
-/*   retval = bl_errif_invalid_len(params,2,2);
-   if(retval != NULL) return retval;*/
 
-      bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
+      retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
       retval->fix_int = 0;
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
