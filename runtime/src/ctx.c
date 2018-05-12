@@ -52,6 +52,8 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
    bl_ctx_set(retval,  bl_mk_symbol("serexp"), bl_mk_native_oper(&bl_oper_serexp));
    bl_ctx_set(retval,     bl_mk_symbol("inc"), bl_mk_native_oper(&bl_oper_inc));
    bl_ctx_set(retval,     bl_mk_symbol("dec"), bl_mk_native_oper(&bl_oper_dec));
+   bl_ctx_set(retval,   bl_mk_symbol("parse"), bl_mk_native_oper(&bl_oper_parse));
+   bl_ctx_set(retval,    bl_mk_symbol("eval"), bl_mk_native_oper(&bl_oper_eval));
 
 
    bl_ctx_set(retval, bl_mk_symbol("True"),  bl_mk_bool(true));

@@ -16,6 +16,23 @@
 #include <stdbool.h>
 #include <libgen.h>
 
+bl_val_t* bl_oper_parse(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   params = bl_eval_cons(ctx,params);
+   if(params->type == BL_VAL_TYPE_ERROR) return params;
+
+   bl_val_type_t expected_types[1] = {BL_VAL_TYPE_STRING};
+   bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,1);
+   if(retval != NULL) return retval;
+
+   return bl_parse_sexp(params->car->s_val);
+}
+
+bl_val_t* bl_oper_eval(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   params = bl_eval_cons(ctx,params);
+   if(bl_list_len(params)==1) params=bl_list_first(params);
+   return bl_ctx_eval(ctx,params);
+}
+
 bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
    params = bl_eval_cons(ctx,params);
