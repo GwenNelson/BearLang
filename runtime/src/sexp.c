@@ -118,6 +118,7 @@ bl_val_t* bl_parse_sexp(char* sexp) { // LCOV_EXCL_LINE
    yy_scan_string(sexp,scanner);
    bl_val_t* retval = read_form(scanner);
    yylex_destroy(scanner);
+   if(retval==NULL) return bl_mk_null();
    return retval;
 }
 

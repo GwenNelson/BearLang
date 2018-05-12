@@ -45,7 +45,7 @@ bl_val_t* bl_oper_try(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* catch_sym   = bl_mk_symbol("catch");
    bl_val_t* finally_sym = bl_mk_symbol("finally");
    bl_val_t* catch_err    = NULL;
-   bl_val_t* catch_expr   = bl_mk_null();
+   bl_val_t* catch_expr   = try_result;
    bl_val_t* finally_expr = NULL;
 
    for(i=other_exprs; i != NULL; i=i->cdr) {

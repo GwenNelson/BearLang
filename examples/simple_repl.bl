@@ -7,8 +7,10 @@
 (print "Simple BearLang REPL!\n")
 
 (while True
-	(= input-line (stdio::readline "REPL> "))
-	(= sexp (parse input-line))
+	(= input-line (try (stdio::readline "REPL> ")
+                           (catch ERR_IO None)))
+	(= sexp (try (parse input-line)
+                     (catch ERR_ANY None)))
         (try (do (= result (eval sexp))
                  (print result "\n"))
              (catch ERR_ANY             (print "Generic error!\n"))

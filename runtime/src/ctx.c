@@ -127,6 +127,7 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 		   L=L->cdr;
 		}
 	    }
+            if(L_start==NULL) return bl_mk_null();
 	    return L_start;
   /*  } else {
 	    for(i=expr; i != NULL; i=i->cdr) {
@@ -139,7 +140,7 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 }
 
 bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
-
+    if(expr==NULL) return bl_mk_null();
     bl_val_t* retval = NULL;
     bool in_func = false;
     bool in_oper = false;
