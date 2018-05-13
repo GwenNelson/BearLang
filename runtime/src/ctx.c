@@ -56,6 +56,7 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
    bl_ctx_set(retval,    bl_mk_symbol("eval"), bl_mk_native_oper(&bl_oper_eval));
    bl_ctx_set(retval,     bl_mk_symbol("try"), bl_mk_native_oper(&bl_oper_try));
    bl_ctx_set(retval,   bl_mk_symbol("quote"), bl_mk_native_oper(&bl_oper_quote));
+   bl_ctx_set(retval,   bl_mk_symbol("using"), bl_mk_native_oper(&bl_oper_using));
 
    bl_ctx_set(retval, bl_mk_symbol("True"),  bl_mk_bool(true));
    bl_ctx_set(retval, bl_mk_symbol("False"), bl_mk_bool(false));
@@ -83,6 +84,7 @@ bl_val_t* bl_ctx_new(bl_val_t* parent) { // LCOV_EXCL_LINE
    retval->hash_val   = NULL;
    retval->vals_count = 8;
    retval->vals       = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*retval->vals_count);
+   retval->keys       = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*retval->vals_count);
    retval->write_to_parent = false;
    return retval;
 }
@@ -281,12 +283,18 @@ bl_val_t* bl_ctx_set(bl_val_t* ctx, bl_val_t* key, bl_val_t* val) { // LCOV_EXCL
      uint64_t old_count = ctx->vals_count;
      ctx->vals_count = key->sym_id+8;
      bl_val_t** old_vals = ctx->vals;
+     bl_val_t** old_keys = ctx->keys;
      ctx->vals = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*(ctx->vals_count));
+     ctx->keys = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*(ctx->vals_count));
      int i=0;
      
-     for(i=0; i<old_count; i++) ctx->vals[i] = old_vals[i];
+     for(i=0; i<old_count; i++) {
+         ctx->vals[i] = old_vals[i];
+         ctx->keys[i] = old_keys[i];
+     }
 
    }
+   ctx->keys[key->sym_id] = key;
    ctx->vals[key->sym_id] = val;
    return val;
 

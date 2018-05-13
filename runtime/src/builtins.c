@@ -28,7 +28,7 @@ bl_val_t* bl_oper_parse(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 }
 
 bl_val_t* bl_oper_quote(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   params->quoted = true;
+   if(bl_list_len(params)==1) return bl_list_first(params);
    return params;
 }
 
@@ -472,9 +472,7 @@ bl_val_t* bl_oper_include(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 typedef bl_val_t* (*mod_init_fn)(bl_val_t*);
 
-// LCOV_EXCL_START
-
-bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
+bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      bl_val_t* first = bl_list_first(params);
      bl_val_t* module_name = first;
      if(first->type == BL_VAL_TYPE_SYMBOL) {
@@ -537,7 +535,41 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) {
      return bl_mk_null();
 }
 
-// LCOV_EXCL_STOP
+// syntax
+// (using stdio::fprintf) binds fprintf symbol in the current context
+// TODO: implement (using stdio::*)
+bl_val_t* bl_oper_using(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   bl_val_t* sym = bl_list_first(params);
+   char* s = sym->s_val;
+   char* last = strrchr(s,':');
+   bl_val_t* bindsym = NULL;
+   if(last != NULL) {
+      if(last != s) {
+         last--;
+         if(last[0]==':') {
+            bindsym = bl_mk_symbol(last+2);
+            if(strcmp(bindsym->s_val,"*")==0) {
+               last[0] = '\0';
+               bl_val_t* other_ctx = bl_ctx_get(ctx,bl_mk_symbol(s));
+               if(other_ctx->type == BL_VAL_TYPE_ERROR) return other_ctx;
+               int i=0;
+               for(i=0; i<other_ctx->vals_count; i++) {
+                   if(other_ctx->vals[i] != NULL) {
+                      bl_ctx_set(ctx,other_ctx->keys[i],other_ctx->vals[i]);
+                   }
+               }
+ 	       return bl_mk_null();
+            } else {
+               bl_val_t* bindval = bl_ctx_get(ctx,sym);
+               if(bindval->type == BL_VAL_TYPE_ERROR) return bindval;
+               bl_ctx_set(ctx,bindsym,bindval);
+            }
+            
+         }
+      }
+   }
+   return bl_ctx_get(ctx,sym);
+}
 
 bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 

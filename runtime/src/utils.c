@@ -28,7 +28,6 @@ bl_val_t* bl_mk_val(bl_val_type_t type) { // LCOV_EXCL_LINE
 
    bl_val_t* retval = &(val_pool[last_alloc++]);
    retval->type = type;
-   retval->quoted = false;
    return retval;
 }
 

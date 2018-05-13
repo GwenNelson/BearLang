@@ -25,6 +25,7 @@ bl_val_t* bl_oper_isset (bl_val_t* ctx, bl_val_t* params);
 
 bl_val_t* bl_oper_include (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_import  (bl_val_t* ctx, bl_val_t* params);
+bl_val_t* bl_oper_using   (bl_val_t* ctx, bl_val_t* params);
 
 bl_val_t* bl_oper_eq    (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_lt    (bl_val_t* ctx, bl_val_t* params);
