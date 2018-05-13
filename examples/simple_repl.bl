@@ -3,17 +3,20 @@
 (import stdio)
 (import error)
 
-(fun quit () (os::exit 0))
+(= quit (using os::exit))
 
 (print "Simple BearLang REPL!\n")
 
 (while True
+	(= sexp None)
 	(= input-line (try (stdio::readline "REPL> ")
                            (catch ERR_IO None)))
 	(= sexp (try (parse input-line)
                      (catch ERR_ANY "\nUse (quit) to quit")))
-        (if (eq sexp None) (= sexp ""))
-        (print (try (eval sexp)
-                    (catch ERR_ANY             (+ "Generic error!"))
-                    (catch ERR_SYMBOL_NOTFOUND (+ "Missing symbol " (error::getsym *ERR*) "")))
-                "\n"))
+        (= result (try (eval sexp)
+                       (catch ERR_ANY             (+ "Generic error!"))
+                       (catch ERR_SYMBOL_NOTFOUND (+ "Missing symbol " (error::getsym *ERR*) ""))))
+	(if (not (eq result None)) (print (serexp result)))
+
+	(print "\n"))
+                
