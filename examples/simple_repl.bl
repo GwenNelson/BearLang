@@ -14,9 +14,9 @@
 	(= sexp (try (parse input-line)
                      (catch ERR_ANY "\nUse (quit) to quit")))
         (= result (try (eval sexp)
-                       (catch ERR_ANY             (+ "Generic error!"))
+                       (catch ERR_ANY             (+ "Generic error! Error was: " (serexp *ERR*) ))
                        (catch ERR_SYMBOL_NOTFOUND (+ "Missing symbol " (error::getsym *ERR*) ""))))
-	(if (not (eq result None)) (print (serexp result)))
+	(if (not (eq result None)) (print result))
 
 	(print "\n"))
                 

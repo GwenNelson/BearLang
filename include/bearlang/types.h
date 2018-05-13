@@ -111,12 +111,13 @@ typedef struct bl_val_t {
                          bl_val_t* cdr;	};
 
 		// BL_VAL_TYPE_CTX
-		struct { struct bl_hash_t *hash_val;
+		struct { void* custom_ctx_data; // for use by custom get function in C extension modules
 			 bl_val_t** keys;
 			 bl_val_t** vals;
 			 size_t vals_count;
 			 bl_val_t* parent;
 	                 bl_val_t* secondary;
+			 bl_val_t* (*ctx_get)(bl_val_t*,bl_val_t*); // custom get function, can override default, signature is: bl_val_t* ctx_get(bl_val_t* ctx,bl_val_t* sym);
 	                 bool write_to_parent; };
 
 		// BL_VAL_TYPE_CPTR
