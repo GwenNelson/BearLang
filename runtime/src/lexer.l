@@ -20,6 +20,7 @@ STRING          \"(\\.|[^"\\])*\"
 NUMBER_INTEGER  [-]*[0-9]+ 
 WHITESPACE      [ \t\n\r]
 SYMBOL          [\_\%\:\=\*\-\/\+a-zA-Z0-9]+
+QUOTED_SYMBOL   "'"[\_\%\:\=\*\-\/\+a-zA-Z0-9]+
 COMMENT_START   \;
 
 %%
@@ -33,6 +34,7 @@ COMMENT_START   \;
 {IF_OPER}	   { return BL_TOKEN_IF; }
 {DO_OPER}	   { return BL_TOKEN_DO; }
 {WHILE_OPER}	   { return BL_TOKEN_WHILE; }
+{QUOTED_SYMBOL}    { return BL_TOKEN_SYMBOL; }
 {SYMBOL}           { return BL_TOKEN_SYMBOL; }
 
 

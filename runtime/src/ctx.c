@@ -241,7 +241,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 
 
 bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) { // LCOV_EXCL_LINE
-
+   if(key->s_val[0]=='\'') return bl_mk_symbol(key->s_val+1);
 // LCOV_EXCL_START
    if(strstr(key->s_val,"::")) {
      char* tmp = strdup(key->s_val);
