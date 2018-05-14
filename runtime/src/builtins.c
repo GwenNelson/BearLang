@@ -349,6 +349,10 @@ bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* retval        = bl_mk_val(BL_VAL_TYPE_FUNC_BL);
    retval->bl_funcargs_ptr = bl_list_second(params);
    retval->bl_func_ptr     = bl_list_rest(bl_list_rest(params)); // the rest of the rest is better than the rest
+   if(retval->bl_func_ptr->car->type == BL_VAL_TYPE_DOCSTRING) {
+      retval->docstr = retval->bl_func_ptr->car;
+      retval->bl_func_ptr = retval->bl_func_ptr->cdr;
+   }
    retval->lexical_closure = ctx;
    retval->inner_closure   = bl_ctx_new(ctx);
    retval->sym = bl_list_first(params); 
@@ -632,4 +636,16 @@ bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    symval->fix_int--;
    //   mpz_sub(symval->i_val, symval->i_val, integer_one);
    return symval;
+}
+
+
+bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   bl_val_t* symname = bl_list_first(params);
+   bl_val_t* symval  = bl_ctx_get(ctx,symname);
+   if(symval->docstr==NULL) {
+      return bl_mk_str("No documentation!");
+   } else {
+      return bl_mk_str(symval->docstr->s_val);
+   }
+
 }

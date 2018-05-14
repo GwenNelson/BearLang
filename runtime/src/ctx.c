@@ -57,6 +57,7 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
    bl_ctx_set(retval,     bl_mk_symbol("try"), bl_mk_native_oper(&bl_oper_try));
    bl_ctx_set(retval,   bl_mk_symbol("quote"), bl_mk_native_oper(&bl_oper_quote));
    bl_ctx_set(retval,   bl_mk_symbol("using"), bl_mk_native_oper(&bl_oper_using));
+   bl_ctx_set(retval,     bl_mk_symbol("doc"), bl_mk_native_oper(&bl_oper_doc));
 
    bl_ctx_set(retval, bl_mk_symbol("True"),  bl_mk_bool(true));
    bl_ctx_set(retval, bl_mk_symbol("False"), bl_mk_bool(false));
@@ -81,7 +82,6 @@ bl_val_t* bl_ctx_new(bl_val_t* parent) { // LCOV_EXCL_LINE
    bl_val_t* retval   = bl_mk_val(BL_VAL_TYPE_CTX);
    retval->parent     = parent;
    retval->secondary  = NULL;
-   retval->hash_val   = NULL;
    retval->vals_count = 8;
    retval->vals       = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*retval->vals_count);
    retval->keys       = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*retval->vals_count);

@@ -108,6 +108,9 @@ bl_val_t* read_form(yyscan_t scanner) { // LCOV_EXCL_LINE
 	case BL_TOKEN_WHILE:
 		return &while_oper_val;
 	break;
+	case BL_TOKEN_DOCSTRING:
+		return bl_mk_docstr(yyget_text(scanner));
+	break;
    }
 }
 

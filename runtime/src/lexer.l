@@ -16,6 +16,7 @@ RIGHT_PAREN     ")"
 IF_OPER		"if"
 DO_OPER		"do"
 WHILE_OPER	"while"
+DOCSTR          \"\"\"(\\.|[^"\\])*\"\"\"
 STRING          \"(\\.|[^"\\])*\"
 NUMBER_INTEGER  [-]*[0-9]+ 
 WHITESPACE      [ \t\n\r]
@@ -24,6 +25,8 @@ QUOTED_SYMBOL   "'"[\_\%\:\=\*\-\/\+a-zA-Z0-9]+
 COMMENT_START   \;
 
 %%
+{DOCSTR}	   { memmove(yyget_text(yyscanner),yyget_text(yyscanner)+3,yyget_leng(yyscanner)-3);
+                     yyget_text(yyscanner)[yyget_leng(yyscanner)-6]='\0';  return BL_TOKEN_DOCSTRING; }
 {STRING}           { memmove(yyget_text(yyscanner),yyget_text(yyscanner)+1,yyget_leng(yyscanner)-1);
                      yyget_text(yyscanner)[yyget_leng(yyscanner)-2]='\0'; return BL_TOKEN_STRING; }
 {WHITESPACE}       { /* do nothing */ }

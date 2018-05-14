@@ -34,6 +34,7 @@ typedef enum bl_val_type_t {
 	BL_VAL_TYPE_OPER_DO=16,     // special form
 	BL_VAL_TYPE_OPER_IF=17,     // special form
 	BL_VAL_TYPE_OPER_WHILE=18,  // special form
+	BL_VAL_TYPE_DOCSTRING=19,   // docstrings
 } bl_val_type_t;
 
 typedef enum bl_err_type_t {
@@ -52,14 +53,15 @@ typedef enum bl_err_type_t {
 
 // TODO: add all builtins as tokens to the lexer
 typedef enum bl_token_type_t {
-	BL_TOKEN_LPAREN  = 1,
-	BL_TOKEN_RPAREN  = 2,
-	BL_TOKEN_STRING  = 3,
-	BL_TOKEN_INTEGER = 4,
-	BL_TOKEN_SYMBOL  = 5,
-	BL_TOKEN_IF      = 6,
-	BL_TOKEN_DO      = 7,
-	BL_TOKEN_WHILE   = 8,
+	BL_TOKEN_LPAREN     = 1,
+	BL_TOKEN_RPAREN     = 2,
+	BL_TOKEN_STRING     = 3,
+	BL_TOKEN_INTEGER    = 4,
+	BL_TOKEN_SYMBOL     = 5,
+	BL_TOKEN_IF         = 6,
+	BL_TOKEN_DO         = 7,
+	BL_TOKEN_WHILE      = 8,
+	BL_TOKEN_DOCSTRING  = 9,
 } bl_token_type_t;
 
 typedef struct bl_val_t bl_val_t;
@@ -88,6 +90,7 @@ struct bl_hash_t {
 typedef struct bl_val_t {
         bl_val_type_t type;
 	bl_val_t* eval_last; // used by bl_eval_cons
+	bl_val_t* docstr;    // docstring for this value
 	union {
 
 		// BL_VAL_TYPE_ERROR

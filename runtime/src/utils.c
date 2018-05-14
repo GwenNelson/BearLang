@@ -93,6 +93,15 @@ bl_val_t* bl_mk_str(char* s) { // LCOV_EXCL_LINE
    return retval;
 }
 
+bl_val_t* bl_mk_docstr(char* s) { // LCOV_EXCL_LINE
+
+   bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_DOCSTRING);
+   size_t count     = strlen(s)*sizeof(char)+1;
+   retval->s_val    = (char*)GC_MALLOC_ATOMIC(count);
+   snprintf(retval->s_val,count,"%s",s);
+   return retval;
+}
+
 bl_val_t* bl_mk_native_oper(void* func_ptr) { // LCOV_EXCL_LINE
 
    bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_OPER_NATIVE);
