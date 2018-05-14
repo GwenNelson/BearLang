@@ -14,9 +14,20 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
 
    bl_val_t* retval = bl_ctx_new(NULL);
 
-   bl_ctx_set(retval,bl_mk_symbol("*VERSION*"), bl_mk_str("0.WHATEVER")); // TODO - change this and use a real versioning system
-   bl_ctx_set(retval,bl_mk_symbol("*PATH*"), bl_mk_list(2,bl_mk_str("."),bl_mk_str("./stdlib")));
+   char* path_env = getenv("BEARLANGPATH");
+   if(path_env != NULL) {
+      bl_val_t* path_val = NULL;
+      char* path_dir;
+      char* rest = path_env;
+      while((path_dir = strtok_r(rest, ":", &rest))) {
+         path_val = bl_list_append(path_val,bl_mk_str(path_dir));
+      }
+      bl_ctx_set(retval,bl_mk_symbol("*PATH*"), path_val);
+   } else {
+      bl_ctx_set(retval,bl_mk_symbol("*PATH*"), bl_mk_list(2,bl_mk_str("."),bl_mk_str("./stdlib")));
+   }
 
+   bl_ctx_set(retval,bl_mk_symbol("*VERSION*"), bl_mk_str("0.WHATEVER")); // TODO - change this and use a real versioning system
    bl_ctx_set(retval,   bl_mk_symbol( "None"), bl_mk_null());
    bl_ctx_set(retval,       bl_mk_symbol("+"), bl_mk_native_oper(&bl_oper_add));
    bl_ctx_set(retval,       bl_mk_symbol("-"), bl_mk_native_oper(&bl_oper_sub));

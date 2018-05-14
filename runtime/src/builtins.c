@@ -653,7 +653,7 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
       if(first->type == BL_VAL_TYPE_CTX) {
          return bl_mk_str(bl_ctx_get(first,bl_mk_symbol("DOC"))->s_val);
       } else {
-         return bl_mk_str("");
+         return bl_mk_str(""); // TODO - autogenerate docstring for functions
       }
    }
    return bl_mk_str(first->docstr->s_val);
