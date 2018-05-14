@@ -651,3 +651,16 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    }
    return bl_mk_str(symval->docstr->s_val);
 }
+
+bl_val_t* bl_oper_dir (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   bl_val_t* symname = bl_list_first(params);
+   bl_val_t* symval  = bl_ctx_get(ctx,symname);
+   bl_val_t* retval  = NULL;
+   int i=0;
+   for(i=0; i<symval->vals_count; i++) {
+       if(symval->vals[i] != NULL) {
+          retval = bl_list_prepend(retval,symval->keys[i]);
+       }
+   }
+   return retval;
+}

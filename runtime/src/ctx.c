@@ -58,6 +58,7 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
    bl_ctx_set(retval,   bl_mk_symbol("quote"), bl_mk_native_oper(&bl_oper_quote));
    bl_ctx_set(retval,   bl_mk_symbol("using"), bl_mk_native_oper(&bl_oper_using));
    bl_ctx_set(retval,     bl_mk_symbol("doc"), bl_mk_native_oper(&bl_oper_doc));
+   bl_ctx_set(retval,     bl_mk_symbol("dir"), bl_mk_native_oper(&bl_oper_dir));
 
    bl_ctx_set(retval, bl_mk_symbol("True"),  bl_mk_bool(true));
    bl_ctx_set(retval, bl_mk_symbol("False"), bl_mk_bool(false));
