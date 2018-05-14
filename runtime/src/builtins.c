@@ -654,7 +654,8 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_dir (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* symname = bl_list_first(params);
-   bl_val_t* symval  = bl_ctx_get(ctx,symname);
+   bl_val_t* symval  = bl_ctx_eval(ctx,bl_ctx_get(ctx,symname));
+   if(symval->type != BL_VAL_TYPE_CTX) return NULL;
    bl_val_t* retval  = NULL;
    int i=0;
    for(i=0; i<symval->vals_count; i++) {
@@ -663,4 +664,10 @@ bl_val_t* bl_oper_dir (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
        }
    }
    return retval;
+}
+
+bl_val_t* bl_oper_mksym  (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   params = bl_ctx_eval(ctx,params);
+   bl_val_t* first = bl_list_first(params);
+   return bl_mk_symbol(first->s_val);
 }
