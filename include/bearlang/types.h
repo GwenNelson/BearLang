@@ -35,6 +35,7 @@ typedef enum bl_val_type_t {
 	BL_VAL_TYPE_OPER_IF=17,     // special form
 	BL_VAL_TYPE_OPER_WHILE=18,  // special form
 	BL_VAL_TYPE_DOCSTRING=19,   // docstrings
+	BL_VAL_TYPE_TYPE=20,	    // Reference to a type
 } bl_val_type_t;
 
 typedef enum bl_err_type_t {
@@ -142,6 +143,9 @@ typedef struct bl_val_t {
 
 		// BL_VAL_TYPE_FUNC_NATIVE
 		struct { bl_val_t* (*func_ptr)(bl_val_t*,bl_val_t*); };
+
+		// BL_VAL_TYPE_TYPE
+		struct { bl_val_type_t ref_type; };
         };
 } bl_val_t;
 

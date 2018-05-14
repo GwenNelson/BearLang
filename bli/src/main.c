@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
 	        char*          errmsg = "";
 		switch(result->type) {
 	           case BL_VAL_TYPE_NULL:
-	              printf("None\n");
+	              printf("\n");
 		   break;
 	           case BL_VAL_TYPE_ERROR:
 	              errmsg = bl_errmsg(result);

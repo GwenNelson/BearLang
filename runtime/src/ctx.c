@@ -60,9 +60,14 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
    bl_ctx_set(retval,     bl_mk_symbol("doc"), bl_mk_native_oper(&bl_oper_doc));
    bl_ctx_set(retval,     bl_mk_symbol("dir"), bl_mk_native_oper(&bl_oper_dir));
    bl_ctx_set(retval,   bl_mk_symbol("mksym"), bl_mk_native_oper(&bl_oper_mksym));
+   bl_ctx_set(retval,  bl_mk_symbol("ctxget"), bl_mk_native_oper(&bl_oper_ctxget));
+   bl_ctx_set(retval,    bl_mk_symbol("type"), bl_mk_native_oper(&bl_oper_type));
 
    bl_ctx_set(retval, bl_mk_symbol("True"),  bl_mk_bool(true));
    bl_ctx_set(retval, bl_mk_symbol("False"), bl_mk_bool(false));
+
+   bl_ctx_set(retval, bl_mk_symbol("TYPE_SYMBOL"), bl_mk_type(BL_VAL_TYPE_SYMBOL));
+   bl_ctx_set(retval, bl_mk_symbol("TYPE_CTX"),    bl_mk_type(BL_VAL_TYPE_CTX));
 
    bl_ctx_set(retval, bl_mk_symbol("ERR_ANY"),              bl_mk_err(BL_ERR_ANY));
    bl_ctx_set(retval, bl_mk_symbol("ERR_UNKNOWN"),          bl_mk_err(BL_ERR_UNKNOWN));

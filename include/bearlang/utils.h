@@ -17,5 +17,6 @@ bl_val_t* bl_mk_bool(bool b);
 
 bl_val_t* bl_mk_list(size_t count, ...);
 bl_val_t* bl_mk_ptr(void* ptr);
+bl_val_t* bl_mk_type(bl_val_type_t type);
 
 bl_val_t* bl_eval_file(bl_val_t* ctx, char* filename, FILE* fd);

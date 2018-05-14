@@ -155,3 +155,9 @@ bl_val_t* bl_mk_ptr(void* ptr) { // LCOV_EXCL_LINE
    retval->c_ptr    = ptr;
    return retval;
 }
+
+bl_val_t* bl_mk_type(bl_val_type_t type) { // LCOV_EXCL_LINE
+   bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_TYPE);
+   retval->ref_type = type;
+   return retval;
+}

@@ -20,6 +20,8 @@ bl_val_t* bl_oper_parse  (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_eval   (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_quote  (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_mksym  (bl_val_t* ctx, bl_val_t* params);
+bl_val_t* bl_oper_ctxget (bl_val_t* ctx, bl_val_t* params);
+bl_val_t* bl_oper_type   (bl_val_t* ctx, bl_val_t* params);
 
 bl_val_t* bl_oper_try   (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_isset (bl_val_t* ctx, bl_val_t* params);

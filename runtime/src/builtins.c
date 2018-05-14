@@ -376,6 +376,13 @@ bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
+   if(first->type == BL_VAL_TYPE_TYPE && second->type == BL_VAL_TYPE_TYPE) {
+      if(first->ref_type == second->ref_type) {
+         return bl_mk_bool(true);
+      } else {
+         return bl_mk_bool(false);
+      }
+   }
 
    if(first->type == BL_VAL_TYPE_STRING && second->type == BL_VAL_TYPE_STRING) {
       if(strcmp(first->s_val, second->s_val)==0) {
@@ -640,16 +647,16 @@ bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 
 bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   bl_val_t* symname = bl_list_first(params);
-   bl_val_t* symval  = bl_ctx_get(ctx,symname);
-   if(symval->docstr==NULL) {
-      if(symval->type == BL_VAL_TYPE_CTX) {
-         symval->docstr = bl_ctx_get(symval,bl_mk_symbol("*DOC*"));
+   params = bl_ctx_eval(ctx,params);
+   bl_val_t* first = bl_list_first(params);
+   if(first->docstr==NULL) {
+      if(first->type == BL_VAL_TYPE_CTX) {
+         return bl_mk_str(bl_ctx_get(first,bl_mk_symbol("DOC"))->s_val);
       } else {
-         return bl_mk_str("No documentation!");
+         return bl_mk_str("");
       }
    }
-   return bl_mk_str(symval->docstr->s_val);
+   return bl_mk_str(first->docstr->s_val);
 }
 
 bl_val_t* bl_oper_dir (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
@@ -660,7 +667,7 @@ bl_val_t* bl_oper_dir (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    int i=0;
    for(i=0; i<symval->vals_count; i++) {
        if(symval->vals[i] != NULL) {
-          retval = bl_list_prepend(retval,symval->keys[i]);
+          retval = bl_list_prepend(retval,bl_mk_str(symval->keys[i]->s_val));
        }
    }
    return retval;
@@ -671,3 +678,16 @@ bl_val_t* bl_oper_mksym  (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* first = bl_list_first(params);
    return bl_mk_symbol(first->s_val);
 }
+
+bl_val_t* bl_oper_ctxget (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   bl_val_t* symname = bl_list_first(params);
+   bl_val_t* symval  = bl_ctx_eval(ctx,bl_ctx_get(ctx,symname));
+   if(symval->type != BL_VAL_TYPE_CTX) return NULL;
+   return bl_ctx_get(symval,bl_ctx_eval(ctx,bl_list_second(params)));
+}
+
+bl_val_t* bl_oper_type (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   params = bl_ctx_eval(ctx,params);
+   return bl_mk_type(bl_list_first(params)->type);
+}
+
