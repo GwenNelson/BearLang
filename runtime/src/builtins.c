@@ -643,9 +643,11 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* symname = bl_list_first(params);
    bl_val_t* symval  = bl_ctx_get(ctx,symname);
    if(symval->docstr==NULL) {
-      return bl_mk_str("No documentation!");
-   } else {
-      return bl_mk_str(symval->docstr->s_val);
+      if(symval->type == BL_VAL_TYPE_CTX) {
+         symval->docstr = bl_ctx_get(symval,bl_mk_symbol("*DOC*"));
+      } else {
+         return bl_mk_str("No documentation!");
+      }
    }
-
+   return bl_mk_str(symval->docstr->s_val);
 }
