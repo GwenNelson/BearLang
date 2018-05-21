@@ -38,6 +38,7 @@ void run_file(char* filename, int argc, char** argv) {
      bl_val_t* FILE_CTX   = bl_ctx_new(STDLIB_CTX);
 
      bl_ctx_set(FILE_CTX, bl_mk_symbol("*MAINFILE*"), bl_mk_str(basename(filename)));
+     bl_ctx_set(FILE_CTX, bl_mk_symbol("*FILENAME*"), bl_mk_str(basename(filename)));
 
      int i=0;
      bl_val_t* argv_cons = NULL;
@@ -75,6 +76,8 @@ int main(int argc, char** argv) {
     bl_val_t* STDLIB_CTX = bl_ctx_new_std();
     bl_val_t* REPL_CTX   = bl_ctx_new(STDLIB_CTX);
 
+    bl_ctx_set(REPL_CTX,bl_mk_symbol("*MAINFILE*"), bl_mk_str(""));
+    bl_ctx_set(REPL_CTX,bl_mk_symbol("*FILENAME*"), bl_mk_str(""));
     bl_ctx_set(REPL_CTX,bl_mk_symbol("quit"), bl_mk_native_oper(&quit_cmd));
 
     for(;;) {
