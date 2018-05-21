@@ -45,44 +45,10 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
 #include "builtins.inc"
 #undef BUILTIN_X
 
-   bl_ctx_set(retval,      bl_mk_symbol("fn"), bl_mk_native_oper(&bl_oper_fn));
-   bl_ctx_set(retval,     bl_mk_symbol("fun"), bl_mk_native_oper(&bl_oper_fun));
-   bl_ctx_set(retval,     bl_mk_symbol("map"), bl_mk_native_oper(&bl_oper_map));
-   bl_ctx_set(retval,    bl_mk_symbol("oper"), bl_mk_native_oper(&bl_oper_oper));
-   bl_ctx_set(retval,      bl_mk_symbol("eq"), bl_mk_native_oper(&bl_oper_eq));
-   bl_ctx_set(retval,      bl_mk_symbol("lt"), bl_mk_native_oper(&bl_oper_lt));
-   bl_ctx_set(retval,      bl_mk_symbol("gt"), bl_mk_native_oper(&bl_oper_gt));
-   bl_ctx_set(retval,      bl_mk_symbol("=="), bl_mk_native_oper(&bl_oper_eq));
-   bl_ctx_set(retval,   bl_mk_symbol("print"), bl_mk_native_oper(&bl_oper_print));
-   bl_ctx_set(retval,     bl_mk_symbol("and"), bl_mk_native_oper(&bl_oper_and));
-   bl_ctx_set(retval,     bl_mk_symbol("not"), bl_mk_native_oper(&bl_oper_not));
-   bl_ctx_set(retval,      bl_mk_symbol("or"), bl_mk_native_oper(&bl_oper_or));
-   bl_ctx_set(retval,     bl_mk_symbol("xor"), bl_mk_native_oper(&bl_oper_xor));
-   bl_ctx_set(retval,   bl_mk_symbol("first"), bl_mk_native_oper(&bl_oper_first));
-   bl_ctx_set(retval,  bl_mk_symbol("second"), bl_mk_native_oper(&bl_oper_second));
-   bl_ctx_set(retval,   bl_mk_symbol("third"), bl_mk_native_oper(&bl_oper_third));
-   bl_ctx_set(retval,    bl_mk_symbol("rest"), bl_mk_native_oper(&bl_oper_rest));
-   bl_ctx_set(retval,  bl_mk_symbol("append"), bl_mk_native_oper(&bl_oper_append));
-   bl_ctx_set(retval, bl_mk_symbol("prepend"), bl_mk_native_oper(&bl_oper_prepend));
-   bl_ctx_set(retval, bl_mk_symbol("reverse"), bl_mk_native_oper(&bl_oper_reverse));
-   bl_ctx_set(retval,     bl_mk_symbol("car"), bl_mk_native_oper(&bl_oper_first));
-   bl_ctx_set(retval,     bl_mk_symbol("cdr"), bl_mk_native_oper(&bl_oper_rest));
-   bl_ctx_set(retval, bl_mk_symbol("include"), bl_mk_native_oper(&bl_oper_include));
-   bl_ctx_set(retval,  bl_mk_symbol("import"), bl_mk_native_oper(&bl_oper_import));
-   bl_ctx_set(retval,   bl_mk_symbol("isset"), bl_mk_native_oper(&bl_oper_isset));
-   bl_ctx_set(retval,  bl_mk_symbol("serexp"), bl_mk_native_oper(&bl_oper_serexp));
-   bl_ctx_set(retval,     bl_mk_symbol("inc"), bl_mk_native_oper(&bl_oper_inc));
-   bl_ctx_set(retval,     bl_mk_symbol("dec"), bl_mk_native_oper(&bl_oper_dec));
-   bl_ctx_set(retval,   bl_mk_symbol("parse"), bl_mk_native_oper(&bl_oper_parse));
-   bl_ctx_set(retval,    bl_mk_symbol("eval"), bl_mk_native_oper(&bl_oper_eval));
-   bl_ctx_set(retval,     bl_mk_symbol("try"), bl_mk_native_oper(&bl_oper_try));
-   bl_ctx_set(retval,   bl_mk_symbol("quote"), bl_mk_native_oper(&bl_oper_quote));
-   bl_ctx_set(retval,   bl_mk_symbol("using"), bl_mk_native_oper(&bl_oper_using));
-   bl_ctx_set(retval,     bl_mk_symbol("doc"), bl_mk_native_oper(&bl_oper_doc));
-   bl_ctx_set(retval,     bl_mk_symbol("dir"), bl_mk_native_oper(&bl_oper_dir));
-   bl_ctx_set(retval,   bl_mk_symbol("mksym"), bl_mk_native_oper(&bl_oper_mksym));
-   bl_ctx_set(retval,  bl_mk_symbol("ctxget"), bl_mk_native_oper(&bl_oper_ctxget));
-   bl_ctx_set(retval,    bl_mk_symbol("type"), bl_mk_native_oper(&bl_oper_type));
+   // most builtins are defined in the include file above, these are defined here as aliases
+   bl_ctx_set(retval,     bl_mk_symbol("car"), &native_oper_first);
+   bl_ctx_set(retval,     bl_mk_symbol("cdr"), &native_oper_rest);
+   bl_ctx_set(retval,     bl_mk_symbol("=="),  &native_oper_eq);
 
    bl_ctx_set(retval, bl_mk_symbol("True"),  bl_mk_bool(true));
    bl_ctx_set(retval, bl_mk_symbol("False"), bl_mk_bool(false));
