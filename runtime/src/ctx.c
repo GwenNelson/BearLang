@@ -10,6 +10,18 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#define BUILTIN_STRUCT(builtin_name,builtin_symbol,builtin_docstr) bl_val_t native_oper_docstr_ ## builtin_name = { .s_val = builtin_docstr }; \
+				                    bl_val_t native_oper_ ## builtin_name = { .type = BL_VAL_TYPE_OPER_NATIVE, \
+											     .code_ptr = &bl_oper_ ## builtin_name, \
+											     .docstr   = &native_oper_docstr_ ## builtin_name};
+
+#define ADD_BUILTIN(builtin_name,builtin_symbol,builtin_docstr) bl_ctx_set(retval,bl_mk_symbol(builtin_symbol), &native_oper_ ## builtin_name);
+
+#define BUILTIN_X BUILTIN_STRUCT
+#include "builtins.inc"
+#undef BUILTIN_X
+
+
 bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
 
    bl_val_t* retval = bl_ctx_new(NULL);
@@ -29,12 +41,10 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
 
    bl_ctx_set(retval,bl_mk_symbol("*VERSION*"), bl_mk_str("0.WHATEVER")); // TODO - change this and use a real versioning system
    bl_ctx_set(retval,   bl_mk_symbol( "None"), bl_mk_null());
-   bl_ctx_set(retval,       bl_mk_symbol("+"), bl_mk_native_oper(&bl_oper_add));
-   bl_ctx_set(retval,       bl_mk_symbol("-"), bl_mk_native_oper(&bl_oper_sub));
-   bl_ctx_set(retval,       bl_mk_symbol("*"), bl_mk_native_oper(&bl_oper_mult));
-   bl_ctx_set(retval,       bl_mk_symbol("/"), bl_mk_native_oper(&bl_oper_div));
-   bl_ctx_set(retval,       bl_mk_symbol("%"), bl_mk_native_oper(&bl_oper_mod));
-   bl_ctx_set(retval,       bl_mk_symbol("="), bl_mk_native_oper(&bl_oper_set));
+#define BUILTIN_X ADD_BUILTIN
+#include "builtins.inc"
+#undef BUILTIN_X
+
    bl_ctx_set(retval,      bl_mk_symbol("fn"), bl_mk_native_oper(&bl_oper_fn));
    bl_ctx_set(retval,     bl_mk_symbol("fun"), bl_mk_native_oper(&bl_oper_fun));
    bl_ctx_set(retval,     bl_mk_symbol("map"), bl_mk_native_oper(&bl_oper_map));

@@ -584,7 +584,6 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 // syntax
 // (using stdio::fprintf) binds fprintf symbol in the current context
-// TODO: implement (using stdio::*)
 bl_val_t* bl_oper_using(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* sym = bl_list_first(params);
    char* s = sym->s_val;
@@ -683,8 +682,8 @@ bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 
 bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   params = bl_ctx_eval(ctx,params);
-   bl_val_t* first = bl_list_first(params);
+   bl_val_t* first = bl_ctx_get(ctx,bl_list_first(params));
+   
    if(first->docstr==NULL) {
       if(first->type == BL_VAL_TYPE_CTX) {
          return bl_mk_str(bl_ctx_get(first,bl_mk_symbol("DOC"))->s_val);
