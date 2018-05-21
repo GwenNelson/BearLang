@@ -20,8 +20,8 @@ DOCSTR          \"\"\"(\\.|[^"\\])*\"\"\"
 STRING          \"(\\.|[^"\\])*\"
 NUMBER_INTEGER  [-]*[0-9]+ 
 WHITESPACE      [ \t\n\r]
-SYMBOL          [\_\%\:\=\*\-\/\+a-zA-Z0-9]+
-QUOTED_SYMBOL   "'"[\_\%\:\=\*\-\/\+a-zA-Z0-9]+
+SYMBOL          [\@\_\%\:\=\*\-\/\+a-zA-Z0-9]+
+QUOTED_SYMBOL   "'"[\@\_\%\:\=\*\-\/\+a-zA-Z0-9]+
 COMMENT_START   \;
 
 %%

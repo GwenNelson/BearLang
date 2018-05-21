@@ -92,6 +92,7 @@ typedef struct bl_val_t {
         bl_val_type_t type;
 	bl_val_t* eval_last; // used by bl_eval_cons
 	bl_val_t* docstr;    // docstring for this value
+	bl_val_t* invoked_sym; // informs native opers what symbol was used to invoke them, set on the params
 	union {
 
 		// BL_VAL_TYPE_ERROR
