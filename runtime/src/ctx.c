@@ -165,6 +165,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 				break;
    				case BL_VAL_TYPE_OPER_NATIVE:
 					expr->cdr->invoked_sym = expr->car; // let the operator know what symbol was used to invoke it
+					expr->cdr->custom_data = car->custom_data; // pass any custom data
 					retval = car->code_ptr(ctx, expr->cdr);
 					return retval;
 				break;
