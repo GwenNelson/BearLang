@@ -1,0 +1,24 @@
+; vim: filetype=Lisp
+(= DOC
+""" This example shows how to generate XML using the XML module, it spits out the following (without pretty printing):
+<html>
+ <head><title>An example</title></head>
+ <body>
+  <h1 id="greeting">Hi there!</h1>
+  <p>This is an example</p>
+ </body>
+</html>
+
+"""
+)
+
+(import xml)
+(using xml::*)
+
+(= output (x::html 
+     (x::head (x::title "An example"))
+     (x::body
+         (x::h1 (@ 'id "greeting") "Hi there!")
+         (x::p "This is an example."))))
+
+(print output)
