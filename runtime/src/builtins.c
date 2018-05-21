@@ -486,10 +486,10 @@ typedef bl_val_t* (*mod_init_fn)(bl_val_t*);
 bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      bl_val_t* first = bl_list_first(params);
      bl_val_t* module_name = first;
-/*     if(first->type == BL_VAL_TYPE_SYMBOL) {
+     if(first->type == BL_VAL_TYPE_SYMBOL) {
         module_name = bl_ctx_get(ctx,first);
 	if(module_name == NULL) module_name = first;
-     }*/
+     }
 
      if(strstr(module_name->s_val,"::")) {
         char* tmp = strdup(module_name->s_val);
