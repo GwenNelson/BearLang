@@ -5,8 +5,6 @@
 
 (using xml::*)
 
-(= output )
-
 (fun req_handle (method url body)
      (simpleweb::html_response (x::html 
      (x::head (x::title "An example"))
