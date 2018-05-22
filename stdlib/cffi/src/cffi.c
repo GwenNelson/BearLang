@@ -18,6 +18,8 @@
 // (= somelib (cffi::dlopen "somelib.so"))
 // (= somefunc (cffi::dlsym "myfunc" somelib))
 // (= my_somefunc (cffi::func void somefunc ())
+//
+// current types supported: void, void*, char*, int
 
 #include <bearlang/common.h>
 #include <bearlang/types.h>
@@ -76,8 +78,25 @@ bl_val_t* native_oper_ret_int(bl_val_t* ctx, bl_val_t* params) {
          param   = params->cdr;
      }
      int rc;
+
+     char* ret_int = GC_MALLOC_ATOMIC(10);
+     snprintf(ret_int,10,"%d", rc);
      ffi_call(&(func_def->cif), func_def->native_fn, &rc, args);
-     return bl_mk_null();
+     return bl_mk_integer(ret_int);
+}
+
+bl_val_t* native_oper_ret_ptr(bl_val_t* ctx, bl_val_t* params) {
+     ffi_func_t* func_def = (ffi_func_t*)params->custom_data;
+     int i=0;
+     void** args = GC_MALLOC(func_def->arg_count * sizeof(void*));
+     bl_val_t* param = params;
+     for(i=0; i<func_def->arg_count; i++) {
+         args[i] = &(param->car->s_val); // TODO - implement other stuff
+         param   = params->cdr;
+     }
+     void* ret_ptr;
+     ffi_call(&(func_def->cif), func_def->native_fn, &ret_ptr, args);
+     return bl_mk_ptr(ret_ptr);
 }
 
 // this sets up the ffi_func_t struct and then returns a new native oper
@@ -110,8 +129,14 @@ bl_val_t* func_bearlang(bl_val_t* ctx, bl_val_t* params) {
            if(L->car == bl_mk_symbol("char*")) {
               func_def->ffi_arg_types[n] = &ffi_type_pointer;
               func_def->arg_types[n] = BL_VAL_TYPE_STRING;
-              n++;
+           } else if(L->car == bl_mk_symbol("void*")) {
+              func_def->ffi_arg_types[n] = &ffi_type_pointer;
+              func_def->arg_types[n] = BL_VAL_TYPE_CPTR;              
+           } else if(L->car == bl_mk_symbol("int")) {
+              func_def->ffi_arg_types[n] = &ffi_type_sint64;
+              func_def->arg_types[n] = BL_VAL_TYPE_NUMBER;
            }
+           n++;
        }
 
      }
@@ -126,6 +151,9 @@ bl_val_t* func_bearlang(bl_val_t* ctx, bl_val_t* params) {
      } else if (retval_type == bl_mk_symbol("char*")) {
         func_def->ret_type = &ffi_type_pointer;
         retval = bl_mk_native_oper(&native_oper_ret_str);
+     } else if (retval_type == bl_mk_symbol("void*")) {
+        func_def->ret_type = &ffi_type_pointer;
+        retval = bl_mk_native_oper(&native_oper_ret_ptr);
      }
 
      ffi_status r = ffi_prep_cif(&(func_def->cif), FFI_DEFAULT_ABI, 1, func_def->ret_type, func_def->ffi_arg_types);
