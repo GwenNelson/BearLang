@@ -16,14 +16,14 @@ DESCRIPTION
 
 		item should be a function, module or context
 	"""
-	(print (filtered (dir val ("*FILENAME*" "DOC" "val"))))
 	(= result (doc val))
 	(= result (+ result "\n"))
 	(if (eq (type val) TYPE_CTX) (do
 	     (= result (+ result "MEMBERS\n"))
 	     (foreach member (filtered (dir val) ("*FILENAME*" "DOC" "val")) (do
 			(= member-val (ctxget val (mksym member)))
-			(if (not (eq (type member_val) TYPE_CTX)) (do
+			(if (and (not (eq (type member_val) TYPE_CTX))
+				 (not (eq member-val val))) (do
 					(= result (+ result (doc member-val)))
 					(= result (+ result "\n"))))
 					))
@@ -32,7 +32,6 @@ DESCRIPTION
 	(= pipe (stdio::popen "less -XF" "w"))
 	(stdio::fprintf pipe result)
 	(stdio::pclose pipe)
-;	(print result)
 	None
 	)
 

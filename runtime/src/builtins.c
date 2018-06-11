@@ -720,7 +720,6 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
       first = bl_ctx_eval(ctx,first);
       if(first == NULL) return bl_mk_str("UNKNOWN SYMBOL");
    }
-  printf("Trying to get doc string for %s\n", bl_ser_sexp(first));
 
 
 
