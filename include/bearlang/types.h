@@ -50,6 +50,7 @@ typedef enum bl_err_type_t {
 	BL_ERR_CUSTOM=8,             // Custom error type - contains a human-readable string and a numeric error code
 	BL_ERR_IO=9,                 // Generic I/O error
 	BL_ERR_MODULE_NOTFOUND=10,   // Failed to find a module
+	BL_ERR_BL_CUSTOM=11,	     // Custom error type - contains a symbol and an arbitrary value
 } bl_err_type_t;
 
 // TODO: add all builtins as tokens to the lexer
@@ -80,6 +81,9 @@ typedef struct bl_err_t {
 	char* symbol_name; // only set if relevant to the error
 	char* errmsg;      // for BL_ERR_CUSTOM
 	uint64_t errnum;    // for BL_ERR_CUSTOM
+
+	bl_val_t* err_sym; // for BL_ERR_BL_CUSTOM
+	bl_val_t* err_val; // for BL_ERR_BL_CUSTOM
 } bl_err_t;
 
 struct bl_hash_t {

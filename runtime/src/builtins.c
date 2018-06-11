@@ -16,6 +16,16 @@
 #include <stdbool.h>
 #include <libgen.h>
 
+bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   bl_val_t* errtype = bl_list_first(params);
+   bl_val_t* errval  = bl_ctx_eval(ctx,bl_list_second(params));
+   if(errval == NULL) errval = bl_mk_null();
+   bl_val_t* retval = bl_mk_err(BL_ERR_BL_CUSTOM);
+   retval->err_val.err_sym = errtype;
+   retval->err_val.err_val = errval;
+   return retval;
+}
+
 bl_val_t* bl_oper_foreach(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* sym  = bl_list_first(params);
    bl_val_t* L    = bl_ctx_eval(ctx,bl_list_second(params));

@@ -8,7 +8,7 @@
 #include <bearlang/list_ops.h>
 #include <bearlang/error_tools.h>
 
-
+#include <bearlang/sexp.h>
 #include <bearlang/utils.h>
 
 bl_val_t* bl_errif_invalid_len(bl_val_t* L, uint64_t min, uint64_t max) {  // LCOV_EXCL_LINE
@@ -237,6 +237,9 @@ char* bl_errmsg(bl_val_t* E) {
 	  break;
 	  case BL_ERR_MODULE_NOTFOUND:
 	       snprintf(retval,1023,"Module %s could not be found", E->err_val.symbol_name);
+	  break;
+	  case BL_ERR_BL_CUSTOM:
+	       snprintf(retval,1023,"%s: %s", E->err_val.err_sym->s_val, bl_ser_sexp(E->err_val.err_val));
 	  break;
       }
       return retval;

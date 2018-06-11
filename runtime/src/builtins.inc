@@ -31,6 +31,9 @@ BUILTIN_X(foreach,"foreach","(foreach sym list expr)"
 BUILTIN_X(filtered,"filtered","(filtered L items)"
 	                      "\t Returns the list L without any of the items in the list \"items\"")
 
+BUILTIN_X(throw,"throw","(throw errtype errval)"
+	                "\t Throws a custom error, errtype should be a symbol specifying the type, errval is an optional param with an arbitrary value")
+
 BUILTIN_X(oper,"oper", "")
 BUILTIN_X(map,"map", "")
 BUILTIN_X(eq,"eq", "")

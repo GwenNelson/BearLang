@@ -58,3 +58,4 @@ bl_val_t* bl_oper_inc (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_dec (bl_val_t* ctx, bl_val_t* params);
 
 bl_val_t* bl_oper_foreach (bl_val_t* ctx, bl_val_t* params);
+bl_val_t* bl_oper_throw   (bl_val_t* ctx, bl_val_t* params);
