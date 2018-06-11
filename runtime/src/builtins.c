@@ -607,7 +607,11 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
       if(!dylib_val->c_ptr) fprintf(stderr, "dlopen error: %s\n", dlerror());
       mod_init_fn mod_init = dlsym(dylib_val->c_ptr, "bl_mod_init");
       char* err = dlerror();
-      if(err) fprintf(stderr,"dlsym failed: %s\n", err);
+      if(err) { 
+         bl_val_t* ret_err = bl_mk_err(BL_ERR_CUSTOM);
+	 ret_err->err_val.errmsg = strdup(err);
+	 return ret_err;
+      }
       bl_val_t* new_ctx = mod_init(ctx);
       bl_ctx_set(new_ctx, bl_mk_symbol("*FILENAME*"), bl_mk_str(found_path));
       bl_ctx_set(ctx, bl_mk_symbol(module_name->s_val), new_ctx);
