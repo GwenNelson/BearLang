@@ -969,6 +969,14 @@ int test_import_noexist() {
     return 0;
 }
 
+int test_docstr_fun() {
+    bl_val_t* ctx    = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx, bl_parse_sexp("(fun test (x) \"\"\"foobar\"\"\" (+ x 1))"));
+    result           = bl_ctx_eval(ctx, bl_parse_sexp("(doc test)"));
+    ASSERT("result is correct docstr", strcmp(bl_ser_naked_sexp(result),"foobar")==0)
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1038,6 +1046,7 @@ int main(int argc, char** argv) {
     TEST("parse builtin oper                         ", test_parse_builtin)
     TEST("quote builtin oper                         ", test_quote_builtin)
     TEST("import non-existent module                 ", test_import_noexist)
+    TEST("docstring in functions                     ", test_docstr_fun)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
