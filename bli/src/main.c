@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
     bl_ctx_set(REPL_CTX,bl_mk_symbol("quit"), bl_mk_native_oper(&quit_cmd));
 
     bl_ctx_eval(REPL_CTX,bl_parse_sexp("(import bldoc)"));
-    bl_ctx_eval(REPL_CTX,bl_parse_sexp("(using bldoc::*)"));
+    bl_ctx_eval(REPL_CTX,bl_parse_sexp("(using bldoc::help)"));
 
     char* errmsg;
     for(;;) {

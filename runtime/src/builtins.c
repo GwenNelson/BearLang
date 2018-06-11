@@ -518,7 +518,9 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      if(first->type == BL_VAL_TYPE_SYMBOL) {
         module_name = bl_ctx_get(ctx,first);
 	if(module_name == NULL) module_name = first;
+	if(module_name->type == BL_VAL_TYPE_CTX) return module_name;
      }
+
 
      if(strstr(module_name->s_val,"::")) {
         char* tmp = strdup(module_name->s_val);
