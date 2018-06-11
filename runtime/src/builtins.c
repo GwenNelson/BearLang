@@ -415,6 +415,7 @@ bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
 
+   // LCOV_EXCL_START
    if(first->type == BL_VAL_TYPE_TYPE && second->type == BL_VAL_TYPE_TYPE) {
       if(first->ref_type == second->ref_type) {
          return bl_mk_bool(true);
@@ -422,6 +423,8 @@ bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
          return bl_mk_bool(false);
       }
    }
+   // LCOV_EXCL_STOP
+
 
    if(first->type == BL_VAL_TYPE_STRING && second->type == BL_VAL_TYPE_STRING) {
       if(strcmp(first->s_val, second->s_val)==0) {
@@ -556,8 +559,8 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      int i=0;
      bl_val_t* cur_path     = bl_ctx_get(ctx,bl_mk_symbol("*PATH*"));
      bl_val_t* mod_filename = bl_ctx_get(ctx,bl_mk_symbol("*FILENAME*"));
-     if(cur_path==NULL)     cur_path = bl_mk_str(".");
-     if(mod_filename==NULL) mod_filename = bl_mk_str("");
+     if(cur_path==NULL)     cur_path = bl_mk_str("."); // LCOV_EXCL_BR_LINE
+     if(mod_filename==NULL) mod_filename = bl_mk_str(""); // LCOV_EXCL_BR_LINE
 
      char* mod_filename_s = strdup(mod_filename->s_val);
      char* mod_dirname = NULL;
@@ -568,10 +571,10 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      char* pattern = GC_MALLOC_ATOMIC(4096);
      pattern[0] = NULL;
      if(mod_dirname != NULL) {
-        if(strlen(mod_dirname)>0) {
+        if(strlen(mod_dirname)>0) { // LCOV_EXCL_BR_LINE
            snprintf(pattern,4096,"{%s,", mod_dirname);
         } else {
-           snprintf(pattern,4096,"{");
+           snprintf(pattern,4096,"{"); // LCOV_EXCL_LINE
         }
      } else {
         snprintf(pattern,4096,"{");
@@ -586,12 +589,12 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      char* found_path = "";
      glob(pattern,GLOB_TILDE|GLOB_MARK|GLOB_BRACE,NULL,&globbuf);
          for(i=0; i<globbuf.gl_pathc; i++) {
-             if(globbuf.gl_pathv[i][strlen(globbuf.gl_pathv[i])-1] != '/') { 
+             if(globbuf.gl_pathv[i][strlen(globbuf.gl_pathv[i])-1] != '/') {  // LCOV_EXCL_BR_LINE
 		     found_path = GC_MALLOC_ATOMIC(4096);
 	             snprintf(found_path,4096,"%s",globbuf.gl_pathv[i]);
                      break;
              }
-	 }
+	 } // LCOV_EXCL_LINE
 	 globfree(&globbuf);
      if(strlen(found_path)==0) {
         return bl_err_modnotfound(module_name->s_val);
@@ -601,10 +604,10 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      snprintf(fname,4096,"%s", found_path);
      fname = basename(fname);
      char* fext = strrchr(fname, '.')+1;
-     if(strcmp(fext,"dylib")==0 || strcmp(fext,"so")==0) { // dlopen time!
+     if(strcmp(fext,"dylib")==0 || strcmp(fext,"so")==0) { // dlopen time! // LCOV_EXCL_BR_LINE
       bl_val_t* dylib_val = bl_mk_val(BL_VAL_TYPE_CPTR);
       dylib_val->c_ptr = dlopen(found_path,RTLD_NOW);
-      if(!dylib_val->c_ptr) fprintf(stderr, "dlopen error: %s\n", dlerror());
+      if(!dylib_val->c_ptr) fprintf(stderr, "dlopen error: %s\n", dlerror()); // TODO: add proper error handling here LCOV_EXCL_LINE
       mod_init_fn mod_init = dlsym(dylib_val->c_ptr, "bl_mod_init");
       char* err = dlerror();
       if(err) { 

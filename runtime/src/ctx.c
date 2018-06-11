@@ -27,7 +27,7 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
    bl_val_t* retval = bl_ctx_new(NULL);
 
    char* path_env = strdup(getenv("BEARLANGPATH"));
-   if(path_env != NULL) {
+   if(path_env != NULL) { // LCOV_EXCL_BR_LINE
       bl_val_t* path_val = NULL;
       char* path_dir;
       char* rest = path_env;
@@ -123,7 +123,7 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 		   L=L->cdr;
 		}
 	    }
-            if(L_start==NULL) return bl_mk_null();
+            if(L_start==NULL) return bl_mk_null(); // LCOV_EXCL_BR_LINE
 	    return L_start;
     return NULL;
 }
@@ -134,7 +134,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
     bool in_func = false;
     bool in_oper = false;
     while(true) {
-	    if(expr == NULL) return bl_mk_null();
+	    if(expr == NULL) return bl_mk_null(); // LCOV_EXCL_BR_LINE
 	    if(expr->type == BL_VAL_TYPE_ERROR) return expr;
 	    bl_val_t* symval  = NULL;
 	    bl_val_t* car     = NULL;
@@ -184,7 +184,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 					while(bl_ctx_eval(ctx, cond)->b_val==true) {
 						for(i=bl_list_rest(expr->cdr); i != NULL; i=i->cdr) {
     							retval = bl_ctx_eval(ctx,i->car);
-							if(retval != NULL) {
+							if(retval != NULL) { // LCOV_EXCL_BR_LINE
 	    							if(retval->type == BL_VAL_TYPE_ERROR) return retval;
 							}
 						}
@@ -234,9 +234,8 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 
 
 bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) { // LCOV_EXCL_LINE
-   if(ctx->ctx_get != NULL) return ctx->ctx_get(ctx,key);
-   if(key->s_val[0]=='\'') return bl_mk_symbol(key->s_val+1);
-// LCOV_EXCL_START
+   if(ctx->ctx_get != NULL) return ctx->ctx_get(ctx,key); // LCOV_EXCL_BR_LINE
+   if(key->s_val[0]=='\'') return bl_mk_symbol(key->s_val+1); // LCOV_EXCL_BR_LINE
    if(strstr(key->s_val,"::")) {
      char* tmp = strdup(key->s_val);
      strstr(tmp,"::")[0]='\0';
@@ -251,7 +250,6 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) { // LCOV_EXCL_LINE
      return bl_ctx_get(other_ctx,bl_mk_symbol(sym_key));
 
    }
-// LCOV_EXCL_STOP
    bl_val_t* retval = NULL;
    if(key->sym_id < ctx->vals_count) {
     	   retval = ctx->vals[key->sym_id];

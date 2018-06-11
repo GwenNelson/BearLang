@@ -990,6 +990,27 @@ int test_invalid_dylib_import() {
     return 0;
 }
 
+int test_using_oper() {
+    bl_val_t* ctx_a = bl_ctx_new_std();
+    bl_val_t* ctx_b = bl_ctx_new_std();
+    bl_val_t* val_a = bl_mk_str("foo");
+    bl_val_t* val_b = bl_mk_str("bar");
+
+    bl_ctx_set(ctx_a,bl_mk_symbol("a"), val_a);
+    bl_ctx_set(ctx_a,bl_mk_symbol("b"), val_b);
+
+    bl_ctx_set(ctx_b,bl_mk_symbol("ctx_a"),ctx_a);
+
+    bl_ctx_eval(ctx_b, bl_parse_sexp("(using ctx_a::a)"));
+    bl_val_t* result = bl_ctx_eval(ctx_b, bl_parse_sexp("a"));
+    ASSERT("value a", strcmp(bl_ser_naked_sexp(result),"foo")==0)
+
+    bl_ctx_eval(ctx_b, bl_parse_sexp("(using ctx_a::*)"));
+    result = bl_ctx_eval(ctx_b, bl_parse_sexp("b"));
+    ASSERT("value a", strcmp(bl_ser_naked_sexp(result),"bar")==0)
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1061,6 +1082,7 @@ int main(int argc, char** argv) {
     TEST("import non-existent module                 ", test_import_noexist)
     TEST("docstring in functions                     ", test_docstr_fun)
     TEST("import invalid dynamic library module      ", test_invalid_dylib_import)
+    TEST("using oper                                 ", test_using_oper)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
