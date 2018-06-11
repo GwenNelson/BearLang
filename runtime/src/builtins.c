@@ -18,11 +18,11 @@
 
 bl_val_t* bl_oper_parse(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    params = bl_eval_cons(ctx,params);
-   if(params->type == BL_VAL_TYPE_ERROR) return params;
+   if(params->type == BL_VAL_TYPE_ERROR) return params; // LCOV_EXCL_LINE
 
    bl_val_type_t expected_types[1] = {BL_VAL_TYPE_STRING};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,1);
-   if(retval != NULL) return retval;
+   if(retval != NULL) return retval; // LCOV_EXCL_LINE
 
    return bl_parse_sexp(params->car->s_val);
 }
@@ -515,6 +515,9 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      int i=0;
      bl_val_t* cur_path     = bl_ctx_get(ctx,bl_mk_symbol("*PATH*"));
      bl_val_t* mod_filename = bl_ctx_get(ctx,bl_mk_symbol("*FILENAME*"));
+     if(cur_path==NULL)     cur_path = bl_mk_str(".");
+     if(mod_filename==NULL) mod_filename = bl_mk_str("");
+
      char* mod_filename_s = strdup(mod_filename->s_val);
      char* mod_dirname = NULL;
      if(strlen(mod_filename_s)>0) {

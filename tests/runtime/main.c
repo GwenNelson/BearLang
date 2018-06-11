@@ -941,6 +941,34 @@ int test_import_testmod() {
     return 0;
 }
 
+int test_parse_builtin() {
+    bl_val_t* ctx    = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(parse \"(1 2 3)\""));
+    ASSERT("result is a list", result->type == BL_VAL_TYPE_CONS)
+    ASSERT("result is correctly parsed", strcmp(bl_ser_sexp(result),"(1 2 3)")==0)
+    return 0;
+}
+
+
+int test_quote_builtin() {
+    bl_val_t* ctx    = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(quote print)"));
+    ASSERT("result is a symbol", result->type == BL_VAL_TYPE_SYMBOL)
+    ASSERT("result is correct symbol", strcmp(result->s_val,"print")==0)
+    result = bl_ctx_eval(ctx,bl_parse_sexp("(quote 1 2 3)"));
+    ASSERT("result is a list", result->type == BL_VAL_TYPE_CONS)
+    ASSERT("result is correct list", strcmp(bl_ser_sexp(result),"(1 2 3)")==0)
+
+    return 0;
+}
+
+int test_import_noexist() {
+    bl_val_t* ctx    = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(import notexist)"));
+    ASSERT("result is an error", result->type == BL_VAL_TYPE_ERROR)
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1007,6 +1035,9 @@ int main(int argc, char** argv) {
     TEST("divide by zero                             ", test_div_zero)
     TEST("simple docstring parsing                   ", test_docstring_parse)
     TEST("import test module                         ", test_import_testmod)
+    TEST("parse builtin oper                         ", test_parse_builtin)
+    TEST("quote builtin oper                         ", test_quote_builtin)
+    TEST("import non-existent module                 ", test_import_noexist)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
