@@ -919,7 +919,11 @@ int test_div_zero() {
     return 0;
 }
 
-
+int test_docstring_parse() {
+    bl_val_t* docstr = bl_parse_sexp("\"\"\"Test\"\"\"");
+    ASSERT("s_val is correct", strcmp(docstr->s_val,"Test")==0)
+    return 0;
+}
 
 
 int main(int argc, char** argv) {
@@ -986,6 +990,7 @@ int main(int argc, char** argv) {
     TEST("sub oper with only 1 argument              ", test_sub_onearg)
     TEST("mult oper with only 1 argument             ", test_mult_onearg)
     TEST("divide by zero                             ", test_div_zero)
+    TEST("simple docstring parsing                   ", test_docstring_parse)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
