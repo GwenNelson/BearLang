@@ -560,7 +560,7 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      bl_val_t* cur_path     = bl_ctx_get(ctx,bl_mk_symbol("*PATH*"));
      bl_val_t* mod_filename = bl_ctx_get(ctx,bl_mk_symbol("*FILENAME*"));
      if(cur_path==NULL)     cur_path = bl_mk_str("."); // LCOV_EXCL_BR_LINE
-     if(mod_filename==NULL) mod_filename = bl_mk_str(""); // LCOV_EXCL_BR_LINE
+     if(mod_filename==NULL) mod_filename = bl_mk_str("."); // LCOV_EXCL_BR_LINE
 
      char* mod_filename_s = strdup(mod_filename->s_val);
      char* mod_dirname = NULL;
@@ -570,22 +570,32 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      free(mod_filename_s);
      char* pattern = GC_MALLOC_ATOMIC(4096);
      pattern[0] = NULL;
+     char* buf = NULL;
      if(mod_dirname != NULL) {
         if(strlen(mod_dirname)>0) { // LCOV_EXCL_BR_LINE
-           snprintf(pattern,4096,"{%s,", mod_dirname);
+           buf = GC_MALLOC_ATOMIC(strlen(pattern)+strlen(mod_dirname)+4);
+           sprintf(buf,"{%s,", mod_dirname);
         } else {
-           snprintf(pattern,4096,"{"); // LCOV_EXCL_LINE
+           buf = GC_MALLOC_ATOMIC(4);
+           sprintf(buf,"{"); // LCOV_EXCL_LINE
         }
      } else {
-        snprintf(pattern,4096,"{");
+        buf = GC_MALLOC_ATOMIC(4);
+        sprintf(buf,"{");
      }
+
+     pattern = buf;
      for(p_i=cur_path; p_i != NULL; p_i = p_i->cdr) {
-         snprintf(pattern,4096,"%s%s,",pattern,p_i->car->s_val);
+         buf = GC_MALLOC_ATOMIC(strlen(pattern)+strlen(p_i->car->s_val)+4);
+         sprintf(buf,"%s%s,",pattern,p_i->car->s_val);
+         pattern = buf;
      }
      pattern[strlen(pattern)-1] = '}';
-     snprintf(pattern,4096,"%s/{%s.bl,lib%s.so,lib%s.dylib,%s/module.bl,%s/lib%s.so,%s/lib%s.dylib}",pattern,module_name->s_val,
+     buf = GC_MALLOC_ATOMIC(strlen(pattern)+1024);
+     snprintf(buf,strlen(pattern)+1024,"%s/{%s.bl,lib%s.so,lib%s.dylib,%s/module.bl,%s/lib%s.so,%s/lib%s.dylib}",pattern,module_name->s_val,
 		                          module_name->s_val,module_name->s_val,module_name->s_val,module_name->s_val,module_name->s_val,
 					  module_name->s_val,module_name->s_val);
+     pattern = buf;
      char* found_path = "";
      glob(pattern,GLOB_TILDE|GLOB_MARK|GLOB_BRACE,NULL,&globbuf);
          for(i=0; i<globbuf.gl_pathc; i++) {
