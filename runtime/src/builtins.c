@@ -16,6 +16,35 @@
 #include <stdbool.h>
 #include <libgen.h>
 
+bl_val_t* bl_oper_foreach(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   bl_val_t* sym  = bl_list_first(params);
+   bl_val_t* L    = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* expr = bl_list_third(params);
+   for(; L != NULL; L=L->cdr) {
+      bl_ctx_set(ctx,sym,L->car);
+      bl_ctx_eval(ctx,expr);
+   }
+   bl_ctx_set(ctx,sym,NULL);
+   return bl_mk_null();
+}
+
+bl_val_t* bl_oper_filtered(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   bl_val_t* L     = bl_ctx_eval(ctx,bl_list_first(params));
+   bl_val_t* items = bl_ctx_eval(ctx,bl_list_second(params));
+   // TODO implement an "in" operation and set data type and shit
+   bl_val_t* retval = NULL;
+   bl_val_t* I      = items;
+   for(; L != NULL; L=L->cdr) {
+       bool is_in = false;
+       for(I=items; I != NULL; I=I->cdr) {
+  	   bl_val_t* eq_result = bl_oper_eq(ctx,bl_mk_list(2,L->car,I->car));
+	   if(eq_result->b_val==true) is_in=true;
+       }
+       if(!is_in) retval = bl_list_prepend(retval,L->car);
+   }
+   return bl_list_reverse(retval);
+}
+
 bl_val_t* bl_oper_parse(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    params = bl_eval_cons(ctx,params);
    if(params->type == BL_VAL_TYPE_ERROR) return params; // LCOV_EXCL_LINE
@@ -685,9 +714,16 @@ bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 
 bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   params = bl_ctx_eval(ctx,params);
    bl_val_t* first = bl_list_first(params);
-   
+ 
+   if(first->type == BL_VAL_TYPE_SYMBOL) {
+      first = bl_ctx_eval(ctx,first);
+      if(first == NULL) return bl_mk_str("UNKNOWN SYMBOL");
+   }
+  printf("Trying to get doc string for %s\n", bl_ser_sexp(first));
+
+
+
    if(first->docstr==NULL) {
       if(first->type == BL_VAL_TYPE_CTX) {
          return bl_mk_str(bl_ctx_get(first,bl_mk_symbol("DOC"))->s_val);
@@ -706,7 +742,8 @@ bl_val_t* bl_oper_dir (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    int i=0;
    for(i=0; i<symval->vals_count; i++) {
        if(symval->vals[i] != NULL) {
-          retval = bl_list_prepend(retval,bl_mk_str(symval->keys[i]->s_val));
+           if( strcmp(symval->keys[i]->s_val,"DOC") != 0)
+     	       retval = bl_list_prepend(retval,bl_mk_str(symval->keys[i]->s_val));
        }
    }
    return retval;
@@ -727,6 +764,7 @@ bl_val_t* bl_oper_ctxget (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_type (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    params = bl_ctx_eval(ctx,params);
+   if(params->type == BL_VAL_TYPE_ERROR) return params;
    return bl_mk_type(bl_list_first(params)->type);
 }
 

@@ -36,7 +36,8 @@ bl_val_t* bl_oper_eq    (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_lt    (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_gt    (bl_val_t* ctx, bl_val_t* params);
 
-bl_val_t* bl_oper_map   (bl_val_t* ctx, bl_val_t* params);
+bl_val_t* bl_oper_map         (bl_val_t* ctx, bl_val_t* params);
+bl_val_t* bl_oper_filtered    (bl_val_t* ctx, bl_val_t* params);
 
 bl_val_t* bl_oper_and   (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_not   (bl_val_t* ctx, bl_val_t* params);
@@ -55,3 +56,5 @@ bl_val_t* bl_oper_reverse (bl_val_t* ctx, bl_val_t* params);
 
 bl_val_t* bl_oper_inc (bl_val_t* ctx, bl_val_t* params);
 bl_val_t* bl_oper_dec (bl_val_t* ctx, bl_val_t* params);
+
+bl_val_t* bl_oper_foreach (bl_val_t* ctx, bl_val_t* params);
