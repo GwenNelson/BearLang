@@ -25,9 +25,10 @@
 bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
 
    bl_val_t* retval = bl_ctx_new(NULL);
+   char* path_env = getenv("BEARLANGPATH");
 
-   char* path_env = strdup(getenv("BEARLANGPATH"));
    if(path_env != NULL) { // LCOV_EXCL_BR_LINE
+      path_env = strdup(getenv("BEARLANGPATH"));
       bl_val_t* path_val = NULL;
       char* path_dir;
       char* rest = path_env;
