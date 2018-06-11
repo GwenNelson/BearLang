@@ -212,7 +212,6 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    char*     buf = NULL;
 
    L = params;
-
    for(L=params; L!= NULL; L=L->cdr) {
            x = bl_ctx_eval(ctx,L->car);
         switch(retval->type) {
@@ -221,9 +220,10 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 	    break;
 	    default:
                  s = bl_ser_naked_sexp(x);
-		 c = strlen(s) + strlen(retval->s_val)+5;
-                 retval->s_val = GC_REALLOC(retval->s_val,c);
-                 snprintf(retval->s_val,c,"%s%s", retval->s_val,s);
+		 c = strlen(s) + strlen(retval->s_val)+1;
+                 buf = GC_MALLOC(c);
+                 snprintf(buf,c,"%s%s", retval->s_val,s);
+		 retval->s_val = buf;
 	    break;
 	}
    }
