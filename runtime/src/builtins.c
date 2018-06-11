@@ -743,10 +743,10 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 
    if(first->docstr==NULL) {
-      if(first->type == BL_VAL_TYPE_CTX) {
-         return bl_mk_str(bl_ctx_get(first,bl_mk_symbol("DOC"))->s_val);
-      } else {
-         return bl_mk_str(""); // TODO - autogenerate docstring for functions
+      switch(first->type) {
+	  case BL_VAL_TYPE_CTX: return bl_mk_str(bl_ctx_get(first,bl_mk_symbol("DOC"))->s_val); break;
+	  case BL_VAL_TYPE_STRING: return first; break;
+	  default: return bl_mk_str(""); break;
       }
    }
    return bl_mk_str(first->docstr->s_val);

@@ -24,8 +24,11 @@ DESCRIPTION
 			(= member-val (ctxget val (mksym member)))
 			(if (and (not (eq (type member_val) TYPE_CTX))
 				 (not (eq member-val val))) (do
-					(= result (+ result (doc member-val)))
+					(= result (+ result "\t"))
+				 	(= result (+ result member "\n\t\t"))
+				 	(= result (+ result (doc member-val)))
 					(= result (+ result "\n"))))
+
 					))
         ))
 
