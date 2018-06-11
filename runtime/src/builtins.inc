@@ -18,8 +18,13 @@ BUILTIN_X(mod,"%","(% a b)\n"
 
 BUILTIN_X(set,"=","(= <SYM> <ANY>)\n"
                   "\t Assigns a value to a symbol")
-BUILTIN_X(fn,"fn", "")
-BUILTIN_X(fun,"fun", "")
+
+BUILTIN_X(fn,"fn", "(fn (args ...) expr ...)"
+		   "\t Lambda expression, defines and returns function")
+
+BUILTIN_X(fun,"fun", "(fun name (args ...) expr ...)"
+		     "\t Defines and returns new function and binds it to the specified name")
+
 BUILTIN_X(oper,"oper", "")
 BUILTIN_X(map,"map", "")
 BUILTIN_X(eq,"eq", "")

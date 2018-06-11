@@ -12,8 +12,8 @@
 
 #define BUILTIN_STRUCT(builtin_name,builtin_symbol,builtin_docstr) bl_val_t native_oper_docstr_ ## builtin_name = { .s_val = builtin_docstr }; \
 				                    bl_val_t native_oper_ ## builtin_name = { .type = BL_VAL_TYPE_OPER_NATIVE, \
-											     .code_ptr = &bl_oper_ ## builtin_name, \
-											     .docstr   = &native_oper_docstr_ ## builtin_name};
+											      .code_ptr = &bl_oper_ ## builtin_name, \
+											      .docstr   = &native_oper_docstr_ ## builtin_name};
 
 #define ADD_BUILTIN(builtin_name,builtin_symbol,builtin_docstr) bl_ctx_set(retval,bl_mk_symbol(builtin_symbol), &native_oper_ ## builtin_name);
 

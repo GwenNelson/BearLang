@@ -1,5 +1,6 @@
 // This module provides basic file I/O
 
+// TODO - implement a standard stream data type in the core runtime and integrate it here
 
 #include <bearlang/common.h>
 #include <bearlang/types.h>
@@ -241,6 +242,28 @@ bl_val_t* bl_readline(bl_val_t* ctx, bl_val_t* params) {
      return &generic_error;
 }
 
+// (popen command mode)
+// simple wrapper around popen(3)
+// on success, returns a FILE* pointer
+bl_val_t* bl_popen(bl_val_t* ctx, bl_val_t* params) {
+     params = bl_ctx_eval(ctx,params);
+     bl_val_t* first   = bl_list_first(params);
+     bl_val_t* second  = bl_list_second(params);
+     char* cmd  = first->s_val;
+     char* mode = second->s_val;
+     FILE* retval = popen((const char*)cmd,(const char*)mode);
+     return bl_mk_ptr((void*)retval);
+}
+
+// (pclose stream)
+// simple wrapper around pclose(3) - must be used instead of fclose
+bl_val_t* bl_pclose(bl_val_t* ctx, bl_val_t* params) {
+     params = bl_ctx_eval(ctx,params);
+     bl_val_t* first   = bl_list_first(params);
+     pclose(first->c_ptr);
+     return bl_mk_null();
+}
+
 bl_val_t* bl_mod_init(bl_val_t* ctx) {
      bl_val_t* my_ctx = bl_ctx_new(ctx);
      bl_ctx_set(my_ctx,bl_mk_symbol("fopen"),   bl_mk_native_oper(&bl_fopen));
@@ -248,6 +271,9 @@ bl_val_t* bl_mod_init(bl_val_t* ctx) {
      bl_ctx_set(my_ctx,bl_mk_symbol("fprintf"), bl_mk_native_oper(&bl_fprintf));
      bl_ctx_set(my_ctx,bl_mk_symbol("fgets"),   bl_mk_native_oper(&bl_fgets));
      bl_ctx_set(my_ctx,bl_mk_symbol("readline"),bl_mk_native_oper(&bl_readline));
+     bl_ctx_set(my_ctx,bl_mk_symbol("popen"),   bl_mk_native_oper(&bl_popen));
+     bl_ctx_set(my_ctx,bl_mk_symbol("pclose"),  bl_mk_native_oper(&bl_pclose));
+
      bl_ctx_set(my_ctx,bl_mk_symbol("STDIN"),   bl_mk_ptr((void*)stdin));
      bl_ctx_set(my_ctx,bl_mk_symbol("STDOUT"),  bl_mk_ptr((void*)stdout));
      return my_ctx;

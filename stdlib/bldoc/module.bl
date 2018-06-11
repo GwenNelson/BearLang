@@ -3,9 +3,12 @@ NAME
 	bldoc - Documentation system for BearLang
 
 DESCRIPTION
-	This module contains the implementation of the standard documentation system for BearLang. The help system in the REPL is
-	actually implemented here, the REPL simply imports it into the standard context.
+	This module contains the implementation of the standard documentation system for BearLang. 
+        The help system in the REPL is actually implemented here, the REPL simply imports it into the 
+        standard context.
 """)
+
+(import stdio)
 
 (fun help (val) """
 	(help item)
@@ -13,13 +16,18 @@ DESCRIPTION
 
 		item should be a function, module or context
 	"""
-	(print (doc val) "\n")
-	(if (eq (type val) TYPE_CTX) (do
-		(print "MEMBERS\n")
-		(map (fn (x) 
-			(print (doc (ctxget val (mksym x))) "\n" ))
-			(dir val))
-		))
+	(= result (doc val))
+	(= result (+ result "\n"))
+;	(if (eq (type val) TYPE_CTX) (do
+;		(print "MEMBERS\n")
+;		(map (fn (x) 
+;			(print (doc (ctxget val (mksym x))) "\n" ))
+;			(dir val))
+;		))
+	(= pipe (stdio::popen "less -XF" "w"))
+	(stdio::fprintf pipe result)
+	(stdio::pclose pipe)
+;	(print result)
 	None
 	)
 

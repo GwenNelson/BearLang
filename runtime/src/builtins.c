@@ -685,7 +685,8 @@ bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 
 bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   bl_val_t* first = bl_ctx_get(ctx,bl_list_first(params));
+   params = bl_ctx_eval(ctx,params);
+   bl_val_t* first = bl_list_first(params);
    
    if(first->docstr==NULL) {
       if(first->type == BL_VAL_TYPE_CTX) {
