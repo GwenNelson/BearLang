@@ -108,7 +108,6 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
     bl_val_t* L_start = NULL;
     bl_val_t* L      = NULL;
     bl_val_t* i = NULL;
-//    if(build_new_list) {
 	    for(i=expr; i != NULL; i=i->cdr) {
 	        retval = bl_ctx_eval(ctx,i->car);
 	        if(retval->type == BL_VAL_TYPE_ERROR) return retval;
@@ -125,13 +124,6 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 	    }
             if(L_start==NULL) return bl_mk_null();
 	    return L_start;
-  /*  } else {
-	    for(i=expr; i != NULL; i=i->cdr) {
-	        retval = bl_ctx_eval(ctx,i->car);
-	        if(retval->type == BL_VAL_TYPE_ERROR) return retval;
-
-	    }
-    }*/
     return NULL;
 }
 
@@ -164,11 +156,12 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 					return car;
 				break;
    				case BL_VAL_TYPE_OPER_NATIVE:
-					if(expr->cdr == NULL) expr->cdr = bl_mk_null();
-					expr->cdr->invoked_sym = expr->car; // let the operator know what symbol was used to invoke it
+				     if(expr->cdr != NULL) {
+            				expr->cdr->invoked_sym = expr->car; // let the operator know what symbol was used to invoke it
 					expr->cdr->custom_data = car->custom_data; // pass any custom data
-					retval = car->code_ptr(ctx, expr->cdr);
-					return retval;
+				     }
+			             retval = car->code_ptr(ctx, expr->cdr);
+				     return retval;
 				break;
 				case BL_VAL_TYPE_OPER_DO:
 					expr = expr->cdr;
