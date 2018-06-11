@@ -925,6 +925,21 @@ int test_docstring_parse() {
     return 0;
 }
 
+int test_import_testmod() {
+    bl_val_t* ctx    = bl_ctx_new_std();
+
+    bl_ctx_set(ctx,bl_mk_symbol("*MAINFILE*"), bl_mk_str(""));
+    bl_ctx_set(ctx,bl_mk_symbol("*FILENAME*"), bl_mk_str(""));
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(import testmod)"));
+    ASSERT("import does not return an error", result->type != BL_VAL_TYPE_ERROR)
+    result = bl_ctx_eval(ctx,bl_parse_sexp("(testmod::get_cptr)"));
+    ASSERT("get_cptr returns a pointer type", result->type == BL_VAL_TYPE_CPTR)
+    void* ptr = result->c_ptr;
+    ASSERT("ptr is not NULL", ptr != NULL)
+    char* test_str = (char*)ptr;
+    ASSERT("ptr as string is correct", strcmp(test_str,"TEST STRING")==0)
+    return 0;
+}
 
 int main(int argc, char** argv) {
     int passed_tests = 0;
@@ -991,6 +1006,7 @@ int main(int argc, char** argv) {
     TEST("mult oper with only 1 argument             ", test_mult_onearg)
     TEST("divide by zero                             ", test_div_zero)
     TEST("simple docstring parsing                   ", test_docstring_parse)
+    TEST("import test module                         ", test_import_testmod)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

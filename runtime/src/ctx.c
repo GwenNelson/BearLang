@@ -26,7 +26,7 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
 
    bl_val_t* retval = bl_ctx_new(NULL);
 
-   char* path_env = getenv("BEARLANGPATH");
+   char* path_env = strdup(getenv("BEARLANGPATH"));
    if(path_env != NULL) {
       bl_val_t* path_val = NULL;
       char* path_dir;
@@ -38,6 +38,7 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
    } else {
       bl_ctx_set(retval,bl_mk_symbol("*PATH*"), bl_mk_list(2,bl_mk_str("."),bl_mk_str("./stdlib")));
    }
+   free(path_env);
 
    bl_ctx_set(retval,bl_mk_symbol("*VERSION*"), bl_mk_str("0.WHATEVER")); // TODO - change this and use a real versioning system
    bl_ctx_set(retval,   bl_mk_symbol( "None"), bl_mk_null());
