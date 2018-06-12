@@ -573,6 +573,13 @@ int test_list_ops() {
     return 0;
 }
 
+int test_list_last() {
+    bl_val_t* L = bl_mk_list(3,bl_mk_str("1"),bl_mk_str("2"),bl_mk_str("3"));
+    bl_val_t* last = bl_list_last(L);
+    ASSERT("correct last item", strcmp(bl_ser_naked_sexp(last),"3")==0)
+    return 0;
+}
+
 int test_parse_string() {
     char* test_str = "\"Hello world\"";
     bl_val_t* parsed = bl_parse_sexp(test_str);
@@ -1093,6 +1100,7 @@ int main(int argc, char** argv) {
     TEST("List ops: append to NULL                   ", test_append_null)
     TEST("List ops: get list length                  ", test_list_len)
     TEST("List ops: first,second,third,rest          ", test_list_ops)
+    TEST("List ops: last                             ", test_list_last)
     TEST("Create an empty context and get/set        ", test_empty_ctx)
     TEST("Create a child context and lookup in parent", test_child_ctx)
     TEST("Simple arithmetic (addition)               ", test_simple_arithmetic)
