@@ -663,7 +663,7 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      fname = basename(fname);
      char* fext = strrchr(fname, '.')+1;
 
-     if(strcmp(fext,"dylib")==0 || strcmp(fext,"so")==0) { // dlopen time!
+     if(strcmp(fext,"bl")!=0) {
       bl_val_t* dylib_val = bl_mk_val(BL_VAL_TYPE_CPTR);
       dylib_val->c_ptr = dlopen(found_path,RTLD_NOW);
       if(!dylib_val->c_ptr) fprintf(stderr, "dlopen error: %s\n", dlerror()); // TODO: add proper error handling here LCOV_EXCL_LINE
@@ -690,7 +690,7 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
       fclose(fd);
 
       // if we had an error while evaluating the source code, return the error
-      if(result->type == BL_VAL_TYPE_ERROR) return result;
+      if(result->type == BL_VAL_TYPE_ERROR) return result; // LCOV_EXCL_LINE
 
       // otherwise, just bind it and return
       bl_ctx_set(ctx, bl_mk_symbol(module_name->s_val), new_ctx);

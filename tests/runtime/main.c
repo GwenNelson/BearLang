@@ -1094,6 +1094,31 @@ int test_join_str() {
     return 0;
 }
 
+int test_import_bl_file() {
+    char* tmpfile = "tmp.bl";
+    FILE* fd = fopen(tmpfile,"w");
+    fprintf(fd,"(= testsym True)\n");
+    fclose(fd);
+
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(import tmp)"));
+    ASSERT("imported successfully", result->type == BL_VAL_TYPE_CTX)
+    bl_val_t* testval = bl_ctx_get(result,bl_mk_symbol("testsym"));
+    ASSERT("testsym is present", testval->b_val)
+    tmpfile = "tmp2.bl";
+    fd      = fopen(tmpfile,"w");
+    fprintf(fd,"(import tmp)");
+    fclose(fd);
+
+    result = bl_ctx_eval(result,bl_parse_sexp("(import tmp2)"));
+    ASSERT("imported successfully", result->type == BL_VAL_TYPE_CTX)
+    testval = bl_ctx_get(result,bl_mk_symbol("tmp::testsym"));
+    ASSERT("testsym is present", testval->b_val)  
+
+
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1173,6 +1198,7 @@ int main(int argc, char** argv) {
     TEST("safe_strcat                                ", test_safe_strcat)
     TEST("split_str                                  ", test_split_str)
     TEST("join_str                                   ", test_join_str)
+    TEST("import .bl file                            ", test_import_bl_file)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

@@ -242,10 +242,11 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) { // LCOV_EXCL_LINE
      char* sym_key = tmp+strlen(ctx_key)+2;
      bl_val_t* other_ctx = bl_ctx_get(ctx, bl_mk_symbol(ctx_key));
      free(tmp);
+      // LCOV_EXCL_START
      if(other_ctx == NULL) { 
    	return NULL;
      }
-   
+     // LCOV_EXCL_STOP 
      return bl_ctx_get(other_ctx,bl_mk_symbol(sym_key));
 
    }
