@@ -1011,6 +1011,22 @@ int test_using_oper() {
     return 0;
 }
 
+int test_filtered_oper() {
+    bl_val_t* ctx    = bl_ctx_new_std();
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(filtered (1 2 3 4 5 6) (2 3 4))"));
+    ASSERT("filtered list is correct", strcmp(bl_ser_sexp(result),"(1 5 6)")==0)
+    return 0;
+}
+
+int test_foreach_oper() {
+    bl_val_t* ctx    = bl_ctx_new_std();
+    bl_ctx_eval(ctx,bl_parse_sexp("(= x 0)"));
+    bl_ctx_eval(ctx,bl_parse_sexp("(foreach i (1 2 3) (= x (+ x i)))"));
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("x"));
+    ASSERT("foreach works", strcmp(bl_ser_sexp(result),"6")==0)
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1083,6 +1099,8 @@ int main(int argc, char** argv) {
     TEST("docstring in functions                     ", test_docstr_fun)
     TEST("import invalid dynamic library module      ", test_invalid_dylib_import)
     TEST("using oper                                 ", test_using_oper)
+    TEST("filtered oper                              ", test_filtered_oper)
+    TEST("foreach oper                               ", test_foreach_oper)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

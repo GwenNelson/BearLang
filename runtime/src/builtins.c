@@ -16,6 +16,7 @@
 #include <stdbool.h>
 #include <libgen.h>
 
+// LCOV_EXCL_START
 bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* errtype = bl_list_first(params);
    bl_val_t* errval  = bl_ctx_eval(ctx,bl_list_second(params));
@@ -25,6 +26,8 @@ bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    retval->err_val.err_val = errval;
    return retval;
 }
+// LCOV_EXCL_STOP
+
 
 bl_val_t* bl_oper_foreach(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* sym  = bl_list_first(params);
@@ -760,6 +763,8 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    return bl_mk_str(first->docstr->s_val);
 }
 
+// LCOV_EXCL_START
+
 bl_val_t* bl_oper_dir (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* symname = bl_list_first(params);
    bl_val_t* symval  = bl_ctx_eval(ctx,bl_ctx_get(ctx,symname));
@@ -774,6 +779,7 @@ bl_val_t* bl_oper_dir (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    }
    return retval;
 }
+
 
 bl_val_t* bl_oper_mksym  (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    params = bl_ctx_eval(ctx,params);
@@ -794,3 +800,4 @@ bl_val_t* bl_oper_type (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    return bl_mk_type(bl_list_first(params)->type);
 }
 
+// LCOV_EXCL_STOP
