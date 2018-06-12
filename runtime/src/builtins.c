@@ -537,12 +537,13 @@ typedef bl_val_t* (*mod_init_fn)(bl_val_t*);
 bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      bl_val_t* first = bl_list_first(params);
      bl_val_t* module_name = first;
+     // LCOV_EXCL_START
      if(first->type == BL_VAL_TYPE_SYMBOL) {
         module_name = bl_ctx_get(ctx,first);
 	if(module_name == NULL) module_name = first;
 	if(module_name->type == BL_VAL_TYPE_CTX) return module_name;
      }
-
+     // LCOV_EXCL_STOP
 
      if(strstr(module_name->s_val,"::")) {
         char* tmp = strdup(module_name->s_val);
@@ -632,7 +633,10 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
       bl_ctx_set(new_ctx, bl_mk_symbol("*FILENAME*"), bl_mk_str(found_path));
       bl_ctx_set(ctx, bl_mk_symbol(module_name->s_val), new_ctx);
       return new_ctx;
-     } else { // .bl module time!
+     } 
+     // LCOV_EXCL_START
+     else { // .bl module time!
+ 	// TODO: add test here
       FILE* fd = fopen(found_path,"r");
       bl_val_t* new_ctx = bl_ctx_new(ctx);
       bl_ctx_set(new_ctx, bl_mk_symbol("*FILENAME*"), bl_mk_str(found_path));
@@ -644,6 +648,7 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
      }
      return bl_mk_null();
+     // LCOV_EXCL_STOP
 }
 
 // syntax
@@ -696,9 +701,11 @@ bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_serexp (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    params = bl_ctx_eval(ctx,params);
+   // LCOV_EXCL_START
    if(params->type == BL_VAL_TYPE_CONS) {
       if(bl_list_len(params)==1) params = bl_list_first(params);
    }
+   // LCOV_EXCL_STOP
    bl_val_t* retval = bl_mk_str(bl_ser_sexp(params));
    return retval;
 }
@@ -758,7 +765,8 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    }
 
 
-
+   // TODO: more testing here
+   // LCOV_EXCL_START
    if(first->docstr==NULL) {
       switch(first->type) {
 	  case BL_VAL_TYPE_CTX: return bl_mk_str(bl_ctx_get(first,bl_mk_symbol("DOC"))->s_val); break;
@@ -766,6 +774,7 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 	  default: return bl_mk_str(""); break;
       }
    }
+   // LCOV_EXCL_STOP
    return bl_mk_str(first->docstr->s_val);
 }
 
