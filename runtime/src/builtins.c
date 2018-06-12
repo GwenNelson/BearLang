@@ -759,12 +759,7 @@ bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* first = bl_list_first(params);
- 
-   if(first->type == BL_VAL_TYPE_SYMBOL) {
-      first = bl_ctx_eval(ctx,first);
-      if(first == NULL) return bl_mk_str("UNKNOWN SYMBOL");
-   }
-
+   first = bl_ctx_eval(ctx,first);
 
    // TODO: more testing here
    // LCOV_EXCL_START
@@ -807,7 +802,9 @@ bl_val_t* bl_oper_ctxget (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* symname = bl_list_first(params);
    bl_val_t* symval  = bl_ctx_eval(ctx,bl_ctx_get(ctx,symname));
    if(symval->type != BL_VAL_TYPE_CTX) return NULL;
-   return bl_ctx_get(symval,bl_list_second(params));
+   bl_val_t* second = bl_list_second(params);
+   if(second->type == BL_VAL_TYPE_CONS) second = bl_ctx_eval(ctx,second);
+   return bl_ctx_get(symval,second);
 }
 
 bl_val_t* bl_oper_type (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
