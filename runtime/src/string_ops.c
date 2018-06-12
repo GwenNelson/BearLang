@@ -8,6 +8,8 @@
 #include <bearlang/sexp.h>
 
 char* safe_strcat(char* a, char* b) { // LCOV_EXCL_LINE
+      if(a==NULL) return b;
+      if(b==NULL) return a;
       size_t a_len   = strlen(a);
       size_t b_len   = strlen(b);
       size_t new_len = a_len+b_len+1;
@@ -16,17 +18,27 @@ char* safe_strcat(char* a, char* b) { // LCOV_EXCL_LINE
       return retval;
 }
 
-char* tail_substr(char* s, char* sep) {
+char* join_str(bl_val_t* L, char* sep) { // LCOV_EXCL_LINE
+      char* retval = NULL;
+      bl_val_t* i=L;
+      for(i=L; i != NULL; i=i->cdr) {
+          if(retval!=NULL) retval = safe_strcat(retval,"::");
+	  retval = safe_strcat(retval,bl_ser_naked_sexp(i->car));
+      }
+      return retval;
+}
+
+char* tail_substr(char* s, char* sep) { // LCOV_EXCL_LINE
       char* ret = strstr(s, sep);
       if(ret==NULL) return NULL;
       *ret = '\0';
       return ret+strlen(sep);
 }
 
-bl_val_t* split_str(char* s, char* sep) {
+bl_val_t* split_str(char* s, char* sep) { // LCOV_EXCL_LINE
 	size_t s_len = strlen(s);
 	size_t sep_len = strlen(sep);
-	if(s_len == 0) return bl_mk_null();
+	if(s_len == 0) return bl_mk_null(); // LCOV_EXCL_LINE
 	if(s_len <= sep_len) return bl_mk_list(1,bl_mk_str(s));
 
 	size_t buf_len = s_len + sep_len + 1;

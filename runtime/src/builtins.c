@@ -6,6 +6,7 @@
 #include <bearlang/types.h>
 #include <bearlang/error_tools.h>
 #include <bearlang/utils.h>
+#include <bearlang/string_ops.h>
 
 #include <glob.h>
 #include <stdio.h>
@@ -218,7 +219,6 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
    char*     s = NULL;
    size_t    c = 0;
-   char*     buf = NULL;
 
    L = params;
    for(L=params; L!= NULL; L=L->cdr) {
@@ -228,11 +228,7 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
            	 retval->fix_int = retval->fix_int + x->fix_int;
 	    break;
 	    default:
-                 s = bl_ser_naked_sexp(x);
-		 c = strlen(s) + strlen(retval->s_val)+1;
-                 buf = GC_MALLOC(c);
-                 snprintf(buf,c,"%s%s", retval->s_val,s);
-		 retval->s_val = buf;
+		 retval->s_val = safe_strcat(retval->s_val,bl_ser_naked_sexp(x));
 	    break;
 	}
    }

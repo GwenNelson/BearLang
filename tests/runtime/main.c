@@ -1063,6 +1063,13 @@ int test_split_str() {
     return 0;
 }
 
+int test_join_str() {
+    bl_val_t* L = bl_mk_list(3,bl_mk_str("a"),bl_mk_str("b"),bl_mk_str("c"));
+    char* result = join_str(L,"::");
+    ASSERT("Correctly joined string", strcmp(result,"a::b::c")==0)
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1140,6 +1147,7 @@ int main(int argc, char** argv) {
     TEST("try oper                                   ", test_try_oper)
     TEST("safe_strcat                                ", test_safe_strcat)
     TEST("split_str                                  ", test_split_str)
+    TEST("join_str                                   ", test_join_str)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
