@@ -1027,6 +1027,19 @@ int test_foreach_oper() {
     return 0;
 }
 
+int test_try_oper() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* try_expr = bl_parse_sexp("(try (/ 2 0)"
+		                       "     (catch ERR_DIVIDE_BY_ZERO \"CAUGHT DIV0\"))");
+    bl_val_t* result = bl_ctx_eval(ctx,try_expr);
+    ASSERT("Catch works",strcmp(bl_ser_naked_sexp(result),"CAUGHT DIV0")==0)
+
+    try_expr = bl_parse_sexp("(try True)");
+    result   = bl_ctx_eval(ctx,try_expr);
+    ASSERT("Empty catch works", result->b_val==true)
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1101,6 +1114,7 @@ int main(int argc, char** argv) {
     TEST("using oper                                 ", test_using_oper)
     TEST("filtered oper                              ", test_filtered_oper)
     TEST("foreach oper                               ", test_foreach_oper)
+    TEST("try oper                                   ", test_try_oper)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
