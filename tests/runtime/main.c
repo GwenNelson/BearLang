@@ -577,6 +577,8 @@ int test_list_last() {
     bl_val_t* L = bl_mk_list(3,bl_mk_str("1"),bl_mk_str("2"),bl_mk_str("3"));
     bl_val_t* last = bl_list_last(L);
     ASSERT("correct last item", strcmp(bl_ser_naked_sexp(last),"3")==0)
+    last = bl_list_last(NULL);
+    ASSERT("last of NULL is NULL", last==NULL)
     return 0;
 }
 
