@@ -11,47 +11,16 @@
 #define uthash_malloc(sz) GC_MALLOC(sz)
 #define uthash_free(ptr,sz) 
 
-
-
 #define BL_LONGEST_LIST 0xFFFFFFFFFFFFFFFF
 
 typedef enum bl_val_type_t {
-        BL_VAL_TYPE_NULL=1,         // The None or NULL type
-        BL_VAL_TYPE_ERROR=2,        // Error / exception - if this is returned anywhere, something went wrong
-        BL_VAL_TYPE_SYMBOL=3,       // A BearLang symbol
-        BL_VAL_TYPE_NUMBER=4,       // A number
-	BL_VAL_TYPE_BOOL=5,         // A boolean value
-        BL_VAL_TYPE_STRING=6,       // A string
-	BL_VAL_TYPE_CONS=7,         // A cons cell (or a list)
-        BL_VAL_TYPE_OPER_NATIVE=8,  // A native-code operator
-	BL_VAL_TYPE_OPER_BL=9,      // A BearLang-code operator
-	BL_VAL_TYPE_FUNC_BL=10,     // A BearLang-code function (uncompiled)
-        BL_VAL_TYPE_FUNC_NATIVE=11, // A native-code function
-	BL_VAL_TYPE_CTX=12,         // A context
-	BL_VAL_TYPE_CPTR=13,        // For use by extension modules
-	BL_VAL_TYPE_ANY=14,         // Any type (only used for error handling etc)
-        BL_VAL_TYPE_LIST_END=15,    // used by the parser
-	BL_VAL_TYPE_OPER_DO=16,     // special form
-	BL_VAL_TYPE_OPER_IF=17,     // special form
-	BL_VAL_TYPE_OPER_WHILE=18,  // special form
-	BL_VAL_TYPE_DOCSTRING=19,   // docstrings
-	BL_VAL_TYPE_TYPE=20,	    // Reference to a type
-} bl_val_type_t;
+	BL_VAL_TYPE_NONE=0, // placeholder
 
-/*typedef enum bl_err_type_t {
-	BL_ERR_ANY=0,		     // Matches ANY error type
-	BL_ERR_UNKNOWN=1,            // Generic / unknown error
-	BL_ERR_PARSE=2,              // Failed to parse an s-expression
-	BL_ERR_INSUFFICIENT_ARGS=3,  // Not enough arguments were provided
-        BL_ERR_TOOMANY_ARGS=4,       // Too many arguments were provided
-	BL_ERR_INVALID_ARGTYPE=5,    // Invalid argument type(s) was/were provided
-	BL_ERR_SYMBOL_NOTFOUND=6,    // Attempted to evaluate an expression containing a symbol that wasn't found
-	BL_ERR_DIVIDE_BY_ZERO=7,     // Attempted to divide by zero
-	BL_ERR_CUSTOM=8,             // Custom error type - contains a human-readable string and a numeric error code
-	BL_ERR_IO=9,                 // Generic I/O error
-	BL_ERR_MODULE_NOTFOUND=10,   // Failed to find a module
-	BL_ERR_BL_CUSTOM=11,	     // Custom error type - contains a symbol and an arbitrary value
-} bl_err_type_t;*/
+#define ENUM_TYPE(type_name) BL_VAL_TYPE_ ## type_name,
+#define TYPE_X ENUM_TYPE
+#include <bearlang/data_types.inc>
+#undef TYPE_X
+} bl_val_type_t;
 
 typedef enum bl_err_type_t {
 #define ENUM_ERR(err_name, err_val) BL_ERR_ ## err_name = err_val,
