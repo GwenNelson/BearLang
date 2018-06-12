@@ -1026,6 +1026,13 @@ int test_using_oper() {
     bl_ctx_eval(ctx_b, bl_parse_sexp("(using ctx_a::*)"));
     result = bl_ctx_eval(ctx_b, bl_parse_sexp("b"));
     ASSERT("value a", strcmp(bl_ser_naked_sexp(result),"bar")==0)
+
+    result = bl_ctx_eval(ctx_a, bl_parse_sexp("(using doesnotexist::something)"));
+    ASSERT("error on nonexistent module", result->type == BL_VAL_TYPE_ERROR)
+
+    result = bl_ctx_eval(ctx_b, bl_parse_sexp("(using ctx_a::doesnotexist)"));
+    ASSERT("error on nonexistent symbol", result->type == BL_VAL_TYPE_ERROR)
+	
     return 0;
 }
 
