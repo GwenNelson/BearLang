@@ -38,7 +38,7 @@ typedef enum bl_val_type_t {
 	BL_VAL_TYPE_TYPE=20,	    // Reference to a type
 } bl_val_type_t;
 
-typedef enum bl_err_type_t {
+/*typedef enum bl_err_type_t {
 	BL_ERR_ANY=0,		     // Matches ANY error type
 	BL_ERR_UNKNOWN=1,            // Generic / unknown error
 	BL_ERR_PARSE=2,              // Failed to parse an s-expression
@@ -51,6 +51,14 @@ typedef enum bl_err_type_t {
 	BL_ERR_IO=9,                 // Generic I/O error
 	BL_ERR_MODULE_NOTFOUND=10,   // Failed to find a module
 	BL_ERR_BL_CUSTOM=11,	     // Custom error type - contains a symbol and an arbitrary value
+} bl_err_type_t;*/
+
+typedef enum bl_err_type_t {
+#define ENUM_ERR(err_name, err_val) BL_ERR_ ## err_name = err_val,
+
+#define ERR_X ENUM_ERR
+#include <bearlang/err_types.inc>
+#undef ERR_X
 } bl_err_type_t;
 
 // TODO: add all builtins as tokens to the lexer

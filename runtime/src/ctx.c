@@ -17,6 +17,8 @@
 
 #define ADD_BUILTIN(builtin_name,builtin_symbol,builtin_docstr) bl_ctx_set(retval,bl_mk_symbol(builtin_symbol), &native_oper_ ## builtin_name);
 
+#define ADD_ERR(err_name,err_val) bl_ctx_set(retval, bl_mk_symbol("ERR_" #err_name ), bl_mk_err(BL_ERR_ ## err_name));
+
 #define BUILTIN_X BUILTIN_STRUCT
 #include <bearlang/builtins.inc>
 #undef BUILTIN_X
@@ -58,17 +60,9 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
    bl_ctx_set(retval, bl_mk_symbol("TYPE_SYMBOL"), bl_mk_type(BL_VAL_TYPE_SYMBOL));
    bl_ctx_set(retval, bl_mk_symbol("TYPE_CTX"),    bl_mk_type(BL_VAL_TYPE_CTX));
 
-   bl_ctx_set(retval, bl_mk_symbol("ERR_ANY"),              bl_mk_err(BL_ERR_ANY));
-   bl_ctx_set(retval, bl_mk_symbol("ERR_UNKNOWN"),          bl_mk_err(BL_ERR_UNKNOWN));
-   bl_ctx_set(retval, bl_mk_symbol("ERR_PARSE"),            bl_mk_err(BL_ERR_PARSE));
-   bl_ctx_set(retval, bl_mk_symbol("ERR_INSUFFICIENT_ARGS"),bl_mk_err(BL_ERR_INSUFFICIENT_ARGS));
-   bl_ctx_set(retval, bl_mk_symbol("ERR_TOOMANY_ARGS"),     bl_mk_err(BL_ERR_TOOMANY_ARGS));
-   bl_ctx_set(retval, bl_mk_symbol("ERR_INVALID_ARGTYPE"),  bl_mk_err(BL_ERR_INVALID_ARGTYPE));
-   bl_ctx_set(retval, bl_mk_symbol("ERR_SYMBOL_NOTFOUND"),  bl_mk_err(BL_ERR_SYMBOL_NOTFOUND));
-   bl_ctx_set(retval, bl_mk_symbol("ERR_DIVIDE_BY_ZERO"),   bl_mk_err(BL_ERR_DIVIDE_BY_ZERO));
-   bl_ctx_set(retval, bl_mk_symbol("ERR_CUSTOM"),           bl_mk_err(BL_ERR_CUSTOM));
-   bl_ctx_set(retval, bl_mk_symbol("ERR_IO"),               bl_mk_err(BL_ERR_IO));
-   bl_ctx_set(retval, bl_mk_symbol("ERR_MODULE_NOTFOUND"),  bl_mk_err(BL_ERR_MODULE_NOTFOUND));
+#define ERR_X ADD_ERR
+#include <bearlang/err_types.inc>
+#undef ERR_X
 
    return retval;
 }
