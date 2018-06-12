@@ -706,38 +706,37 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 bl_val_t* bl_oper_using(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* sym = bl_list_first(params);
    char* s = sym->s_val;
-   char* last = strrchr(s,':');
-   bl_val_t* bindsym = NULL;
-   if(last != NULL) {
-      if(last != s) {
-         last--;
-         if(last[0]==':') {
-            bindsym = bl_mk_symbol(last+2);
-            if(strcmp(bindsym->s_val,"*")==0) {
-               last[0] = '\0';
-               bl_val_t* other_ctx = bl_ctx_get(ctx,bl_mk_symbol(s));
-               if(other_ctx->type == BL_VAL_TYPE_ERROR) return other_ctx;
-               int i=0;
-               for(i=0; i<other_ctx->vals_count; i++) {
-                   if(other_ctx->vals[i] != NULL) {
-                      bl_ctx_set(ctx,other_ctx->keys[i],other_ctx->vals[i]);
-                   }
-               }
- 	       return bl_mk_null();
-            } else {
-               last[0] = '\0';
-               bl_val_t* other_ctx = bl_ctx_get(ctx,bl_mk_symbol(s));
-               if(other_ctx->type == BL_VAL_TYPE_ERROR) return other_ctx;
-               bl_val_t* bindval = bl_ctx_get(other_ctx,bindsym);
-	       if(bindval == NULL) return other_ctx;
-               if(bindval->type == BL_VAL_TYPE_ERROR) return bindval;
-               bl_ctx_set(ctx,bindsym,bindval);
-            }
-            
-         }
-      }
+   bl_val_t* split = split_str(s,"::");
+   bl_val_t* lastsym  = bl_mk_symbol(bl_list_last(split)->s_val); // this is the symbol we're importing, or *
+
+   // get the whole split list except for the last bit
+   bl_val_t* rev_split = bl_list_reverse(split);
+   bl_val_t* all_but_last = bl_list_reverse(bl_list_rest(rev_split));
+
+   // turn it back into one symbol so we can grab the ctx, not very efficient, but doesn't need to be
+   // also far simpler to read and debug
+   bl_val_t* other_ctx_sym = bl_mk_symbol(join_str(all_but_last,"::"));
+
+   // get the other ctx
+   bl_val_t* other_ctx = bl_ctx_get(ctx,other_ctx_sym);
+   if(other_ctx == NULL) return bl_err_modnotfound(other_ctx_sym->s_val);
+
+   // if lastsym is *, we grab all symbols from the other ctx and import them
+   // otherwise, we just import the one symbol
+   if(strcmp(lastsym->s_val,"*")==0) {
+     int i=0;
+     for(i=0; i < other_ctx->vals_count; i++) {
+         if(other_ctx->vals[i] != NULL) {
+            bl_ctx_set(ctx,other_ctx->keys[i],other_ctx->vals[i]);
+	 }
+     }
+     return bl_mk_null();
+   } else {
+     bl_val_t* symval = bl_ctx_get(other_ctx,lastsym);
+     if(symval == NULL) return bl_err_symnotfound(lastsym->s_val); // if not found, return suitable error
+     bl_ctx_set(ctx,lastsym,symval); // bind into current ctx
+     return symval;
    }
-   return bl_ctx_get(ctx,sym);
 }
 
 bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
