@@ -29,11 +29,11 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
 
    if(path_env != NULL) { // LCOV_EXCL_BR_LINE
       path_env = strdup(getenv("BEARLANGPATH"));
-      bl_val_t* path_val = NULL;
+      bl_val_t* path_val = NULL; // LCOV_EXCL_LINE
       char* path_dir;
       char* rest = path_env;
-      while((path_dir = strtok_r(rest, ":", &rest))) {
-         path_val = bl_list_append(path_val,bl_mk_str(path_dir));
+      while((path_dir = strtok_r(rest, ":", &rest))) { // LCOV_EXCL_LINE
+         path_val = bl_list_append(path_val,bl_mk_str(path_dir)); // LCOV_EXCL_LINE
       }
       bl_ctx_set(retval,bl_mk_symbol("*PATH*"), path_val);
    } else {
