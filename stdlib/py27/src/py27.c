@@ -5,16 +5,19 @@
 #include <bearlang/list_ops.h>
 #include <Python.h>
 
-bl_val_t* py_run_str(bl_val_t* ctx, bl_val_t* params) {
-     params = bl_ctx_eval(ctx,params);
-     bl_val_t* s = bl_list_first(params);
-     PyRun_SimpleString(s->s_val);
-     return bl_mk_null();
+PyObject *m;
+
+bl_val_t* py_get(bl_val_t* ctx, bl_val_t* sym) {
+     char* sym_name  = sym->s_val;
+     PyObject* pyobj = PyObject_GetAttrString(m,sym_name);
+     if(pyobj==NULL) return NULL;
+     return bl_mk_ptr(pyobj);
 }
 
 bl_val_t* bl_mod_init(bl_val_t* ctx) {
      Py_Initialize();
+     m = PyImport_AddModule("__main__");
      bl_val_t* my_ctx = bl_ctx_new(ctx);
-     bl_ctx_set(my_ctx,bl_mk_symbol("py_run_str"),bl_mk_native_oper(&py_run_str));
+     my_ctx->ctx_get  = &py_get;
      return my_ctx;
 }

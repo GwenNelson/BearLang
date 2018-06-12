@@ -578,12 +578,13 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
         mod_dirname  = dirname(mod_filename_s);
      }
      free(mod_filename_s);
-     char* pattern;
-     char* buf = GC_MALLOC_ATOMIC(4);
+     char* pattern = "";
+     char* buf = GC_MALLOC_ATOMIC(2);
      buf[0] = '{';
+     buf[1] = 0;
      if(mod_dirname != NULL) {
         if(strlen(mod_dirname)>0) { // LCOV_EXCL_BR_LINE
-           buf = GC_MALLOC_ATOMIC(strlen(pattern)+strlen(mod_dirname)+4);
+           buf = GC_MALLOC_ATOMIC(strlen(pattern)+strlen(mod_dirname));
            sprintf(buf,"{%s,", mod_dirname);
         }
      }
