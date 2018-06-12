@@ -570,7 +570,7 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      bl_val_t* cur_path     = bl_ctx_get(ctx,bl_mk_symbol("*PATH*"));
      bl_val_t* mod_filename = bl_ctx_get(ctx,bl_mk_symbol("*FILENAME*"));
      if(cur_path==NULL)     cur_path = bl_mk_str("."); // LCOV_EXCL_BR_LINE
-     if(mod_filename==NULL) mod_filename = bl_mk_str("."); // LCOV_EXCL_BR_LINE
+     if(mod_filename==NULL) mod_filename = bl_mk_str(""); // LCOV_EXCL_BR_LINE
 
      char* mod_filename_s = strdup(mod_filename->s_val);
      char* mod_dirname = NULL;
