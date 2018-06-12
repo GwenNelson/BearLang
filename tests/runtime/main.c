@@ -940,8 +940,13 @@ int test_import_testmod() {
     char* test_str = (char*)ptr;
     ASSERT("ptr as string is correct", strcmp(test_str,"TEST STRING")==0)
     bl_val_t* nested = bl_ctx_eval(ctx,bl_parse_sexp("(import testmod::nested)"));
-    printf("nested: %s\n", bl_ser_sexp(nested));
     ASSERT("nested imported ok", nested->type == BL_VAL_TYPE_CTX)
+    bl_val_t* nested_str = bl_ctx_get(ctx, bl_mk_symbol("nested::teststr"));
+    ASSERT("nested string correct", strcmp(nested_str->s_val,"TEST STRING2")==0)
+    bl_val_t* nested2 = bl_ctx_eval(ctx,bl_parse_sexp("(import testmod::nested::nested2)"));
+    ASSERT("nested2 imported ok", nested2->type == BL_VAL_TYPE_CTX)
+    bl_val_t* nested2_str = bl_ctx_get(ctx, bl_mk_symbol("nested2::teststr2"));
+    ASSERT("nested2 string correct", strcmp(nested2_str->s_val,"TEST STRING3")==0)
     return 0;
 }
 

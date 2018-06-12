@@ -40,6 +40,17 @@ bl_val_t* bl_list_prepend(bl_val_t* L, bl_val_t* val) { // LCOV_EXCL_LINE
    return retval;
 }
 
+bl_val_t* bl_list_last(bl_val_t* L) { // LCOV_EXCL_LINE
+   if(L==NULL) {
+      return L;
+   }
+   
+   while(L->cdr != NULL) {
+      L = L->cdr;
+   }
+   return L->car;
+}
+
 bl_val_t* bl_list_append(bl_val_t* L, bl_val_t* val) { // LCOV_EXCL_LINE
 
    if(L==NULL) {

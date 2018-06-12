@@ -10,6 +10,7 @@ bl_val_t* bl_list_second(bl_val_t* L);
 bl_val_t* bl_list_third(bl_val_t* L);
 bl_val_t* bl_list_rest(bl_val_t* L);
 
+bl_val_t* bl_list_last(bl_val_t* L);
 bl_val_t* bl_list_append(bl_val_t* L, bl_val_t* val);
 bl_val_t* bl_list_prepend(bl_val_t* L, bl_val_t* val);
 

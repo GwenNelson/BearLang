@@ -534,6 +534,40 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      bl_val_t* first = bl_list_first(params);
      bl_val_t* module_name = first;
      bl_val_t* new_ctx;
+
+
+
+     // check if we're importing a module from another module
+     if(strstr(module_name->s_val,"::")!=NULL) {
+        bl_val_t* split = split_str(module_name->s_val,"::");
+	char* other_ctx_name = split->car->s_val;
+	bl_val_t* other_ctx_sym = bl_mk_symbol(other_ctx_name); 
+	bl_val_t* other_ctx     = bl_ctx_get(ctx,other_ctx_sym);
+
+	if(other_ctx==NULL) {
+           return bl_err_modnotfound(other_ctx_name); // the first entry in the list is the parent module, if it isn't present return an error
+        }
+
+        char* other_ctx_kname;
+	bl_val_t* other_ctx_key;
+
+	if(bl_list_len(split)>2) { // we just recurse into the list, because it's nested >2 layers
+           other_ctx_kname  = join_str(split->cdr,"::");
+           other_ctx_key = bl_mk_symbol(other_ctx_kname);
+           new_ctx = bl_oper_import(other_ctx,bl_mk_list(1,other_ctx_key));
+	
+	} else {
+           other_ctx_kname = split->cdr->car->s_val;
+           other_ctx_key = bl_mk_symbol(other_ctx_kname);
+	   new_ctx = bl_ctx_get(other_ctx,other_ctx_key);
+
+	}
+	   if(new_ctx == NULL) return bl_err_modnotfound(other_ctx_kname);
+	   bl_ctx_set(ctx, bl_mk_symbol(bl_list_last(split)->s_val), new_ctx);
+	   return new_ctx;
+     }
+
+     // see if we already imported, and if so just return the already imported module
      // LCOV_EXCL_START
      if(first->type == BL_VAL_TYPE_SYMBOL) {
         module_name = bl_ctx_get(ctx,first);
@@ -542,88 +576,94 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      }
      // LCOV_EXCL_STOP
 
-     if(strstr(module_name->s_val,"::")) {
-        bl_val_t* split = split_str(module_name->s_val,"::");
-	char* other_ctx_name = split->car->s_val;
-	bl_val_t* other_ctx_sym = bl_mk_symbol(other_ctx_name); 
-	bl_val_t* other_ctx     = bl_ctx_get(ctx,other_ctx_sym);
-        if(other_ctx==NULL) {
-           return bl_err_modnotfound(other_ctx_name);
-        }
-        char* other_ctx_kname;
-	bl_val_t* other_ctx_key;
-	if(bl_list_len(split)>2) {
-           other_ctx_kname  = join_str(split->cdr,"::");
-           other_ctx_key = bl_mk_symbol(other_ctx_kname);
-           return bl_oper_import(other_ctx,bl_mk_list(1,other_ctx_key));
-	} else {
-           other_ctx_kname = split->cdr->s_val;
-           other_ctx_key = bl_mk_symbol(other_ctx_kname);
-           new_ctx = bl_ctx_get(other_ctx,other_ctx_key);
-	   if(new_ctx == NULL) return bl_err_modnotfound(other_ctx_key);
-	   bl_ctx_set(ctx, other_ctx_key, new_ctx);
-	   return new_ctx;
-	}
-     }
 
+     // if we get here, we need to glob for the module lib or source
 
      glob_t globbuf;
 
      bl_val_t* p_i;
      int i=0;
+
+     // get the current path and module filename, and if not set, set some defaults
      bl_val_t* cur_path     = bl_ctx_get(ctx,bl_mk_symbol("*PATH*"));
      bl_val_t* mod_filename = bl_ctx_get(ctx,bl_mk_symbol("*FILENAME*"));
      if(cur_path==NULL)     cur_path = bl_mk_str("."); // LCOV_EXCL_BR_LINE
      if(mod_filename==NULL) mod_filename = bl_mk_str(""); // LCOV_EXCL_BR_LINE
 
+     // get the directory where the currently running module is located, we need this so that modules can do relative imports
      char* mod_filename_s = strdup(mod_filename->s_val);
      char* mod_dirname = NULL;
      if(strlen(mod_filename_s)>0) {
         mod_dirname  = dirname(mod_filename_s);
      }
      free(mod_filename_s);
-     char* pattern = "";
-     char* buf = GC_MALLOC_ATOMIC(2);
-     buf[0] = '{';
-     buf[1] = 0;
+
+     // start building the glob pattern, starting with the directory where the current module is located
+     char* pattern = "{";
      if(mod_dirname != NULL) {
         if(strlen(mod_dirname)>0) { // LCOV_EXCL_BR_LINE
-           buf = GC_MALLOC_ATOMIC(strlen(pattern)+strlen(mod_dirname));
-           sprintf(buf,"{%s,", mod_dirname);
-        }
+           pattern = safe_strcat(pattern,mod_dirname);
+           pattern = safe_strcat(pattern,",");
+	}
      }
 
-     pattern = buf;
+     // add the directories listed in *PATH*
      for(p_i=cur_path; p_i != NULL; p_i = p_i->cdr) {
-         buf = GC_MALLOC_ATOMIC(strlen(pattern)+strlen(p_i->car->s_val)+4);
-         sprintf(buf,"%s%s,",pattern,p_i->car->s_val);
-         pattern = buf;
+         pattern = safe_strcat(pattern,p_i->car->s_val);
+	 pattern = safe_strcat(pattern,",");
      }
+
+     // close the bracket for directories and start building rest of pattern (filenames)
      pattern[strlen(pattern)-1] = '}';
-     buf = GC_MALLOC_ATOMIC(strlen(pattern)+1024);
-     snprintf(buf,strlen(pattern)+1024,"%s/{%s.bl,lib%s.so,lib%s.dylib,%s/module.bl,%s/lib%s.so,%s/lib%s.dylib}",pattern,module_name->s_val,
-		                          module_name->s_val,module_name->s_val,module_name->s_val,module_name->s_val,module_name->s_val,
-					  module_name->s_val,module_name->s_val);
-     pattern = buf;
+     pattern = safe_strcat(pattern,"/{");
+     
+     // <module>.bl
+     pattern = safe_strcat(pattern,module_name->s_val);
+     pattern = safe_strcat(pattern,".bl,");
+
+     // lib<module>.so / .dylib
+     pattern = safe_strcat(pattern,"lib");
+     pattern = safe_strcat(pattern,module_name->s_val);
+     pattern = safe_strcat(pattern,"{.dylib,.so},");
+
+     // <module>/module.bl
+     pattern = safe_strcat(pattern,module_name->s_val);
+     pattern = safe_strcat(pattern,"/module.bl,");
+
+     // <module>/lib<module>.so / .dylib
+     pattern = safe_strcat(pattern,module_name->s_val);
+     pattern = safe_strcat(pattern,"/lib");
+     pattern = safe_strcat(pattern,module_name->s_val);
+     pattern = safe_strcat(pattern,"{.dylib,.so}");
+
+     // close up
+     pattern = safe_strcat(pattern,"}");
+
+     // at this point, the glob pattern is something like {.,./stdlib}/{libhello{.so,.dylib},hello/module.bl,hello/libhello{.so,.dylib}}
+     // that glob pattern should match any possible source for the module
+
      char* found_path = "";
      glob(pattern,GLOB_TILDE|GLOB_MARK|GLOB_BRACE,NULL,&globbuf);
          for(i=0; i<globbuf.gl_pathc; i++) {
              if(globbuf.gl_pathv[i][strlen(globbuf.gl_pathv[i])-1] != '/') {  // LCOV_EXCL_BR_LINE
 		     found_path = GC_MALLOC_ATOMIC(4096);
 	             snprintf(found_path,4096,"%s",globbuf.gl_pathv[i]);
-                     break;
+                     break; // break out on first match to preserve path priority
              }
 	 } // LCOV_EXCL_LINE
 	 globfree(&globbuf);
+
      if(strlen(found_path)==0) {
-        return bl_err_modnotfound(module_name->s_val);
+        return bl_err_modnotfound(module_name->s_val); // if glob failed, return an error
      }
 
+     // get the file extension so we can figure out the appropriate way to import
      char* fname = GC_MALLOC_ATOMIC(4096);
      snprintf(fname,4096,"%s", found_path);
      fname = basename(fname);
      char* fext = strrchr(fname, '.')+1;
-     if(strcmp(fext,"dylib")==0 || strcmp(fext,"so")==0) { // dlopen time! // LCOV_EXCL_BR_LINE
+
+     if(strcmp(fext,"dylib")==0 || strcmp(fext,"so")==0) { // dlopen time!
       bl_val_t* dylib_val = bl_mk_val(BL_VAL_TYPE_CPTR);
       dylib_val->c_ptr = dlopen(found_path,RTLD_NOW);
       if(!dylib_val->c_ptr) fprintf(stderr, "dlopen error: %s\n", dlerror()); // TODO: add proper error handling here LCOV_EXCL_LINE
@@ -634,26 +674,31 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 	 ret_err->err_val.errmsg = strdup(err);
 	 return ret_err;
       }
+
+      // assuming the above all worked ok, we now just init the module, bind it and return
       new_ctx = mod_init(ctx);
       bl_ctx_set(new_ctx, bl_mk_symbol("*FILENAME*"), bl_mk_str(found_path));
       bl_ctx_set(ctx, bl_mk_symbol(module_name->s_val), new_ctx);
       return new_ctx;
-     } 
-     // LCOV_EXCL_START
-     else { // .bl module time!
- 	// TODO: add test here
+
+     } else { // .bl module time!
+
       FILE* fd = fopen(found_path,"r");
       bl_val_t* new_ctx = bl_ctx_new(ctx);
       bl_ctx_set(new_ctx, bl_mk_symbol("*FILENAME*"), bl_mk_str(found_path));
-      bl_eval_file(new_ctx, fname, fd);
+      bl_val_t* result = bl_eval_file(new_ctx, fname, fd);
       fclose(fd);
 
+      // if we had an error while evaluating the source code, return the error
+      if(result->type == BL_VAL_TYPE_ERROR) return result;
+
+      // otherwise, just bind it and return
       bl_ctx_set(ctx, bl_mk_symbol(module_name->s_val), new_ctx);
       return new_ctx;
 
      }
-     return bl_mk_null();
-     // LCOV_EXCL_STOP
+     return bl_err_modnotfound(module_name->s_val); // we should never actually hit this, but if we do something went badly wrong and the import definitely failed
+
 }
 
 // syntax
