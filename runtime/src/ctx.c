@@ -24,6 +24,8 @@
 #undef BUILTIN_X
 
 
+#define ADD_TYPE(type_name) bl_ctx_set(retval, bl_mk_symbol("TYPE_" #type_name ), bl_mk_type(BL_VAL_TYPE_ ## type_name));
+
 bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
 
    bl_val_t* retval = bl_ctx_new(NULL);
@@ -57,8 +59,10 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
    bl_ctx_set(retval, bl_mk_symbol("True"),  bl_mk_bool(true));
    bl_ctx_set(retval, bl_mk_symbol("False"), bl_mk_bool(false));
 
-   bl_ctx_set(retval, bl_mk_symbol("TYPE_SYMBOL"), bl_mk_type(BL_VAL_TYPE_SYMBOL));
-   bl_ctx_set(retval, bl_mk_symbol("TYPE_CTX"),    bl_mk_type(BL_VAL_TYPE_CTX));
+#define TYPE_X ADD_TYPE
+#include <bearlang/data_types.inc>
+#undef TYPE_X
+
 
 #define ERR_X ADD_ERR
 #include <bearlang/err_types.inc>

@@ -53,7 +53,7 @@ static void ev_handler(struct mg_connection *c, int ev, void *p) {
     // We have received an HTTP request. Parsed request is contained in `hm`.
     // Send HTTP reply to the client which shows full original request.
     mg_send_head(c, 200, (int64_t)resp_obj->content_len, "Content-Type: text/html");
-    mg_printf(c, resp_obj->html_content);
+    mg_printf(c, "%s", resp_obj->html_content);
   }
 }
 
