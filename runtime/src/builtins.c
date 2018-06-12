@@ -667,7 +667,11 @@ bl_val_t* bl_oper_using(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
                }
  	       return bl_mk_null();
             } else {
-               bl_val_t* bindval = bl_ctx_get(ctx,sym);
+               last[0] = '\0';
+               bl_val_t* other_ctx = bl_ctx_get(ctx,bl_mk_symbol(s));
+               if(other_ctx->type == BL_VAL_TYPE_ERROR) return other_ctx;
+               bl_val_t* bindval = bl_ctx_get(other_ctx,bindsym);
+	       if(bindval == NULL) return other_ctx;
                if(bindval->type == BL_VAL_TYPE_ERROR) return bindval;
                bl_ctx_set(ctx,bindsym,bindval);
             }
