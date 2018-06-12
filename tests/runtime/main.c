@@ -1112,7 +1112,7 @@ int test_import_bl_file() {
 
     result = bl_ctx_eval(result,bl_parse_sexp("(import tmp2)"));
     ASSERT("imported successfully", result->type == BL_VAL_TYPE_CTX)
-    testval = bl_ctx_get(result,bl_mk_symbol("tmp2::testsym"));
+    testval = bl_ctx_get(result,bl_mk_symbol("testsym"));
 
     ASSERT("testsym is present", testval->b_val)  
 
