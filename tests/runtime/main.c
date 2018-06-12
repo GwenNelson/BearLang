@@ -939,6 +939,9 @@ int test_import_testmod() {
     ASSERT("ptr is not NULL", ptr != NULL)
     char* test_str = (char*)ptr;
     ASSERT("ptr as string is correct", strcmp(test_str,"TEST STRING")==0)
+    bl_val_t* nested = bl_ctx_eval(ctx,bl_parse_sexp("(import testmod::nested)"));
+    printf("nested: %s\n", bl_ser_sexp(nested));
+    ASSERT("nested imported ok", nested->type == BL_VAL_TYPE_CTX)
     return 0;
 }
 

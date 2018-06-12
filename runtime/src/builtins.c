@@ -533,6 +533,7 @@ typedef bl_val_t* (*mod_init_fn)(bl_val_t*);
 bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      bl_val_t* first = bl_list_first(params);
      bl_val_t* module_name = first;
+     bl_val_t* new_ctx;
      // LCOV_EXCL_START
      if(first->type == BL_VAL_TYPE_SYMBOL) {
         module_name = bl_ctx_get(ctx,first);
@@ -542,20 +543,27 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      // LCOV_EXCL_STOP
 
      if(strstr(module_name->s_val,"::")) {
-        char* tmp = strdup(module_name->s_val);
-        strstr(tmp,"::")[0]='\0';
-        char* ctx_key = tmp;
-        char* tmp2 = strdup(module_name->s_val);
-        char* sym_key = strstr(tmp2,"::")+2;
-        bl_val_t* ctx_key_sym = bl_mk_symbol(ctx_key);
-        bl_val_t* other_ctx = bl_ctx_get(ctx, ctx_key_sym);
-        free(tmp);
-        free(tmp2);
-        if(other_ctx == NULL) { 
-           return bl_err_modnotfound(ctx_key_sym->s_val);
+        bl_val_t* split = split_str(module_name->s_val,"::");
+	char* other_ctx_name = split->car->s_val;
+	bl_val_t* other_ctx_sym = bl_mk_symbol(other_ctx_name); 
+	bl_val_t* other_ctx     = bl_ctx_get(ctx,other_ctx_sym);
+        if(other_ctx==NULL) {
+           return bl_err_modnotfound(other_ctx_name);
         }
-        return bl_oper_import(other_ctx,bl_mk_list(1,bl_mk_symbol(sym_key)));
-
+        char* other_ctx_kname;
+	bl_val_t* other_ctx_key;
+	if(bl_list_len(split)>2) {
+           other_ctx_kname  = join_str(split->cdr,"::");
+           other_ctx_key = bl_mk_symbol(other_ctx_kname);
+           return bl_oper_import(other_ctx,bl_mk_list(1,other_ctx_key));
+	} else {
+           other_ctx_kname = split->cdr->s_val;
+           other_ctx_key = bl_mk_symbol(other_ctx_kname);
+           new_ctx = bl_ctx_get(other_ctx,other_ctx_key);
+	   if(new_ctx == NULL) return bl_err_modnotfound(other_ctx_key);
+	   bl_ctx_set(ctx, other_ctx_key, new_ctx);
+	   return new_ctx;
+	}
      }
 
 
@@ -626,7 +634,7 @@ bl_val_t* bl_oper_import(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 	 ret_err->err_val.errmsg = strdup(err);
 	 return ret_err;
       }
-      bl_val_t* new_ctx = mod_init(ctx);
+      new_ctx = mod_init(ctx);
       bl_ctx_set(new_ctx, bl_mk_symbol("*FILENAME*"), bl_mk_str(found_path));
       bl_ctx_set(ctx, bl_mk_symbol(module_name->s_val), new_ctx);
       return new_ctx;
