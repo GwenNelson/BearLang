@@ -787,7 +787,7 @@ bl_val_t* bl_oper_ctxget (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* symname = bl_list_first(params);
    bl_val_t* symval  = bl_ctx_eval(ctx,bl_ctx_get(ctx,symname));
    if(symval->type != BL_VAL_TYPE_CTX) return NULL;
-   return bl_ctx_get(symval,bl_ctx_eval(ctx,bl_list_second(params)));
+   return bl_ctx_get(symval,bl_list_second(params));
 }
 
 bl_val_t* bl_oper_type (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
