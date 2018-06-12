@@ -8,6 +8,7 @@
 #include <bearlang/types.h>
 #include <bearlang/sexp.h>
 #include <bearlang/list_ops.h>
+#include <bearlang/string_ops.h>
 #include <bearlang/error_tools.h>
 #include <bearlang/ctx.h>
 #include <bearlang/utils.h>
@@ -1040,6 +1041,28 @@ int test_try_oper() {
     return 0;
 }
 
+int test_safe_strcat() {
+    char* a = "foo";
+    char* b = "bar";
+    char* result = safe_strcat(a,b);
+    ASSERT("correct result", strcmp(result,"foobar")==0)
+    return 0;
+}
+
+int test_split_str() {
+    bl_val_t* result = split_str("meow::foo::bar::1::2","::");
+    ASSERT("correct split result", strcmp(bl_ser_sexp(result),"(\"meow\" \"foo\" \"bar\" \"1\" \"2\")")==0)
+    result = split_str("a::b::c::","::");
+    ASSERT("correct split result", strcmp(bl_ser_sexp(result),"(\"a\" \"b\" \"c\")")==0)
+    result = split_str("::a::b::c::","::");
+    ASSERT("correct split result", strcmp(bl_ser_sexp(result),"(\"\" \"a\" \"b\" \"c\")")==0)
+    result = split_str("a::b::c:d","::");
+    ASSERT("correct split result", strcmp(bl_ser_sexp(result),"(\"a\" \"b\" \"c:d\")")==0)
+    result = split_str("a",":::");
+    ASSERT("correct split result", strcmp(bl_ser_sexp(result),"(\"a\")")==0)
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1115,6 +1138,8 @@ int main(int argc, char** argv) {
     TEST("filtered oper                              ", test_filtered_oper)
     TEST("foreach oper                               ", test_foreach_oper)
     TEST("try oper                                   ", test_try_oper)
+    TEST("safe_strcat                                ", test_safe_strcat)
+    TEST("split_str                                  ", test_split_str)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
