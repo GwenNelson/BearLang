@@ -24,6 +24,11 @@ find_package (LLVM REQUIRED CONFIG)
 
 file(GLOB RUNTIME_SOURCE "runtime/src/*.c")
 
+set(STDLIB_PATH ${CMAKE_SOURCE_DIR}/stdlib)
+set(STDLIB_PATH2 ${CMAKE_CURRENT_BINARY_DIR}/stdlib)
+
+configure_file(${CMAKE_SOURCE_DIR}/include/bearlang/build_config.h.in bl_build_config.h @ONLY)
+
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${LIBGC_INCLUDE_DIR})
 include_directories(${Readline_INCLUDE_DIR})
