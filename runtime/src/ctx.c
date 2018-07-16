@@ -46,7 +46,7 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
    }
    free(path_env);
 
-   bl_ctx_set(retval,bl_mk_symbol("*VERSION*"), bl_mk_str("0.WHATEVER")); // TODO - change this and use a real versioning system
+   bl_ctx_set(retval,bl_mk_symbol("*VERSION*"), bl_mk_str(BL_VERSION)); // TODO - change this and use a real versioning system
    bl_ctx_set(retval,   bl_mk_symbol( "None"), bl_mk_null());
 #define BUILTIN_X ADD_BUILTIN
 #include <bearlang/builtins.inc>

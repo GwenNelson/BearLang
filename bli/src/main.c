@@ -10,6 +10,7 @@
 #include <bearlang/error_tools.h>
 #include <bearlang/utils.h>
 #include <bearlang/list_ops.h>
+#include <bl_build_config.h>
 
 #include <readline/readline.h>
 
@@ -71,7 +72,7 @@ int main(int argc, char** argv) {
        return 0;
     }
 
-    printf("BearLang Version 0.WHATEVER\n\n"); // TODO: add versioning
+    printf("BearLang Version %s\n\n",BL_VERSION);
 
     bl_val_t* STDLIB_CTX = bl_ctx_new_std();
     bl_val_t* REPL_CTX   = bl_ctx_new(STDLIB_CTX);
@@ -80,8 +81,8 @@ int main(int argc, char** argv) {
     bl_ctx_set(REPL_CTX,bl_mk_symbol("*FILENAME*"), bl_mk_str(""));
     bl_ctx_set(REPL_CTX,bl_mk_symbol("quit"), bl_mk_native_oper(&quit_cmd));
 
-//    bl_ctx_eval(REPL_CTX,bl_parse_sexp("(import bldoc)"));
-//    bl_ctx_eval(REPL_CTX,bl_parse_sexp("(using bldoc::help)"));
+    bl_ctx_eval(REPL_CTX,bl_parse_sexp("(import bldoc)"));
+    bl_ctx_eval(REPL_CTX,bl_parse_sexp("(using bldoc::help)"));
 
     char* errmsg;
     for(;;) {
