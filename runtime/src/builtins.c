@@ -37,9 +37,9 @@ bl_val_t* bl_oper_aget(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* L_car;
    for(; L != NULL; L=L->cdr) {
        L_car = L->car;
-       if(L_car->type != BL_VAL_TYPE_CONS) {
+       if(L_car->type != BL_VAL_TYPE_CONS) { // LCOV_EXCL_START
           return bl_mk_err(BL_ERR_PARSE);
-       }
+       } // LCOV_EXCL_STOP
        if(strcmp(L_car->car->s_val,sym->s_val)==0) retval = bl_list_second(L_car);
    }
    return retval;
