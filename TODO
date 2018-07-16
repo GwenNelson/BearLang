@@ -1,3 +1,11 @@
+For first release (0.1):
+	* Documentation for all of stdlib
+	* Examples for each stdlib module
+	* Ability to implement simple web app
+	* Documentation browser via simpleweb
+	* 100% test coverage on all code
+	* Fix numeric situation - switch back to bignum
+
 Add BearLang tests (as in, test suite written in BearLang instead of just plain C)
 Add mechanism for error values to go up the stack until hitting a handler
 Add argc/argv global symbols in bli
