@@ -1,0 +1,37 @@
+; vim: filetype=Lisp
+
+(= DOC """
+NAME
+	web - web framework for BearLang
+
+DESCRIPTION
+	This module builds on top of simpleweb and provides a usable web framework for BearLang.
+""")
+
+(import simpleweb)
+(import xml)
+
+(using xml::x)
+
+(fun missing_handler (method url body)
+     (simpleweb::html_response (x::html
+				 (x::head (x::title "404 - Not found"))
+				 (x::body (x::p "File not found!")))))
+
+(fun  get_handler (urls) """
+	(get_handler urls)
+		Returns a handle function for the specified URLs list
+
+		URLs list should map URL prefixes to handler functions
+	"""
+	(fun internal_handler (method url body)
+	     (= retval (aget url urls))
+             (print "Got URL" url ", \n" (doc retval))
+             (try 
+                (retval method url body)
+		(catch ERR_SYMBOL_NOTFOUND (missing_handler method url body))
+		)
+	        
+	     )
+	internal_handler)
+
