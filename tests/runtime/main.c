@@ -1120,6 +1120,17 @@ int test_import_bl_file() {
     return 0;
 }
 
+int test_aget_oper() {
+    bl_val_t* ctx      = bl_ctx_new_std();
+    bl_val_t* set_expr = bl_parse_sexp("(= atest (('x 1) ('y 2) ('z 3)))");
+    bl_ctx_eval(ctx,set_expr);
+    
+    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(aget 'x atest)"));
+    ASSERT("Got x correctly", strcmp(bl_ser_sexp(result),"1")==0)
+    return 0;
+
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1200,6 +1211,7 @@ int main(int argc, char** argv) {
     TEST("split_str                                  ", test_split_str)
     TEST("join_str                                   ", test_join_str)
     TEST("import .bl file                            ", test_import_bl_file)
+    TEST("aget oper                                  ", test_aget_oper)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
