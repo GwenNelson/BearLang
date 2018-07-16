@@ -42,7 +42,7 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
       }
       bl_ctx_set(retval,bl_mk_symbol("*PATH*"), path_val);
    } else {
-      bl_ctx_set(retval,bl_mk_symbol("*PATH*"), bl_mk_list(3,bl_mk_str("."),bl_mk_str(BL_STDLIB_PATH2),bl_mk_str(BL_STDLIB_PATH)));
+      bl_ctx_set(retval,bl_mk_symbol("*PATH*"), bl_mk_list(4,bl_mk_str("."),bl_mk_str(BL_STDLIB_PATH1),bl_mk_str(BL_STDLIB_PATH2),bl_mk_str(BL_STDLIB_PATH3)));
    }
    free(path_env);
 
