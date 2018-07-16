@@ -17,19 +17,6 @@ DESCRIPTION
 		item should be a function, module or context
 	"""
 	(= result (doc val))
-	(= result (+ result "\n"))
-	     (= result (+ result "MEMBERS\n"))
-	     (foreach member (filtered (dir val) ("*FILENAME*" "DOC" "val")) (do
-			(= memberval (ctxget val (mksym member)))
-			(if (and (not (eq (type memberval) TYPE_CTX))
-				 (not (eq memberval val))) (do
-					(= result (+ result "\t"))
-				 	(= result (+ result member "\n\t\t"))
-				 	(= result (+ result (doc memberval)))
-					(= result (+ result "\n"))))
-
-					))
-
 	(= pipe (stdio::popen "less -XF" "w"))
 	(stdio::fprintf pipe result)
 	(stdio::pclose pipe)

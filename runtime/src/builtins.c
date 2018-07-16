@@ -806,20 +806,44 @@ bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 
 bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   bl_val_t* first = bl_list_first(params);
-   first = bl_ctx_eval(ctx,first);
 
-   // TODO: more testing here
-   // LCOV_EXCL_START
-   if(first->docstr==NULL) {
-      switch(first->type) {
-	  case BL_VAL_TYPE_CTX: return bl_mk_str(bl_ctx_get(first,bl_mk_symbol("DOC"))->s_val); break;
-	  case BL_VAL_TYPE_STRING: return first; break;
-	  default: return bl_mk_str(""); break;
-      }
-   }
-   // LCOV_EXCL_STOP
-   return bl_mk_str(first->docstr->s_val);
+     bl_val_t* first      = bl_list_first(params);
+     bl_val_t* first_eval = bl_ctx_eval(ctx,first);
+
+     char* retval = "";
+
+     // first, check if the symbol exists
+     if(first_eval==NULL) {
+        return bl_err_symnotfound(first->s_val);
+     }
+
+     // now check if there's a docstring
+     if(first_eval->docstr == NULL) {
+        if(first_eval->type == BL_VAL_TYPE_CTX) {
+           bl_val_t* ctx_docstr = bl_ctx_get(first_eval,bl_mk_symbol("DOC"));
+	   if(ctx_docstr != NULL) retval = safe_strcat(retval,ctx_docstr->s_val);
+	}
+     } else {
+        retval = safe_strcat(retval,first_eval->docstr->s_val);
+     }
+
+     if(first_eval->type == BL_VAL_TYPE_CTX) {
+        retval = safe_strcat(retval,"\nMEMBERS");
+        int i=0;
+        for(i=0; i<first_eval->vals_count; i++) {
+           if(first_eval->vals[i] != NULL) {
+              if(strcmp(first_eval->keys[i]->s_val,"DOC") != 0) if ( first_eval->keys[i]->s_val[0] != '*') {
+                 retval=safe_strcat(retval,"\n\t");
+	         retval=safe_strcat(retval,first_eval->keys[i]->s_val);
+		 retval=safe_strcat(retval,"\n\t");
+                 retval=safe_strcat(retval,bl_oper_doc(ctx, bl_mk_list(1,first_eval->vals[i]))->s_val);
+		 retval=safe_strcat(retval,"\n");
+              }
+            }
+        }
+     }
+
+     return bl_mk_str(retval);
 }
 
 // LCOV_EXCL_START
