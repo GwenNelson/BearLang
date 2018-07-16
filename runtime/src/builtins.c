@@ -30,6 +30,21 @@ bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 // LCOV_EXCL_STOP
 
 
+bl_val_t* bl_oper_aget(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   bl_val_t* sym    = bl_ctx_eval(ctx,bl_list_first(params));
+   bl_val_t* L      = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* retval = bl_err_symnotfound(sym->s_val);
+   bl_val_t* L_car;
+   for(; L != NULL; L=L->cdr) {
+       L_car = L->car;
+       if(L_car->type != BL_VAL_TYPE_CONS) {
+          return bl_mk_err(BL_ERR_PARSE);
+       }
+       if(strcmp(L_car->car->s_val,sym->s_val)==0) retval = bl_list_second(L_car);
+   }
+   return retval;
+}
+
 bl_val_t* bl_oper_foreach(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* sym  = bl_list_first(params);
    bl_val_t* L    = bl_ctx_eval(ctx,bl_list_second(params));

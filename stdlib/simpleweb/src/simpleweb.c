@@ -37,6 +37,8 @@ static void ev_handler(struct mg_connection *c, int ev, void *p) {
     bl_val_t* handler_func = (bl_val_t*)c->mgr->user_data;
     bl_val_t* ctx = (bl_val_t*)handler_func->custom_data;
 
+
+    printf("URI: %s\n", uri);
     // build BearLang expression
     bl_val_t* L = bl_mk_list(4,(bl_val_t*)c->mgr->user_data,
     		               bl_mk_str(req_method),

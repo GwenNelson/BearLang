@@ -1,0 +1,33 @@
+; vim: filetype=Lisp
+
+(import simpleweb)
+(import web)
+(import xml)
+
+(using xml::*)
+
+(fun handle_foo (method url body) """
+     handles /foo
+     """
+     (simpleweb::html_response (x::html 
+     (x::head (x::title "foo"))
+     (x::body
+         (x::p "foo!")
+	 ))))
+
+(fun handle_bar (method url body) """
+     handles /bar
+     """
+     (simpleweb::html_response (x::html 
+     (x::head (x::title "bar"))
+     (x::body
+	 (x::p "You are at URL " url)
+	 ))))
+
+(= urls (('/foo handle_foo)
+	 ('/bar handle_bar)))
+
+(= my_handler (web::get_handler urls))
+
+
+(simpleweb::serve 8000 my_handler)

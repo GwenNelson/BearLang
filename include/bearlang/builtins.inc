@@ -1,3 +1,5 @@
+BUILTIN_X(aget,"aget","(aget <SYM> <LIST>)\n"
+                      "\t Gets the value of a symbol from an assoc list")
 
 BUILTIN_X(add,"+","(+ <NUM> <NUM> ...)\n"
                   "\t Adds up the numbers provided and returns the sum\n"
