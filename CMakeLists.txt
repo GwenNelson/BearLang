@@ -56,13 +56,12 @@ file(GLOB BLI_SRC          "bli/src/*.c")
 file(GLOB BLC_SRC          "blc/src/*.c")
 
 add_executable(bli ${BLI_SRC})
-#add_executable(blc ${BLC_SRC})
+add_executable(blc ${BLC_SRC})
 target_link_libraries(bli blruntime)
 target_link_libraries(bli ${Readline_LIBRARY})
 
 
-#target_link_libraries(blc blruntime)
-#target_link_libraries(blc ${llvm_libs})
+target_link_libraries(blc blruntime)
 
 
 add_executable(test_blruntime ${RUNTIME_TEST_SRC})
