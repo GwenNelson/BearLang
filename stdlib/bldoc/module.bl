@@ -10,13 +10,13 @@ DESCRIPTION
 
 (import stdio)
 
-(fun help (val) """
+(oper help (item) """
 	(help item)
 		Display help for a particular item
 
 		item should be a function, module or context
 	"""
-	(= result (doc val))
+	(= result (doc (eval item)))
 	(= pipe (stdio::popen "less -XF" "w"))
 	(stdio::fprintf pipe result)
 	(stdio::pclose pipe)

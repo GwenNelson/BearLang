@@ -30,6 +30,32 @@
 #include <ffi.h>
 #include <dlfcn.h>
 
+static char* doc_str = "\n"
+"NAME\n"
+"	cffi - C foreign function interface for BearLang\n"
+"\n"
+"DESCRIPTION\n"
+"	This module allows you to import arbitrary shared object files using the dlopen() interface and call functions\n"
+"\n"
+"EXAMPLE\n"
+"\n"
+"	This example code shows how to import and call the standard libc function puts:\n"
+"\n"
+"	  (import cffi)\n"
+"	  (= cputs   (cffi::dlsym \"puts\"))\n"
+"	  (= my_puts (cffi::func int cputs (char*))\n"
+"\n"
+"	Now my_puts can be called like any normal function, passing a single parameter of type string and returning a number\n"
+"\n"
+"	dlopen can also be used to import an arbitrary library:\n"
+"\n"
+"	  (= somelib     (cffi::dlopen \"somelib.so\"))\n"
+"	  (= somefunc    (cffi::dlsym  \"somefunc\" somelib))\n"
+"	  (= my_somefunc (cffi::func void somefunc ())\n"
+"\n"
+"	Now my_somefunc can be called, in this example there are no parameters accepted by the function\n"
+;
+
 typedef struct ffi_func_t {
      ffi_type *ret_type;
      bl_val_type_t *arg_types;
@@ -165,6 +191,7 @@ bl_val_t* func_bearlang(bl_val_t* ctx, bl_val_t* params) {
 
 bl_val_t* bl_mod_init(bl_val_t* ctx) {
      bl_val_t* my_ctx = bl_ctx_new(ctx);
+     bl_ctx_set(my_ctx,bl_mk_symbol("DOC"),   bl_mk_str(doc_str));
      bl_ctx_set(my_ctx,bl_mk_symbol("dlopen"),bl_mk_native_oper(&dlopen_bearlang));
      bl_ctx_set(my_ctx,bl_mk_symbol("dlsym"), bl_mk_native_oper(&dlsym_bearlang));
      bl_ctx_set(my_ctx,bl_mk_symbol("func"),  bl_mk_native_oper(&func_bearlang));

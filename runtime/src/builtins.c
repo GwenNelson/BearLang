@@ -425,6 +425,15 @@ bl_val_t* bl_oper_oper(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    retval->bl_operargs_ptr = bl_list_second(params);
    retval->bl_oper_ptr     = bl_list_rest(bl_list_rest(params));
 
+  if(retval->bl_func_ptr->car->type == BL_VAL_TYPE_DOCSTRING) {
+      retval->docstr = retval->bl_oper_ptr->car;
+      retval->bl_oper_ptr = retval->bl_oper_ptr->cdr;
+   }
+
+
+   retval->lexical_closure = ctx;
+   retval->inner_closure   = bl_ctx_new(ctx);
+
    bl_val_t* name = bl_list_first(params);
    bl_ctx_set(ctx, name, retval);
    return retval;
