@@ -1,9 +1,39 @@
 ; vim: filetype=Lisp
 
+(import simpleweb)
 (import web)
+(import xml)
 
-(= urls ("/"         handle_index
-	 "/module/*" handle_module))
+(using xml::*)
+
+(fun handle_module (method url body)
+     (= split_url (split url "/"))
+     (= modname   (third split_url))
+     (= modsym (mksym modname))
+     (import modsym)
+     (= docval (doc (eval modsym)))
+     (simpleweb::html_response (x::html 
+     (x::head (x::title (+ "BearLang documentation - " modname)))
+     (x::body
+	 (x::pre docval)
+	 ))))
+
+(fun handle_index (method url body)
+     (simpleweb::html_response (x::html
+       (x::head (x::title "BearLang Documentation - index"))
+       (x::body 
+	 (x::p "Click on one of the following links to browse module documentation:")
+	 (x::a (@ 'href "/module/cffi") "C Foreign Function interface (CFFI)")
+	 )
+
+       ))
+     
+     )
+
+(= urls (
+	 ('/module/ handle_module)
+	 ('/        handle_index)
+	 ))
 
 (= my_handler (web::get_handler urls))
 
