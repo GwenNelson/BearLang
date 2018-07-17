@@ -19,7 +19,6 @@ endif  (CMAKE_BUILD_TYPE STREQUAL "Debug")
 find_package (LibGc REQUIRED)
 find_package (Readline REQUIRED)
 find_package (FLEX REQUIRED)
-find_package (LLVM REQUIRED CONFIG)
 
 
 file(GLOB RUNTIME_SOURCE "runtime/src/*.c")
@@ -36,8 +35,6 @@ include_directories(${LIBGC_INCLUDE_DIR})
 include_directories(${Readline_INCLUDE_DIR})
 include_directories(${FLEX_INCLUDES})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${LLVM_INCLUDE_DIRS})
-add_definitions(${LLVM_DEFINITIONS})
 
 
 FLEX_TARGET(BLLexer
@@ -59,14 +56,13 @@ file(GLOB BLI_SRC          "bli/src/*.c")
 file(GLOB BLC_SRC          "blc/src/*.c")
 
 add_executable(bli ${BLI_SRC})
-add_executable(blc ${BLC_SRC})
+#add_executable(blc ${BLC_SRC})
 target_link_libraries(bli blruntime)
 target_link_libraries(bli ${Readline_LIBRARY})
 
-llvm_map_components_to_libnames(llvm_libs core executionengine mcjit interpreter analysis native bitwriter)
 
-target_link_libraries(blc blruntime)
-target_link_libraries(blc ${llvm_libs})
+#target_link_libraries(blc blruntime)
+#target_link_libraries(blc ${llvm_libs})
 
 
 add_executable(test_blruntime ${RUNTIME_TEST_SRC})

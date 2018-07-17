@@ -26,7 +26,6 @@ DESCRIPTION
 	"""
 	(fun internal_handler (method url body)
 	     (= retval (aget url urls))
-             (print "Got URL" url ", \n" (doc retval))
              (try 
                 (retval method url body)
 		(catch ERR_SYMBOL_NOTFOUND (missing_handler method url body))
