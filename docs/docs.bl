@@ -2,15 +2,8 @@
 
 (import web)
 
-(= templates (web::templates "./templates" bldoc_base)) ; setup the template rendering to use templates in ./templates and bldoc_base.htbl as template
-
-; handles /module/<mod_name>
-(fun handle_module (name) 
-     
-     )
-
-(= urls ("/"            handle_index
-	 "/module/(.*)" handle_module))
+(= urls ("/"         handle_index
+	 "/module/*" handle_module))
 
 (= my_handler (web::get_handler urls))
 

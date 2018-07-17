@@ -14,22 +14,29 @@ bl_val_t* py_invoke_callable(bl_val_t* ctx, bl_val_t* params) {
 }
 
 bl_val_t* py_get(bl_val_t* ctx, bl_val_t* sym) {
-     PyObject* m = (PyObject*)ctx->custom_ctx_data;
-   	char* sym_name  = sym->s_val;
+     PyGILState_STATE gstate;
+     gstate = PyGILState_Ensure();
+
+   	PyObject* m = (PyObject*)ctx->custom_ctx_data;
+     char* sym_name  = sym->s_val;
      PyObject* pyobj = PyObject_GetAttrString(m,sym_name);
      if(pyobj==NULL) { 
         PyErr_Print();
-     	     return NULL;
+PyGILState_Release(gstate);
+	return NULL;
      }
      if(PyString_Check(pyobj)) {
         char* py_str = PyString_AsString(pyobj);
+PyGILState_Release(gstate);
 	return bl_mk_str(py_str);
      } 
      if(PyCallable_Check(pyobj)) {
         bl_val_t* retval = bl_mk_native_oper(&py_invoke_callable);
 	retval->custom_data = (void*)pyobj;
+PyGILState_Release(gstate);
 	return retval;
      }
+PyGILState_Release(gstate);
      return bl_mk_ptr(pyobj);
 }
 
@@ -53,6 +60,7 @@ bl_val_t* py_import(bl_val_t* ctx, bl_val_t* params) {
 bl_val_t* bl_mod_init(bl_val_t* ctx) {
      Py_Initialize();
      PyObject* sysPath = PySys_GetObject((char*)"path");
+
      PyList_Append(sysPath, PyString_FromString("."));
      bl_val_t* my_ctx       = bl_ctx_new(ctx);
      bl_val_t* main_ctx     = py_ctx(PyImport_AddModule("__main__"));
