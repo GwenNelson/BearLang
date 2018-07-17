@@ -1,0 +1,13 @@
+#pragma once
+
+// the current version string
+#define BL_VERSION "@VERSION_STR@"
+
+// the path to installed stdlib
+#define BL_STDLIB_PATH1  "@STDLIB_PATH1@"
+
+// the path to the .bl modules in source tree
+#define BL_STDLIB_PATH2  "@STDLIB_PATH2@"
+
+// the path to the compiled modules in source tree
+#define BL_STDLIB_PATH3 "@STDLIB_PATH3@"
