@@ -7,6 +7,10 @@ BUILTIN_X(split,"split","(split <STR> <STR>)\n"
 BUILTIN_X(startswith,"startswith","(startswith <STR> <STR>)\n"
 	                          "\t Checks if the first string starts with the second string\n")
 
+BUILTIN_X(pmatch,"pmatch","(pmatch <STR> <ALIST>)\n"
+	                  "\t Matches the string prefix against an alist, that is, returns the cdr of the first pair in the alist where the string starts with the car\n"
+		  	  "\t Returns None if no match found")
+
 BUILTIN_X(add,"+","(+ <NUM> <NUM> ...)\n"
                   "\t Adds up the numbers provided and returns the sum\n"
                   "(+ <ANY> <ANY> ...)\n"

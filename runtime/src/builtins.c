@@ -29,6 +29,20 @@ bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 }
 // LCOV_EXCL_STOP
 
+bl_val_t* bl_oper_pmatch(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   params      = bl_ctx_eval(ctx,params);
+   
+   bl_val_t* retval = bl_mk_null();
+
+   bl_val_t* S = bl_list_first(params);
+   bl_val_t* L = bl_list_second(params);
+   for(; L != NULL; L=L->cdr) {
+       char* prefix = L->car->car->s_val;
+       if(strstr(S->s_val,prefix)==S->s_val) return L->car->cdr->car;
+   }
+   return retval;
+}
+
 bl_val_t* bl_oper_startswith(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    params = bl_ctx_eval(ctx,params);
    bl_val_t* first  = bl_list_first(params);
