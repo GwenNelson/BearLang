@@ -6,6 +6,7 @@
 
 (using xml::*)
 
+; TODO - implement a (doc) type oper that returns an alist of NAME,DESCRIPTION etc
 (fun handle_module (method url body)
      (= split_url (split url "/"))
      (= modname   (third split_url))
