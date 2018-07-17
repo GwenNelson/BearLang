@@ -848,7 +848,6 @@ bl_val_t* bl_genmod_doc(bl_val_t* ctx, bl_val_t* sym, bl_val_t* mod) { // LCOV_E
      if(DESCRIPTION!=NULL) {
 	retval = safe_strcat(retval,"\nDESCRIPTION\n");
         bl_val_t* split_desc = split_str(DESCRIPTION->s_val,"\n");
-	printf("split_desc: %s\n", bl_ser_sexp(split_desc));
 	for(; split_desc != NULL; split_desc=split_desc->cdr) {
 	    retval = safe_strcat(retval,"\t");
             retval = safe_strcat(retval,split_desc->car->s_val);
