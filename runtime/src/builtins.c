@@ -29,6 +29,15 @@ bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 }
 // LCOV_EXCL_STOP
 
+bl_val_t* bl_oper_listbuiltins(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   bl_val_t* retval = NULL;
+   #define BUILTIN_RETURN(builtin_name,builtin_symbol,builtin_docstr) retval=bl_list_prepend(retval,bl_mk_symbol(builtin_symbol));
+   #define BUILTIN_X BUILTIN_RETURN
+   #include <bearlang/builtins.inc>
+   #undef BUILTIN_X
+   return bl_list_reverse(retval);
+}
+
 bl_val_t* bl_oper_pmatch(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    params      = bl_ctx_eval(ctx,params);
    

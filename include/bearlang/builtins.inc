@@ -1,3 +1,6 @@
+BUILTIN_X(listbuiltins,"listbuiltins","(listbuiltins)\n"
+	                              "\t Returns a list of all builtins in the current runtime\n")
+
 BUILTIN_X(aget,"aget","(aget <SYM> <LIST>)\n"
                       "\t Gets the value of a symbol from an assoc list")
 
