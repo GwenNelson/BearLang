@@ -182,7 +182,7 @@ bl_val_t* bl_fprintf(bl_val_t* ctx, bl_val_t* params) {
                  format_sym = false;
                  var_iter = bl_list_rest(var_iter);
 	      } else {
-                 if(fputc('s',fd) == EOF) return &generic_error;
+                 if(fputc('x',fd) == EOF) return &generic_error;
               }
               break;
 	   default:
