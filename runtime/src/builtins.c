@@ -842,14 +842,30 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      }
 
      // now check if there's a docstring
-     if(first_eval->docstr == NULL) {
+     bl_val_t* docstr = first_eval->docstr;
+     if(docstr == NULL) {
         if(first_eval->type == BL_VAL_TYPE_CTX) {
-           bl_val_t* ctx_docstr = bl_ctx_get(first_eval,bl_mk_symbol("DOC"));
-	   if(ctx_docstr != NULL) retval = safe_strcat(retval,ctx_docstr->s_val);
+           docstr = bl_ctx_get(first_eval,bl_mk_symbol("DOC"));
 	}
-     } else {
-        retval = safe_strcat(retval,first_eval->docstr->s_val);
      }
+
+     char* buf = NULL;
+     if(docstr == NULL) { // if it doesn't exist, generate one dynamically
+        switch(first_eval->type) {
+            case BL_VAL_TYPE_FUNC_BL:
+                    if(first->type == BL_VAL_TYPE_SYMBOL) {
+           		    docstr = bl_mk_str(bl_ser_sexp(bl_list_prepend(first_eval->bl_funcargs_ptr,first)));
+		    } else {
+                            docstr = bl_mk_str(bl_ser_sexp(bl_list_prepend(first_eval->bl_funcargs_ptr,first_eval->sym)));
+		    }
+	    break;
+	    default:
+		    docstr = bl_mk_str(bl_ser_sexp(first_eval));
+	    break;
+	}
+     }
+
+     retval = safe_strcat(retval,docstr->s_val);
 
      if(first_eval->type == BL_VAL_TYPE_CTX) {
         retval = safe_strcat(retval,"\nMEMBERS");
@@ -857,11 +873,13 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
         for(i=0; i<first_eval->vals_count; i++) {
            if(first_eval->vals[i] != NULL) {
               if(strcmp(first_eval->keys[i]->s_val,"DOC") != 0) if ( first_eval->keys[i]->s_val[0] != '*') {
-                 retval=safe_strcat(retval,"\n\t");
-	         retval=safe_strcat(retval,first_eval->keys[i]->s_val);
-		 retval=safe_strcat(retval,"\n\t");
-                 retval=safe_strcat(retval,bl_oper_doc(ctx, bl_mk_list(1,first_eval->vals[i]))->s_val);
-		 retval=safe_strcat(retval,"\n");
+                 if(first_eval->vals[i]->type != BL_VAL_TYPE_CTX) {
+			 retval=safe_strcat(retval,"\n\t");
+		         retval=safe_strcat(retval,first_eval->keys[i]->s_val);
+			 retval=safe_strcat(retval,"\n\t");
+	                 retval=safe_strcat(retval,bl_oper_doc(ctx, bl_mk_list(1,first_eval->vals[i]))->s_val);
+			 retval=safe_strcat(retval,"\n");
+		 }
               }
             }
         }

@@ -65,12 +65,22 @@ typedef struct ffi_func_t {
      ffi_type **ffi_arg_types;
 } ffi_func_t;
 
+
+static char* dlopen_doc_str = "\n"
+"	(dlopen filename)\n"
+"		Opens a shared object / dynamic library file and returns a pointer to it\n"
+;
 bl_val_t* dlopen_bearlang(bl_val_t* ctx, bl_val_t* params) {
      params            = bl_ctx_eval(ctx,params);
      bl_val_t* libname = bl_list_first(params);
      void* retval = dlopen(libname->s_val,RTLD_LOCAL);
      return bl_mk_ptr(retval);
 }
+
+static char* dlsym_doc_str = "\n"
+"	(dlsym symbol library)\n"
+"		Looks up the specified symbol in the provided library, library must be a pointer returned from dlopen\n"
+;
 
 bl_val_t* dlsym_bearlang(bl_val_t* ctx, bl_val_t* params) {
      params              = bl_ctx_eval(ctx,params);
@@ -125,6 +135,12 @@ bl_val_t* native_oper_ret_ptr(bl_val_t* ctx, bl_val_t* params) {
      return bl_mk_ptr(ret_ptr);
 }
 
+static char* func_doc_str = "\n"
+"	(func return-type function (param-type ...))\n"
+"		Creates a callable BearLang function from the specified function pointer (as returned by dlsym)\n"
+"		return-type must be the C type the function returns\n"
+"		param-type is the type of the function's parameter at that position, optionally an empty list may be provided instead\n"
+;
 // this sets up the ffi_func_t struct and then returns a new native oper
 bl_val_t* func_bearlang(bl_val_t* ctx, bl_val_t* params) {
      bl_val_t* retval_type = bl_list_first(params);
@@ -192,8 +208,17 @@ bl_val_t* func_bearlang(bl_val_t* ctx, bl_val_t* params) {
 bl_val_t* bl_mod_init(bl_val_t* ctx) {
      bl_val_t* my_ctx = bl_ctx_new(ctx);
      bl_ctx_set(my_ctx,bl_mk_symbol("DOC"),   bl_mk_str(doc_str));
-     bl_ctx_set(my_ctx,bl_mk_symbol("dlopen"),bl_mk_native_oper(&dlopen_bearlang));
-     bl_ctx_set(my_ctx,bl_mk_symbol("dlsym"), bl_mk_native_oper(&dlsym_bearlang));
-     bl_ctx_set(my_ctx,bl_mk_symbol("func"),  bl_mk_native_oper(&func_bearlang));
+
+     bl_val_t* dlopen_oper = bl_mk_native_oper(&dlopen_bearlang);
+     dlopen_oper->docstr   = bl_mk_str(dlopen_doc_str);
+     bl_ctx_set(my_ctx,bl_mk_symbol("dlopen"),dlopen_oper);
+
+     bl_val_t* dlsym_oper = bl_mk_native_oper(&dlsym_bearlang);
+     dlsym_oper->docstr   = bl_mk_str(dlsym_doc_str);
+     bl_ctx_set(my_ctx,bl_mk_symbol("dlsym"), dlsym_oper);
+
+     bl_val_t* func_oper = bl_mk_native_oper(&func_bearlang);
+     func_oper->docstr   = bl_mk_str(func_doc_str);
+     bl_ctx_set(my_ctx,bl_mk_symbol("func"),  func_oper);
      return my_ctx;
 }
