@@ -34,37 +34,62 @@ BUILTIN_X(mod,"%","(% a b)\n"
 BUILTIN_X(set,"=","(= <SYM> <ANY>)\n"
                   "\t Assigns a value to a symbol")
 
-BUILTIN_X(fn,"fn", "(fn (args ...) expr ...)"
+BUILTIN_X(fn,"fn", "(fn (args ...) expr ...)\n"
 		   "\t Lambda expression, defines and returns function")
 
-BUILTIN_X(fun,"fun", "(fun name (args ...) expr ...)"
+BUILTIN_X(fun,"fun", "(fun name (args ...) expr ...)\n"
 		     "\t Defines and returns new function and binds it to the specified name")
 
-BUILTIN_X(foreach,"foreach","(foreach sym list expr)"
+BUILTIN_X(foreach,"foreach","(foreach sym list expr)\n"
 	                    "\t A classic for-each loop, binds sym and then evaluates expr for each item in list")
 
-BUILTIN_X(filtered,"filtered","(filtered L items)"
+BUILTIN_X(filtered,"filtered","(filtered L items)\n"
 	                      "\t Returns the list L without any of the items in the list \"items\"")
 
-BUILTIN_X(throw,"throw","(throw errtype errval)"
+BUILTIN_X(throw,"throw","(throw errtype errval)\n"
 	                "\t Throws a custom error, errtype should be a symbol specifying the type, errval is an optional param with an arbitrary value")
 
-BUILTIN_X(oper,"oper", "")
-BUILTIN_X(map,"map", "")
-BUILTIN_X(eq,"eq", "")
-BUILTIN_X(lt,"lt", "")
-BUILTIN_X(gt,"gt", "")
-BUILTIN_X(print,"print", "")
-BUILTIN_X(and,"and", "")
-BUILTIN_X(not,"not", "")
-BUILTIN_X(or,"or", "")
+BUILTIN_X(oper,"oper", "(oper name (args ...) expr ...)\n"
+                       "\t Defines and returns a new oper and binds it to the specified name")
+
+BUILTIN_X(map,"map", "(map func L)\n"
+                     "\t Runs func on every item of list L and returns a new list with the results")
+
+BUILTIN_X(eq,"eq", "(eq a b)\n"
+                   "\t Returns True if a and b are equal, False otherwise")
+
+BUILTIN_X(lt,"lt", "(lt a b)\n"
+                   "\t Check is a is lower than b")
+
+BUILTIN_X(gt,"gt", "(gt a b)\n"
+                   "\t Check is a is greater than b")
+
+BUILTIN_X(print,"print", "(print ...)\n"
+                         "\t Serialises all arguments and then prints them to stdout")
+
+BUILTIN_X(and,"and", "(and a b)\n"
+                     "\t Boolean and operation")
+
+BUILTIN_X(not,"not", "(not x)\n"
+                     "\t Boolean not operation")
+
+BUILTIN_X(or,"or", "(or a b)"
+                   "\t Boolean or operation")
+
 BUILTIN_X(xor,"xor", "")
+
 BUILTIN_X(first,"first", "")
+
 BUILTIN_X(second,"second", "")
+
 BUILTIN_X(third,"third", "")
+
 BUILTIN_X(rest,"rest", "")
+
 BUILTIN_X(append,"append", "")
+
 BUILTIN_X(prepend,"prepend", "")
+
 BUILTIN_X(reverse,"reverse", "")
 
 BUILTIN_X(include,"include", "")

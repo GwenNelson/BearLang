@@ -86,8 +86,6 @@ bl_val_t* bl_mod_init(bl_val_t* ctx) {
 
      PyList_Append(sysPath, PyString_FromString("."));
      bl_val_t* my_ctx       = bl_ctx_new(ctx);
-     bl_val_t* main_ctx     = py_ctx(PyImport_AddModule("__main__"));
-     bl_ctx_set(my_ctx, bl_mk_symbol("main"), main_ctx);
      bl_ctx_set(my_ctx, bl_mk_symbol("import"), bl_mk_native_oper(&py_import));
      return my_ctx;
 }
