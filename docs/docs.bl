@@ -6,6 +6,14 @@
 
 (using xml::*)
 
+(= modules_list (
+	("bldoc" "BearLang documentation system")
+	("cffi"  "C foreign function interface")
+	("error" "Error utilities")
+	("hello" "Example C module")
+	("os"    "Operating system utilities")
+	))
+
 ; TODO - implement a (doc) type oper that returns an alist of NAME,DESCRIPTION etc
 (fun handle_module (method url body)
      (= split_url (split url "/"))
@@ -17,6 +25,7 @@
      (x::head (x::title (+ "BearLang documentation - " modname)))
      (x::body
 	 (x::pre docval)
+	 (x::a (@ 'href "/") "Return to index")
 	 ))))
 
 (fun handle_index (method url body)
@@ -24,7 +33,7 @@
        (x::head (x::title "BearLang Documentation - index"))
        (x::body 
 	 (x::p "Click on one of the following links to browse module documentation:")
-	 (x::a (@ 'href "/module/cffi") "C Foreign Function interface (CFFI)")
+         (+ (map (fn (module) (+ (x::a (@ 'href (+ "/module/" (first module))) (+ (first module) " - " (second module)))(x::br "") ) )  modules_list))
 	 )
 
        ))
