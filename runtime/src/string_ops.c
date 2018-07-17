@@ -22,7 +22,7 @@ char* join_str(bl_val_t* L, char* sep) { // LCOV_EXCL_LINE
       char* retval = NULL;
       bl_val_t* i=L;
       for(i=L; i != NULL; i=i->cdr) {
-          if(retval!=NULL) retval = safe_strcat(retval,"::");
+          if(retval!=NULL) retval = safe_strcat(retval,sep);
 	  retval = safe_strcat(retval,bl_ser_naked_sexp(i->car));
       }
       return retval;
@@ -55,4 +55,14 @@ bl_val_t* split_str(char* s, char* sep) { // LCOV_EXCL_LINE
 	if(strlen(buf)>0) retval = bl_list_prepend(retval,bl_mk_str(buf));
 	retval = bl_list_reverse(retval);
 	return retval;
+}
+
+char* str_replace(char* s, char* a, char* b) {
+      char* retval = NULL;
+      if(strstr(s,a)==NULL) { // if it's not there, we just return s
+         return s;
+      }
+      bl_val_t* L = split_str(s,a);
+      retval = join_str(L,b);
+      return retval;
 }

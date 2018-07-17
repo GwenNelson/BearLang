@@ -20,6 +20,7 @@
 #include <bearlang/ctx.h>
 #include <bearlang/utils.h>
 #include <bearlang/list_ops.h>
+#include <bearlang/string_ops.h>
 #include <bearlang/sexp.h>
 
 bl_val_t* xml_gen_oper(bl_val_t* ctx, bl_val_t* params) {
@@ -83,10 +84,20 @@ bl_val_t* x_get(bl_val_t* ctx, bl_val_t* sym) {
      return retval;
 }
 
+bl_val_t* xml_escape(bl_val_t* ctx, bl_val_t* params) {
+     params = bl_ctx_eval(ctx,params);
+     bl_val_t* s = bl_list_first(params);
+     char* escaped = s->s_val;
+     escaped = str_replace(escaped,"<","&lt;");
+     escaped = str_replace(escaped,">","&gt;");
+     return bl_mk_str(escaped);
+}
+
 bl_val_t* bl_mod_init(bl_val_t* ctx) {
      bl_val_t* my_ctx  = bl_ctx_new(ctx);
      bl_val_t* xml_ctx = bl_ctx_new(ctx);
      xml_ctx->ctx_get      = &x_get;
      bl_ctx_set(my_ctx,bl_mk_symbol("x"),xml_ctx);
+     bl_ctx_set(my_ctx,bl_mk_symbol("escape"), bl_mk_native_oper(&xml_escape));
      return my_ctx;
 }

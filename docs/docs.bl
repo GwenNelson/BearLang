@@ -29,7 +29,7 @@
      (simpleweb::html_response (x::html 
      (x::head (x::title (+ "BearLang documentation - " modname)))
      (x::body
-	 (x::pre docval)
+	 (x::pre (escape docval))
 	 (x::a (@ 'href "/") "Return to index")
 	 ))))
 
@@ -38,7 +38,7 @@
      (x::head (x::title "BearLang documentation - builtins"))
      (x::body
         (x::pre
-         (+ (map (fn (b) (+ b "\n" (doc b) "\n")) (listbuiltins) ))))))
+         (+ (map (fn (b) (escape (+ b "\n" (doc b) "\n"))) (listbuiltins) ))))))
      )
 
 (fun handle_index (method url body)
