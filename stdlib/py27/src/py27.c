@@ -6,6 +6,12 @@
 #include <bearlang/sexp.h>
 #include <Python.h>
 
+static char* bl_module_name        = "py27";
+static char* bl_module_summary     = "Experimental python interop";
+static char* bl_module_description = "This module implements experimental support for python 2.7 and BearLang interop";
+
+
+
 bl_val_t* py_invoke_callable(bl_val_t* ctx, bl_val_t* params) {
      void* custom_data  = params->custom_data;
      PyObject* callable = (PyObject*)custom_data;
@@ -87,5 +93,11 @@ bl_val_t* bl_mod_init(bl_val_t* ctx) {
      PyList_Append(sysPath, PyString_FromString("."));
      bl_val_t* my_ctx       = bl_ctx_new(ctx);
      bl_ctx_set(my_ctx, bl_mk_symbol("import"), bl_mk_native_oper(&py_import));
+
+     
+     bl_ctx_set(my_ctx,bl_mk_symbol("*NAME*"),       bl_mk_str(bl_module_name));
+     bl_ctx_set(my_ctx,bl_mk_symbol("*SUMMARY*"),    bl_mk_str(bl_module_summary));
+     bl_ctx_set(my_ctx,bl_mk_symbol("*DESCRIPTION*"),bl_mk_str(bl_module_description));
+
      return my_ctx;
 }

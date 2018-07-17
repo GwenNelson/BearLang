@@ -13,6 +13,10 @@
 #include <stdlib.h>
 #include <errno.h>
 
+static char* bl_module_name        = "os";
+static char* bl_module_summary     = "Operating system interaction";
+static char* bl_module_description = "The os module contains basic functions for interacting with the operating system.\n";
+
 // (exit retval)
 // exits to OS, if retval is not provided then it is set to 0
 bl_val_t* bl_exit(bl_val_t* ctx, bl_val_t* params) {
@@ -33,9 +37,9 @@ bl_val_t* bl_mod_init(bl_val_t* ctx) {
 		                      "\texits to OS, if retval param is not provided then it is set to 0\n");
      bl_ctx_set(my_ctx,bl_mk_symbol("exit"), oper_exit);
 
-     my_ctx->docstr = bl_mk_docstr("NAME\n"
-		                   "\tos - Operating system interaction\n"
-				   "DESCRIPTION\n"
-				   "\tThe OS module contains basic functions for interacting with the operating system.\n");
+     bl_ctx_set(my_ctx,bl_mk_symbol("*NAME*"),       bl_mk_str(bl_module_name));
+     bl_ctx_set(my_ctx,bl_mk_symbol("*SUMMARY*"),    bl_mk_str(bl_module_summary));
+     bl_ctx_set(my_ctx,bl_mk_symbol("*DESCRIPTION*"),bl_mk_str(bl_module_description));
+
      return my_ctx;
 }
