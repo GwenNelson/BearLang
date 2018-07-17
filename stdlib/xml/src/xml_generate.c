@@ -31,6 +31,9 @@ bl_val_t* xml_gen_oper(bl_val_t* ctx, bl_val_t* params) {
      bl_val_t* attr_list = NULL;
      bl_val_t* i = NULL;
      bl_val_t* L = params;
+     if(bl_list_len(L)==0) {
+        return bl_mk_str(safe_strcat(safe_strcat("<", tag_name_s),"/>"));
+     }
      for(i=L; i != NULL; i=i->cdr) {
          if(i->car->type == BL_VAL_TYPE_CONS) {
             if(i->car->car->type == BL_VAL_TYPE_SYMBOL) {

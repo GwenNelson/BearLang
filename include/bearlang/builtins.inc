@@ -73,38 +73,77 @@ BUILTIN_X(and,"and", "(and a b)\n"
 BUILTIN_X(not,"not", "(not x)\n"
                      "\t Boolean not operation")
 
-BUILTIN_X(or,"or", "(or a b)"
+BUILTIN_X(or,"or", "(or a b)\n"
                    "\t Boolean or operation")
 
-BUILTIN_X(xor,"xor", "")
+BUILTIN_X(xor,"xor", "(xor a b)\n"
+                     "\t Boolean xor operation")
 
-BUILTIN_X(first,"first", "")
+BUILTIN_X(first,"first", "(first L)\n"
+                         "\t Returns first item in list L")
 
-BUILTIN_X(second,"second", "")
+BUILTIN_X(second,"second", "(second L)\n"
+                           "\t Returns second item in list L")
 
-BUILTIN_X(third,"third", "")
+BUILTIN_X(third,"third", "(third L)\n"
+                         "\t Returns the third item in the list L")
 
-BUILTIN_X(rest,"rest", "")
+BUILTIN_X(rest,"rest", "(rest L)\n"
+                       "\t Returns the rest of the list L without the first item")
 
-BUILTIN_X(append,"append", "")
+BUILTIN_X(append,"append", "(append L x)\n"
+                           "\t Returns the list L with x appended to the end of it")
 
-BUILTIN_X(prepend,"prepend", "")
+BUILTIN_X(prepend,"prepend", "(prepend L x)\n"
+                             "\t Returns the list L with x appended to the start of it")
 
-BUILTIN_X(reverse,"reverse", "")
+BUILTIN_X(reverse,"reverse", "(reverse L)\n"
+                             "\t Returns the list L backwards")
 
-BUILTIN_X(include,"include", "")
-BUILTIN_X(import,"import", "")
-BUILTIN_X(isset,"isset", "")
-BUILTIN_X(serexp,"serexp", "")
-BUILTIN_X(inc,"inc", "")
-BUILTIN_X(dec,"dec", "")
-BUILTIN_X(parse,"parse", "")
-BUILTIN_X(eval,"eval", "")
-BUILTIN_X(try,"try", "")
-BUILTIN_X(quote,"quote", "")
-BUILTIN_X(using,"using", "")
-BUILTIN_X(doc,"doc", "")
-BUILTIN_X(dir,"dir", "")
-BUILTIN_X(mksym,"mksym", "")
-BUILTIN_X(ctxget,"ctxget", "")
-BUILTIN_X(type,"type", "")
+BUILTIN_X(include,"include", "(include filename)\n"
+                             "\t Loads the specified filename, parses it and includes it literally")
+
+BUILTIN_X(import,"import", "(import modulename)\n"
+                           "\t Imports the specified module")
+
+BUILTIN_X(isset,"isset", "(isset x)\n"
+                         "\t Checks if the item x is set in the current environment, returns a boolean")
+
+BUILTIN_X(serexp,"serexp", "(serexp E)\n"
+                           "\t Serialises the expression E and returns a string")
+
+BUILTIN_X(inc,"inc", "(inc x)\n"
+                     "\t Increments specified variable in-place")
+
+BUILTIN_X(dec,"dec", "(dec x)\n"
+                     "\t Decrements specified variable in-place")
+
+BUILTIN_X(parse,"parse", "(parse s)\n"
+                         "\t Tries to parse the string s into an s-expression")
+
+BUILTIN_X(eval,"eval", "(eval E)\n"
+                       "\t Evaluates the expression E and returns the result")
+
+BUILTIN_X(try,"try", "(try e (catch <ERR> handler))\n"
+                     "\t Evaluates e, if an error occurs, evaluates handler")
+
+BUILTIN_X(quote,"quote", "(quote E)\n"
+                         "\t Returns E un-evaluated")
+
+BUILTIN_X(using,"using", "(using module::symbol)\n"
+                         "\t Brings a symbol from a module into the current context, use * to bring in all symbols")
+
+BUILTIN_X(doc,"doc", "(doc item)\n"
+                     "\t Returns the docstring for the specified item")
+
+BUILTIN_X(dir,"dir", "(dir ctx)\n"
+                     "\t Returns the contents of a context as a list of symbols")
+
+BUILTIN_X(mksym,"mksym", "(mksym s)\n"
+                         "\t Create a new symbol from string s")
+
+BUILTIN_X(ctxget,"ctxget", "(ctxget ctx sym)\n"
+                           "\t Gets the value of a symbol from a context")
+
+BUILTIN_X(type,"type", "(type x)\n"
+                       "\t Returns the type of x")

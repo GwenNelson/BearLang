@@ -38,15 +38,17 @@
      (x::head (x::title "BearLang documentation - builtins"))
      (x::body
         (x::pre
-         (+ (map (fn (b) (escape (+ b "\n" (doc b) "\n"))) (listbuiltins) ))))))
-     )
+         (+ (map (fn (b) (escape (+ b "\n" (doc b) "\n"))) (listbuiltins) )))
+	(x::a (@ 'href "/") "Return to index")
+     ))))
 
 (fun handle_index (method url body)
      (simpleweb::html_response (x::html
        (x::head (x::title "BearLang Documentation - index"))
        (x::body 
+	 (x::p "Click " (x::a (@ 'href "/builtins") "here") " to browse documentation on the builtins")
 	 (x::p "Click on one of the following links to browse module documentation:")
-         (+ (map (fn (module) (+ (x::a (@ 'href (+ "/module/" (first module))) (+ (first module) " - " (second module)))(x::br "") ) )  modules_list))
+         (+ (map (fn (module) (+ (x::a (@ 'href (+ "/module/" (first module))) (+ (first module) " - " (second module)))(x::br) ) )  modules_list))
 	 )
 
        ))
