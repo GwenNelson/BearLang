@@ -29,6 +29,12 @@ bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 }
 // LCOV_EXCL_STOP
 
+bl_val_t* bl_oper_split(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   params           = bl_ctx_eval(ctx,params);
+   bl_val_t* first  = bl_list_first(params);
+   bl_val_t* second = bl_list_second(params);
+   return split_str(first->s_val,second->s_val);
+}
 
 bl_val_t* bl_oper_aget(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* sym    = bl_ctx_eval(ctx,bl_list_first(params));

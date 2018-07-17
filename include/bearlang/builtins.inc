@@ -1,6 +1,9 @@
 BUILTIN_X(aget,"aget","(aget <SYM> <LIST>)\n"
                       "\t Gets the value of a symbol from an assoc list")
 
+BUILTIN_X(split,"split","(split <STR> <STR>)\n"
+	                "\t Splits the first string by the delimiter specified in the second string\n")
+
 BUILTIN_X(add,"+","(+ <NUM> <NUM> ...)\n"
                   "\t Adds up the numbers provided and returns the sum\n"
                   "(+ <ANY> <ANY> ...)\n"
