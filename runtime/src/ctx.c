@@ -207,6 +207,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 					car->inner_closure = bl_ctx_new(car->lexical_closure);
 					if(bl_list_len(expr) > 1) bl_set_params(car->inner_closure,car->bl_operargs_ptr,args);
 					ctx = car->inner_closure;
+					ctx->write_to_parent = true;
 					expr = car->bl_oper_ptr;
 					for(i=expr; i != NULL; i=i->cdr) {
 						retval = bl_ctx_eval(ctx,i->car);
