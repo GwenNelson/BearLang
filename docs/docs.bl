@@ -7,11 +7,16 @@
 (using xml::*)
 
 (= modules_list (
-	("bldoc" "BearLang documentation system")
-	("cffi"  "C foreign function interface")
-	("error" "Error utilities")
-	("hello" "Example C module")
-	("os"    "Operating system utilities")
+	("bldoc"     "BearLang documentation system")
+	("cffi"      "C foreign function interface")
+	("error"     "Error utilities")
+	("hello"     "Example C module")
+	("os"        "Operating system utilities")
+	("py27"      "Python 2.7 support")
+	("simpleweb" "Simple web framework")
+	("stdio"     "POSIX I/O")
+	("web"       "Full web framework")
+	("xml"       "XML support")
 	))
 
 ; TODO - implement a (doc) type oper that returns an alist of NAME,DESCRIPTION etc
