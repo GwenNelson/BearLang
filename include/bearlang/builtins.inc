@@ -4,6 +4,9 @@ BUILTIN_X(aget,"aget","(aget <SYM> <LIST>)\n"
 BUILTIN_X(split,"split","(split <STR> <STR>)\n"
 	                "\t Splits the first string by the delimiter specified in the second string\n")
 
+BUILTIN_X(startswith,"startswith","(startswith <STR> <STR>)\n"
+	                          "\t Checks if the first string starts with the second string\n")
+
 BUILTIN_X(add,"+","(+ <NUM> <NUM> ...)\n"
                   "\t Adds up the numbers provided and returns the sum\n"
                   "(+ <ANY> <ANY> ...)\n"
