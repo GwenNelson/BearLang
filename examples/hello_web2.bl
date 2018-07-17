@@ -6,18 +6,14 @@
 
 (using xml::*)
 
-(fun handle_foo (method url body) """
-     handles /foo
-     """
+(fun handle_foo (method url body) 
      (simpleweb::html_response (x::html 
      (x::head (x::title "foo"))
      (x::body
          (x::p "foo!")
 	 ))))
 
-(fun handle_bar (method url body) """
-     handles /bar
-     """
+(fun handle_bar (method url body)
      (simpleweb::html_response (x::html 
      (x::head (x::title "bar"))
      (x::body
