@@ -17,7 +17,7 @@ DESCRIPTION
 		item should be a function, module or context
 	"""
 	(= result (doc (eval item)))
-	(= pipe (stdio::popen "less" "w"))
+	(= pipe (stdio::popen "less -XF" "w"))
 	(stdio::fprintf pipe result)
 	(stdio::pclose pipe)
 	None

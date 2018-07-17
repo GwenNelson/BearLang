@@ -828,6 +828,49 @@ bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    return symval;
 }
 
+// utility function used by below oper to generate documentation for a module
+bl_val_t* bl_genmod_doc(bl_val_t* ctx, bl_val_t* sym, bl_val_t* mod) { // LCOV_EXCL_LINE
+     bl_val_t* NAME = bl_ctx_get(mod,bl_mk_symbol("*NAME*"));
+     if(NAME==NULL) NAME=sym;
+
+     char* retval = "NAME\n\t";
+     retval = safe_strcat(retval,NAME->s_val);
+
+     bl_val_t* SUMMARY = bl_ctx_get(mod,bl_mk_symbol("*SUMMARY*"));
+     if(SUMMARY!=NULL) {
+        retval = safe_strcat(retval," - ");
+	retval = safe_strcat(retval,SUMMARY->s_val);
+     }
+
+     retval = safe_strcat(retval,"\n");
+
+     bl_val_t* DESCRIPTION = bl_ctx_get(mod, bl_mk_symbol("*DESCRIPTION*"));
+     if(DESCRIPTION!=NULL) {
+	retval = safe_strcat(retval,"\nDESCRIPTION");
+        bl_val_t* split_desc = split_str(DESCRIPTION->s_val,"\n");
+	printf("split_desc: %s\n", bl_ser_sexp(split_desc));
+	for(; split_desc != NULL; split_desc=split_desc->cdr) {
+	    retval = safe_strcat(retval,"\t");
+            retval = safe_strcat(retval,split_desc->car->s_val);
+	    retval = safe_strcat(retval,"\n");
+	}
+	retval = safe_strcat(retval,"\n");
+     }
+
+     bl_val_t* EXAMPLE = bl_ctx_get(mod, bl_mk_symbol("*EXAMPLE*"));
+     if(EXAMPLE!=NULL) {
+	retval = safe_strcat(retval,"EXAMPLE");
+        bl_val_t* split_desc = split_str(EXAMPLE->s_val,"\n");
+	printf("split_desc: %s\n", bl_ser_sexp(split_desc));
+	for(; split_desc != NULL; split_desc=split_desc->cdr) {
+	    retval = safe_strcat(retval,"\t");
+            retval = safe_strcat(retval,split_desc->car->s_val);
+	    retval = safe_strcat(retval,"\n");
+	}
+     }
+
+     return bl_mk_str(retval);
+}
 
 bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
@@ -858,6 +901,9 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 		    } else {
                             docstr = bl_mk_str(bl_ser_sexp(bl_list_prepend(first_eval->bl_funcargs_ptr,first_eval->sym)));
 		    }
+	    break;
+	    case BL_VAL_TYPE_CTX:
+		    docstr = bl_genmod_doc(ctx, first,first_eval);
 	    break;
 	    default:
 		    docstr = bl_mk_str(bl_ser_sexp(first_eval));
