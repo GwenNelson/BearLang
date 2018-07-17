@@ -912,6 +912,7 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
      bl_val_t* first      = bl_list_first(params);
      bl_val_t* first_eval = bl_ctx_eval(ctx,first);
 
+     if(first_eval->type == BL_VAL_TYPE_SYMBOL) first_eval = bl_ctx_get(ctx,first_eval);
      char* retval = "";
 
      // first, check if the symbol exists
@@ -921,10 +922,13 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
      // now check if there's a docstring
      bl_val_t* docstr = first_eval->docstr;
+
      if(docstr == NULL) {
         if(first_eval->type == BL_VAL_TYPE_CTX) {
            docstr = bl_ctx_get(first_eval,bl_mk_symbol("DOC"));
 	}
+     } else {
+        return bl_mk_str(docstr->s_val);
      }
 
      char* buf = NULL;

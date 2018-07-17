@@ -33,6 +33,14 @@
 	 (x::a (@ 'href "/") "Return to index")
 	 ))))
 
+(fun handle_builtins (method url body)
+     (simpleweb::html_response (x::html
+     (x::head (x::title "BearLang documentation - builtins"))
+     (x::body
+        (x::pre
+         (+ (map (fn (b) (+ b "\n" (doc b) "\n")) (listbuiltins) ))))))
+     )
+
 (fun handle_index (method url body)
      (simpleweb::html_response (x::html
        (x::head (x::title "BearLang Documentation - index"))
@@ -46,8 +54,9 @@
      )
 
 (= urls (
-	 ('/module/ handle_module)
-	 ('/        handle_index)
+	 ('/module/  handle_module)
+	 ('/builtins handle_builtins)
+	 ('/         handle_index)
 	 ))
 
 (= my_handler (web::get_handler urls))
