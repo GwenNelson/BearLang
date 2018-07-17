@@ -3,12 +3,35 @@
 #include <bearlang/ctx.h>
 #include <bearlang/utils.h>
 #include <bearlang/list_ops.h>
+#include <bearlang/sexp.h>
 #include <Python.h>
 
 bl_val_t* py_invoke_callable(bl_val_t* ctx, bl_val_t* params) {
      void* custom_data  = params->custom_data;
      PyObject* callable = (PyObject*)custom_data;
-     PyObject* args     = Py_BuildValue("(s)","test");
+
+     PyObject* args     = PyTuple_New(bl_list_len(params));
+
+     bl_val_t* L = params;
+     PyObject* v=NULL;
+     int i=0;
+     for(; L != NULL; L=L->cdr) {
+         switch(L->car->type) {
+            case BL_VAL_TYPE_NUMBER:
+		 v = PyInt_FromString(bl_ser_sexp(L->car), NULL,10);
+	    break;
+	    case BL_VAL_TYPE_STRING:
+	         v = PyString_FromString(L->car->s_val);
+	    break;
+	    default:
+                 v = PyString_FromString(bl_ser_sexp(L->car));
+	    break;
+         }
+	     PyTuple_SetItem(args,i,v);
+
+         i++;
+     }
+
      PyObject* retval   = PyEval_CallObject(callable,args);
      return bl_mk_null();
 }
