@@ -34,7 +34,7 @@ bl_val_t* bl_mod_init(bl_val_t* ctx) {
 
      bl_val_t* oper_exit = bl_mk_native_oper(&bl_exit);
      oper_exit->docstr = bl_mk_docstr("(exit retval)\n"
-		                      "\texits to OS, if retval param is not provided then it is set to 0\n");
+		                      "\t\texits to OS, if retval param is not provided then it is set to 0\n");
      bl_ctx_set(my_ctx,bl_mk_symbol("exit"), oper_exit);
 
      bl_ctx_set(my_ctx,bl_mk_symbol("*NAME*"),       bl_mk_str(bl_module_name));

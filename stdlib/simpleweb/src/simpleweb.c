@@ -7,6 +7,11 @@
 
 #include "mongoose.h"
 
+static char* bl_module_name        = "simpleweb";
+static char* bl_module_summary     = "Basic webserver implementation";
+static char* bl_module_description = "This module implements simple webapp support, see the web module for a higher-level interface";
+
+
 typedef struct simpleweb_html_resp_t {
     size_t content_len;
     char*  html_content;
@@ -82,7 +87,20 @@ bl_val_t* bl_serve(bl_val_t* ctx, bl_val_t* params) {
 
 bl_val_t* bl_mod_init(bl_val_t* ctx) {
      bl_val_t* my_ctx = bl_ctx_new(ctx);
-     bl_ctx_set(my_ctx, bl_mk_symbol("html_response"), bl_mk_native_oper(&bl_html_response));
-     bl_ctx_set(my_ctx, bl_mk_symbol("serve"),         bl_mk_native_oper(&bl_serve));
+
+     bl_val_t* html_response_oper = bl_mk_native_oper(&bl_html_response);
+     html_response_oper->docstr = bl_mk_docstr("(html_response contents)\n"
+		                               "\t\t This should be returned from a handler function to return an HTML page");
+     bl_ctx_set(my_ctx, bl_mk_symbol("html_response"), html_response_oper);
+
+     bl_val_t* serve_oper = bl_mk_native_oper(&bl_serve);
+     serve_oper->docstr   = bl_mk_docstr("(serve portnum handler_func)\n"
+		                         "\t\t Start listening for clients on the specified port number, passes incoming requests to handler_func\n"
+					 "\t\t handler_func should accept params (method url body)"); 
+     bl_ctx_set(my_ctx, bl_mk_symbol("serve"),serve_oper);
+
+     bl_ctx_set(my_ctx,bl_mk_symbol("*NAME*"),       bl_mk_str(bl_module_name));
+     bl_ctx_set(my_ctx,bl_mk_symbol("*SUMMARY*"),    bl_mk_str(bl_module_summary));
+     bl_ctx_set(my_ctx,bl_mk_symbol("*DESCRIPTION*"),bl_mk_str(bl_module_description));
      return my_ctx;
 }

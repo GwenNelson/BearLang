@@ -92,7 +92,11 @@ bl_val_t* bl_mod_init(bl_val_t* ctx) {
 
      PyList_Append(sysPath, PyString_FromString("."));
      bl_val_t* my_ctx       = bl_ctx_new(ctx);
-     bl_ctx_set(my_ctx, bl_mk_symbol("import"), bl_mk_native_oper(&py_import));
+
+     bl_val_t* oper_py_import = bl_mk_native_oper(&py_import);
+     oper_py_import->docstr = bl_mk_docstr("(import module)\n"
+		                           "\t\tImports a python module and returns it, does not bind the module to a symbol");
+     bl_ctx_set(my_ctx, bl_mk_symbol("import"), oper_py_import);
 
      
      bl_ctx_set(my_ctx,bl_mk_symbol("*NAME*"),       bl_mk_str(bl_module_name));
