@@ -1,19 +1,4 @@
 // Used for implementing SXML-type XML generation
-// (import xml)
-// (using xml::x)
-// (x::html 
-//     (x::head (x::title "An example"))
-//     (x::body
-//         (x::h1 (@ 'id "greeting") "Hi there!")
-//         (x::p "This is an example."))
-//
-// <html>
-//    <head><title>An example</title></head>
-//    <body>
-//       <h1 id="greeting">Hi there!</h1>
-//       <p>This is an example.</p>
-//    </body>
-// </html>
 
 #include <bearlang/common.h>
 #include <bearlang/types.h>
@@ -22,6 +7,27 @@
 #include <bearlang/list_ops.h>
 #include <bearlang/string_ops.h>
 #include <bearlang/sexp.h>
+
+static char* bl_module_name        = "xml";
+static char* bl_module_summary     = "tools for generating and parsing XML";
+static char* bl_module_description = "This module provides tools for converting between s-expressions and XML using SXML style expressions";
+static char* bl_module_example     = ""
+"(import xml)\n"
+"(using xml::x)\n"
+"(x::html \n"
+"     (x::head (x::title \"An example\"))\n"
+"     (x::body\n"
+"         (x::h1 (@ 'id \"greeting\") \"Hi there!\")\n"
+"         (x::p \"This is an example.\"))\n"
+"\n"
+" <html>\n"
+"    <head><title>An example</title></head>\n"
+"    <body>\n"
+"       <h1 id=\"greeting\">Hi there!</h1>\n"
+"       <p>This is an example.</p>\n"
+"    </body>\n"
+" </html>\n";
+
 
 bl_val_t* xml_gen_oper(bl_val_t* ctx, bl_val_t* params) {
      bl_val_t* sym_name = params->invoked_sym;
@@ -102,5 +108,10 @@ bl_val_t* bl_mod_init(bl_val_t* ctx) {
      xml_ctx->ctx_get      = &x_get;
      bl_ctx_set(my_ctx,bl_mk_symbol("x"),xml_ctx);
      bl_ctx_set(my_ctx,bl_mk_symbol("escape"), bl_mk_native_oper(&xml_escape));
+
+     bl_ctx_set(my_ctx,bl_mk_symbol("*NAME*"),       bl_mk_str(bl_module_name));
+     bl_ctx_set(my_ctx,bl_mk_symbol("*SUMMARY*"),    bl_mk_str(bl_module_summary));
+     bl_ctx_set(my_ctx,bl_mk_symbol("*DESCRIPTION*"),bl_mk_str(bl_module_description));
+     bl_ctx_set(my_ctx,bl_mk_symbol("*EXAMPLE*"),    bl_mk_str(bl_module_example));
      return my_ctx;
 }
