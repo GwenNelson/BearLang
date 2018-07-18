@@ -19,7 +19,9 @@ endif  (CMAKE_BUILD_TYPE STREQUAL "Debug")
 find_package (LibGc REQUIRED)
 find_package (Readline REQUIRED)
 find_package (FLEX REQUIRED)
+find_package(PkgConfig)
 
+pkg_check_modules(LIBJIT REQUIRED libjit)
 
 file(GLOB RUNTIME_SOURCE "runtime/src/*.c")
 
@@ -35,6 +37,7 @@ include_directories(${LIBGC_INCLUDE_DIR})
 include_directories(${Readline_INCLUDE_DIR})
 include_directories(${FLEX_INCLUDES})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${LIBJIT_INCLUDE_DIR})
 
 
 FLEX_TARGET(BLLexer
@@ -44,7 +47,7 @@ FLEX_TARGET(BLLexer
 	    DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/bl_lexer.h)
 
 add_library(blruntime SHARED ${RUNTIME_SOURCE} ${FLEX_BLLexer_OUTPUTS})
-target_link_libraries(blruntime ${LIBGC_LIBRARIES} ${FLEX_LIBRARIES} ${Readline_LIBRARY} dl gmp)
+target_link_libraries(blruntime ${LIBGC_LIBRARIES} ${FLEX_LIBRARIES} ${Readline_LIBRARY} jit dl gmp)
 
 add_subdirectory(stdlib)
 

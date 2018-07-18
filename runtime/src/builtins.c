@@ -17,8 +17,52 @@
 #include <stdbool.h>
 #include <libgen.h>
 
+#include <jit/jit.h>
+
 #define PARAM_LEN_CHECK(min,max) bl_val_t* retval = bl_errif_invalid_len(params,min,max); \
 				 if(retval != NULL) return retval;
+
+static bool bl_jit_init=false; // set true if the JIT has been setup
+static jit_context_t jit_context;
+
+void init_jit() {
+     jit_context = jit_context_create();
+     bl_jit_init    = true;
+}
+
+
+bl_val_t* bl_oper_jit(bl_val_t* ctx, bl_val_t* params) {
+   if(!bl_jit_init) init_jit();
+   bl_val_t* func = bl_list_first(params);
+   
+   jit_context_build_start(jit_context);
+   jit_function_t jitted_func;
+   jit_type_t jit_params[2];
+   jit_params[0] = jit_type_void_ptr;
+   jit_params[1] = jit_type_void_ptr;
+   jit_type_t func_sig = jit_type_create_signature(jit_abi_cdecl, jit_type_void_ptr, jit_params, 2, 1);
+   jitted_func = jit_function_create(jit_context,func_sig);
+
+   // placeholder function, substitutes in (print)
+   jit_value_t func_ctx           = jit_value_get_param(jitted_func,0); 
+   jit_value_t func_called_params = jit_value_get_param(jitted_func,1);
+
+   jit_value_t eval_args[2];
+   eval_args[0] = func_ctx;
+   eval_args[1] = func_called_params;
+
+   jit_value_t func_ret = jit_insn_call_native(jitted_func,"bl_oper_print",&bl_oper_print,func_sig,eval_args,2,0);
+   jit_insn_return(jitted_func, func_ret);
+
+   jit_function_compile(jitted_func);
+   jit_context_build_end(jit_context);
+  
+
+
+   bl_val_t* retval    = bl_mk_native_oper(jit_function_to_closure(jitted_func));
+
+   return retval;
+}
 
 bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    PARAM_LEN_CHECK(2,2)
