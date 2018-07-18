@@ -7,7 +7,7 @@
 #include <bearlang/error_tools.h>
 #include <bearlang/utils.h>
 #include <bearlang/string_ops.h>
-
+#include <bearlang/bearjit.h>
 #include <glob.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -18,18 +18,8 @@
 #include <libgen.h>
 #include <time.h>
 
-#include <jit/jit.h>
-
 #define PARAM_LEN_CHECK(min,max) bl_val_t* retval = bl_errif_invalid_len(params,min,max); \
 				 if(retval != NULL) return retval;
-
-static bool bl_jit_init=false; // set true if the JIT has been setup
-static jit_context_t jit_context;
-
-void init_jit() {
-     jit_context = jit_context_create();
-     bl_jit_init    = true;
-}
 
 bl_val_t* bl_oper_profile(bl_val_t* ctx, bl_val_t* params) {
    clock_t start = clock();
@@ -37,81 +27,8 @@ bl_val_t* bl_oper_profile(bl_val_t* ctx, bl_val_t* params) {
    clock_t end = clock();
    double elapsed_time = (end-start)/(double)CLOCKS_PER_SEC;
    char outbuf[512];
-   snprintf(outbuf,512,"Took %d seconds", end-start);
+   snprintf(outbuf,512,"Took %f seconds", elapsed_time);
    return bl_mk_str(outbuf);
-}
-
-bl_val_t* bl_oper_jit(bl_val_t* ctx, bl_val_t* params) {
-   if(!bl_jit_init) init_jit();
-   bl_val_t* func = bl_list_first(params);
-   
-   if(func->type == BL_VAL_TYPE_SYMBOL) func = bl_ctx_get(ctx,func);
-
-   jit_context_build_start(jit_context);
-   jit_function_t jitted_func;
-   jit_type_t jit_params[2];
-   jit_params[0] = jit_type_void_ptr;
-   jit_params[1] = jit_type_void_ptr;
-   jit_type_t func_sig = jit_type_create_signature(jit_abi_cdecl, jit_type_void_ptr, jit_params, 2, 1);
-   jitted_func = jit_function_create(jit_context,func_sig);
-
-   // the below creates the function
-
-   // grab ctx and params
-   jit_value_t func_ctx           = jit_value_get_param(jitted_func,0); 
-   jit_value_t func_called_params = jit_value_get_param(jitted_func,1);
-
-   // evaluate params via bl_ctx_eval
-   jit_value_t eval_args[2];
-   eval_args[0] = func_ctx;
-   eval_args[1] = func_called_params;
-   func_called_params = jit_insn_call_native(jitted_func,"bl_ctx_eval",&bl_ctx_eval,func_sig,eval_args,2,0);
-
-   // create inner closure via bl_ctx_new
-   jit_value_t lexical_closure;
-   jit_value_t inner_closure;
-   jit_type_t  bl_ctx_new_param = jit_type_void_ptr;
-   jit_type_t  bl_ctx_new_sig = jit_type_create_signature(jit_abi_cdecl, jit_type_void_ptr, &bl_ctx_new_param,1,1);
-
-   lexical_closure = jit_value_create_long_constant(jitted_func, jit_type_void_ptr,(long)func->lexical_closure);
-   inner_closure   = jit_insn_call_native(jitted_func,"bl_ctx_new",&bl_ctx_new,bl_ctx_new_sig, &lexical_closure,1,0);
-
-   // bind parameters via bl_set_params
-   jit_type_t bl_set_param_args[3];
-   bl_set_param_args[0] = jit_type_void_ptr;
-   bl_set_param_args[1] = jit_type_void_ptr;
-   bl_set_param_args[2] = jit_type_void_ptr;
-
-   jit_type_t bl_set_param_sig = jit_type_create_signature(jit_abi_cdecl, jit_type_void_ptr, bl_set_param_args,3,1);
-   
-   jit_value_t bl_set_param_arg_vals[3];
-   bl_set_param_arg_vals[0] = inner_closure;
-   bl_set_param_arg_vals[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, func->bl_operargs_ptr);
-   bl_set_param_arg_vals[2] = func_called_params;
-
-   jit_insn_call_native(jitted_func,"bl_set_params",&bl_set_params,bl_set_param_sig,bl_set_param_arg_vals,3,0);
-
-
-   // iterate over the contents of the function and call bl_ctx_eval on each
-   jit_value_t func_ret;
-   bl_val_t* L = func->bl_func_ptr;
-   eval_args[0] = inner_closure;
-
-   // TODO - optimise this to support TCO etc
-   for(L=func->bl_func_ptr; L!=NULL; L=L->cdr) {
-       eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, L->car);
-       jit_value_t func_ret = jit_insn_call_native(jitted_func,"bl_ctx_eval",&bl_ctx_eval,func_sig,eval_args,2,0);
-   }
-
-   jit_insn_return(jitted_func, func_ret);
-
-
-   jit_function_compile(jitted_func);
-   jit_context_build_end(jit_context);
-
-   bl_val_t* retval    = bl_mk_native_oper(jit_function_to_closure(jitted_func));
-
-   return retval;
 }
 
 bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
@@ -551,8 +468,11 @@ bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    retval->lexical_closure = ctx;
    retval->inner_closure   = bl_ctx_new(ctx);
    retval->sym = bl_list_first(params); 
-   
-   bl_ctx_set(ctx, retval->sym, retval);
+
+   bl_val_t* new_retval = bl_mk_native_oper(bl_jit_func(retval));
+   new_retval->sym      = retval->sym;
+   new_retval->docstr   = retval->docstr;   
+   bl_ctx_set(ctx, retval->sym, new_retval);
    return retval;
 }
 

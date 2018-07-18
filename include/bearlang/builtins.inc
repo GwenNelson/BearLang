@@ -1,9 +1,6 @@
 BUILTIN_X(profile,"profile","(profile expr)\n"
 			    "\t profiles the run time it takes to evaluate expr\n")
 
-BUILTIN_X(jit,"jit","(jit func)\n"
-	            "\t JIT compiles the specified function and returns a compiled version\n")
-
 BUILTIN_X(listbuiltins,"listbuiltins","(listbuiltins)\n"
 	                              "\t Returns a list of all builtins in the current runtime\n")
 
