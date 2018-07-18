@@ -57,7 +57,7 @@ bl_val_t* bl_oper_pmatch(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 }
 
 bl_val_t* bl_oper_startswith(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   PARAM_LEN_CHECK(2,2)
+
    params = bl_ctx_eval(ctx,params);
    bl_val_t* first  = bl_list_first(params);
    bl_val_t* second = bl_list_second(params);
@@ -234,7 +234,7 @@ bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 }
 
 bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-
+   if(params->type == BL_VAL_TYPE_NULL) return bl_errif_invalid_len(bl_mk_null(),1,BL_LONGEST_LIST);
    bl_val_t* L = bl_eval_cons(ctx,params);
    if(L->type == BL_VAL_TYPE_ERROR) return L;
    bl_val_t* retval = bl_errif_invalid_len(L,1,BL_LONGEST_LIST);

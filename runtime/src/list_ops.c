@@ -68,8 +68,8 @@ bl_val_t* bl_list_append(bl_val_t* L, bl_val_t* val) { // LCOV_EXCL_LINE
 }
 
 uint64_t bl_list_len(bl_val_t* L) { // LCOV_EXCL_LINE
-
    if(L==NULL) return 0;
+   if(L->type == BL_VAL_TYPE_NULL) return 0;
    if(L->car==NULL) return 0;
    uint64_t retval = 0;
 

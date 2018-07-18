@@ -1131,6 +1131,15 @@ int test_aget_oper() {
 
 }
 
+int test_throw_oper() {
+    bl_val_t* ctx        = bl_ctx_new_std();
+    bl_val_t* throw_expr = bl_parse_sexp("(throw myerr 1234)");
+    bl_val_t* err        = bl_ctx_eval(ctx,throw_expr);
+    ASSERT("error type is returned", err->type==BL_VAL_TYPE_ERROR)
+    ASSERT("error type is correct",  err->err_val.err_sym == bl_mk_symbol("myerr"))
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1212,6 +1221,8 @@ int main(int argc, char** argv) {
     TEST("join_str                                   ", test_join_str)
     TEST("import .bl file                            ", test_import_bl_file)
     TEST("aget oper                                  ", test_aget_oper)
+    TEST("throw oper                                 ", test_throw_oper)
+
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
