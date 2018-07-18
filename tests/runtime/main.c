@@ -856,18 +856,18 @@ int test_simple_oper() {
 int test_map_error() {
     bl_val_t* ctx = bl_ctx_new_std();
     bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(map foo)"));
-    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
+    ASSERT("(map foo) Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
 
     result = bl_ctx_eval(ctx,bl_parse_sexp("(map 1 2)"));
-    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
+    ASSERT("(map 1 2) Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
 
     bl_ctx_eval(ctx,bl_parse_sexp("(fun errfunc (x) True bar)"));
     result = bl_ctx_eval(ctx,bl_parse_sexp("(map errfunc (1 2 3))"));
-    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
+    ASSERT("(map errfunc 1 2 3) Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
 
     bl_ctx_eval(ctx,bl_parse_sexp("(fun errfunc (x) foobar True)"));
     result = bl_ctx_eval(ctx,bl_parse_sexp("(map errfunc (1 2 3))"));
-    ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
+    ASSERT("(map errfunc 1 2 3) Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
 
     bl_ctx_close(ctx);
     return 0;
