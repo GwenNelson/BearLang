@@ -16,6 +16,10 @@
 #include <stdlib.h>
 #include <errno.h>
 
+static char* bl_module_name        = "stdio";
+static char* bl_module_summary     = "POSIX I/O";
+static char* bl_module_description = "This module provides an interface to the standard POSIX file I/O functions";
+
 // pre-allocated errors
 bl_val_t mode_error = {
   .type=BL_VAL_TYPE_ERROR,
@@ -264,17 +268,55 @@ bl_val_t* bl_pclose(bl_val_t* ctx, bl_val_t* params) {
      return bl_mk_null();
 }
 
+#define STDIO_FUNC(func_name,func_doc) bl_val_t* func_name ## _oper = bl_mk_native_oper(&bl_ ## func_name ); \
+					func_name ## _oper->docstr = bl_mk_docstr(func_doc); \
+					bl_ctx_set(my_ctx, bl_mk_symbol( #func_name ), func_name ## _oper); \
+				       
+
 bl_val_t* bl_mod_init(bl_val_t* ctx) {
      bl_val_t* my_ctx = bl_ctx_new(ctx);
-     bl_ctx_set(my_ctx,bl_mk_symbol("fopen"),   bl_mk_native_oper(&bl_fopen));
-     bl_ctx_set(my_ctx,bl_mk_symbol("fclose"),  bl_mk_native_oper(&bl_fclose));
-     bl_ctx_set(my_ctx,bl_mk_symbol("fprintf"), bl_mk_native_oper(&bl_fprintf));
-     bl_ctx_set(my_ctx,bl_mk_symbol("fgets"),   bl_mk_native_oper(&bl_fgets));
-     bl_ctx_set(my_ctx,bl_mk_symbol("readline"),bl_mk_native_oper(&bl_readline));
-     bl_ctx_set(my_ctx,bl_mk_symbol("popen"),   bl_mk_native_oper(&bl_popen));
-     bl_ctx_set(my_ctx,bl_mk_symbol("pclose"),  bl_mk_native_oper(&bl_pclose));
+     STDIO_FUNC(fopen,"(fopen filename mode)\n"
+		      "\t\t Opens a file and returns a handle")
 
-     bl_ctx_set(my_ctx,bl_mk_symbol("STDIN"),   bl_mk_ptr((void*)stdin));
-     bl_ctx_set(my_ctx,bl_mk_symbol("STDOUT"),  bl_mk_ptr((void*)stdout));
+     STDIO_FUNC(fclose,"(fclose handle)\n"
+		       "\t\t Closes the file")
+
+     STDIO_FUNC(fprintf,"(fprintf FD format-string ...)\n"
+			"\t\t format-string accepts the following format characters:\n"
+			"\t\t    %s string (or a string representation of the value)\n"
+			"\t\t    %x converts to hex representation, always has a leading 0x\n"
+			"\t\t    %% literal % character\n"
+			"\t\t any other format characters will be ignored\n"
+			"\t\t if not enough arguments are provided, (null) or 0x00 will be printed in place of the format character\n")
+
+     STDIO_FUNC(fgets,"(fgets FD maxlen)\n"
+		      "\t\t Reads a string up to maxlen from the specified file descriptor")
+
+     STDIO_FUNC(readline,"(readline prompt)\n"
+		         "\t\t Wrapper around the readline library, displays a prompt on stdout and reads a string from the user")
+
+     STDIO_FUNC(popen,"(popen command mode)\n"
+  		      "\t\t Wrapper around popen(3), on success returns a file descriptor")
+
+     STDIO_FUNC(pclose,"(pclose stream)\n"
+		       "\t\t Closes a stream opened by popen")
+
+
+     bl_val_t* stdin_ptr = bl_mk_ptr((void*)stdin);
+     stdin_ptr->docstr = bl_mk_docstr("stdin file descriptor");
+     bl_ctx_set(my_ctx,bl_mk_symbol("STDIN"),   stdin_ptr);
+
+     bl_val_t* stdout_ptr = bl_mk_ptr((void*)stdout);
+     stdout_ptr->docstr = bl_mk_docstr("stdout file descriptor");
+     bl_ctx_set(my_ctx,bl_mk_symbol("STDOUT"),   stdout_ptr);
+
+     bl_val_t* stderr_ptr = bl_mk_ptr((void*)stderr);
+     stderr_ptr->docstr = bl_mk_docstr("stderr file descriptor");
+     bl_ctx_set(my_ctx,bl_mk_symbol("STDERR"),   stderr_ptr);
+
+     bl_ctx_set(my_ctx,bl_mk_symbol("*NAME*"),       bl_mk_str(bl_module_name));
+     bl_ctx_set(my_ctx,bl_mk_symbol("*SUMMARY*"),    bl_mk_str(bl_module_summary));
+     bl_ctx_set(my_ctx,bl_mk_symbol("*DESCRIPTION*"),bl_mk_str(bl_module_description));
+
      return my_ctx;
 }
