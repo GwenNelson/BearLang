@@ -1,3 +1,6 @@
+BUILTIN_X(profile,"profile","(profile expr)\n"
+			    "\t profiles the run time it takes to evaluate expr\n")
+
 BUILTIN_X(jit,"jit","(jit func)\n"
 	            "\t JIT compiles the specified function and returns a compiled version\n")
 

@@ -16,6 +16,7 @@
 #include <gmp.h>
 #include <stdbool.h>
 #include <libgen.h>
+#include <time.h>
 
 #include <jit/jit.h>
 
@@ -30,6 +31,15 @@ void init_jit() {
      bl_jit_init    = true;
 }
 
+bl_val_t* bl_oper_profile(bl_val_t* ctx, bl_val_t* params) {
+   clock_t start = clock();
+   bl_ctx_eval(ctx,params);
+   clock_t end = clock();
+   double elapsed_time = (end-start)/(double)CLOCKS_PER_SEC;
+   char outbuf[512];
+   snprintf(outbuf,512,"Took %d seconds", end-start);
+   return bl_mk_str(outbuf);
+}
 
 bl_val_t* bl_oper_jit(bl_val_t* ctx, bl_val_t* params) {
    if(!bl_jit_init) init_jit();
@@ -86,6 +96,8 @@ bl_val_t* bl_oper_jit(bl_val_t* ctx, bl_val_t* params) {
    jit_value_t func_ret;
    bl_val_t* L = func->bl_func_ptr;
    eval_args[0] = inner_closure;
+
+   // TODO - optimise this to support TCO etc
    for(L=func->bl_func_ptr; L!=NULL; L=L->cdr) {
        eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, L->car);
        jit_value_t func_ret = jit_insn_call_native(jitted_func,"bl_ctx_eval",&bl_ctx_eval,func_sig,eval_args,2,0);
@@ -93,12 +105,9 @@ bl_val_t* bl_oper_jit(bl_val_t* ctx, bl_val_t* params) {
 
    jit_insn_return(jitted_func, func_ret);
 
-   jit_dump_function(stdout,jitted_func,"");
 
    jit_function_compile(jitted_func);
    jit_context_build_end(jit_context);
-  
-
 
    bl_val_t* retval    = bl_mk_native_oper(jit_function_to_closure(jitted_func));
 
