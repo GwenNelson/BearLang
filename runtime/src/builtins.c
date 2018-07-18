@@ -17,20 +17,23 @@
 #include <stdbool.h>
 #include <libgen.h>
 
-// LCOV_EXCL_START
+#define PARAM_LEN_CHECK(min,max) bl_val_t* retval = bl_errif_invalid_len(params,min,max); \
+				 if(retval != NULL) return retval;
+
 bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   PARAM_LEN_CHECK(2,2)
+
    bl_val_t* errtype = bl_list_first(params);
    bl_val_t* errval  = bl_ctx_eval(ctx,bl_list_second(params));
    if(errval == NULL) errval = bl_mk_null();
-   bl_val_t* retval = bl_mk_err(BL_ERR_BL_CUSTOM);
+   retval = bl_mk_err(BL_ERR_BL_CUSTOM);
    retval->err_val.err_sym = errtype;
    retval->err_val.err_val = errval;
    return retval;
 }
-// LCOV_EXCL_STOP
 
 bl_val_t* bl_oper_listbuiltins(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   bl_val_t* retval = NULL;
+   PARAM_LEN_CHECK(0,0)
    #define BUILTIN_RETURN(builtin_name,builtin_symbol,builtin_docstr) retval=bl_list_prepend(retval,bl_mk_symbol(builtin_symbol));
    #define BUILTIN_X BUILTIN_RETURN
    #include <bearlang/builtins.inc>
@@ -39,9 +42,10 @@ bl_val_t* bl_oper_listbuiltins(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_L
 }
 
 bl_val_t* bl_oper_pmatch(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   PARAM_LEN_CHECK(2,2)
    params      = bl_ctx_eval(ctx,params);
    
-   bl_val_t* retval = bl_mk_null();
+   retval = bl_mk_null();
 
    bl_val_t* S = bl_list_first(params);
    bl_val_t* L = bl_list_second(params);
@@ -53,6 +57,7 @@ bl_val_t* bl_oper_pmatch(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 }
 
 bl_val_t* bl_oper_startswith(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
+   PARAM_LEN_CHECK(2,2)
    params = bl_ctx_eval(ctx,params);
    bl_val_t* first  = bl_list_first(params);
    bl_val_t* second = bl_list_second(params);
