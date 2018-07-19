@@ -59,14 +59,14 @@ void* bl_jit_func(bl_val_t* f) {
       jit_value_t lexical_closure;
       jit_value_t inner_closure;
   
-      lexical_closure = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr,f->lexical_closure);
+      lexical_closure = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr,(jit_nint)f->lexical_closure);
       inner_closure   = jit_insn_call_native(jitted_func,"bl_ctx_new",&bl_ctx_new,bl_jit_sig_ctx_new, &lexical_closure,1,0);
 
       // bind params
       if(bl_list_len(f->bl_operargs_ptr)>0) {
          jit_value_t set_params_args[3];
          set_params_args[0] = inner_closure;
-         set_params_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, f->bl_operargs_ptr);
+         set_params_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, (jit_nint)f->bl_operargs_ptr);
          set_params_args[2] = func_called_params;
 
          jit_insn_call_native(jitted_func,"bl_set_params", &bl_set_params, bl_jit_sig_set_params, set_params_args,3,0);
@@ -94,18 +94,18 @@ void* bl_jit_func(bl_val_t* f) {
 				// TODO - pass invoked_sym and custom_data
 			     E->cdr->invoked_sym = E->car;
 			     E->cdr->custom_data = first->custom_data;
-                             eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, E->cdr);
+                             eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, (jit_nint)E->cdr);
 		             tmp = jit_insn_call_native(jitted_func,bl_ser_sexp(E),first->code_ptr,bl_jit_sig_native_oper,eval_args,2,0);
 		             jit_insn_store(jitted_func,func_ret, tmp);
 			break;
   			default:
-			  eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, E);
+			  eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, (jit_nint)E);
 		          tmp = jit_insn_call_native(jitted_func,bl_ser_sexp(E),&bl_ctx_eval,bl_jit_sig_native_oper,eval_args,2,0);
 		          jit_insn_store(jitted_func,func_ret, tmp);
 			break;
 		  }
 	  } else {
-		  eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, E);
+		  eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, (jit_nint)E);
 	          tmp = jit_insn_call_native(jitted_func,safe_strcat("eval ",bl_ser_sexp(E)),&bl_ctx_eval,bl_jit_sig_native_oper,eval_args,2,0);
 	          jit_insn_store(jitted_func,func_ret, tmp);
 	  }
@@ -121,7 +121,7 @@ void* bl_jit_func(bl_val_t* f) {
       jit_insn_label(jitted_func, &end_of_func);
       jit_insn_return(jitted_func, func_ret);
 
-      jit_dump_function(stdout,jitted_func,f->sym->s_val);
+//      jit_dump_function(stdout,jitted_func,f->sym->s_val);
       jit_function_compile(jitted_func);
 
       jit_context_build_end(bl_jit_context);
