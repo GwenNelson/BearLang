@@ -2,6 +2,8 @@
 #include <bearlang/ctx.h>
 #include <bearlang/bearjit.h>
 #include <bearlang/list_ops.h>
+#include <bearlang/string_ops.h>
+#include <bearlang/sexp.h>
 
 #include <jit/jit.h>
 #include <stdio.h>
@@ -77,10 +79,38 @@ void* bl_jit_func(bl_val_t* f) {
       eval_args[0] = inner_closure;
 
       jit_label_t end_of_func = jit_label_undefined;
+      bl_val_t* E;
       for(L=f->bl_func_ptr; L!=NULL; L=L->cdr) {
-          eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, L->car);
-          tmp = jit_insn_call_native(jitted_func,"bl_ctx_eval",&bl_ctx_eval,bl_jit_sig_native_oper,eval_args,2,0);
-          jit_insn_store(jitted_func,func_ret, tmp);
+          E = L->car;
+	  if(E->type == BL_VAL_TYPE_CONS) {
+		  bl_val_t* first;
+		  if(E->car->type == BL_VAL_TYPE_SYMBOL) {
+		     first = bl_ctx_get(f->lexical_closure,E->car);
+		  } else {
+		     first = E->car;
+		  }
+		  switch(first->type) {
+                  	case BL_VAL_TYPE_OPER_NATIVE:
+				// TODO - pass invoked_sym and custom_data
+			     E->cdr->invoked_sym = E->car;
+			     E->cdr->custom_data = first->custom_data;
+                             eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, E->cdr);
+		             tmp = jit_insn_call_native(jitted_func,bl_ser_sexp(E),first->code_ptr,bl_jit_sig_native_oper,eval_args,2,0);
+		             jit_insn_store(jitted_func,func_ret, tmp);
+			break;
+  			default:
+			  eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, E);
+		          tmp = jit_insn_call_native(jitted_func,bl_ser_sexp(E),&bl_ctx_eval,bl_jit_sig_native_oper,eval_args,2,0);
+		          jit_insn_store(jitted_func,func_ret, tmp);
+			break;
+		  }
+	  } else {
+		  eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, E);
+	          tmp = jit_insn_call_native(jitted_func,safe_strcat("eval ",bl_ser_sexp(E)),&bl_ctx_eval,bl_jit_sig_native_oper,eval_args,2,0);
+	          jit_insn_store(jitted_func,func_ret, tmp);
+	  }
+
+
 	  // check if func_ret is an error, since the error type is the first field in bl_val_t we can simply cast it
           // enums are of type int, so we can treat func_ret as a pointer to type int
 	  jit_value_t ret_type   = jit_insn_load_relative(jitted_func,func_ret,0,jit_type_sys_int);
@@ -90,6 +120,8 @@ void* bl_jit_func(bl_val_t* f) {
 
       jit_insn_label(jitted_func, &end_of_func);
       jit_insn_return(jitted_func, func_ret);
+
+      jit_dump_function(stdout,jitted_func,f->sym->s_val);
       jit_function_compile(jitted_func);
 
       jit_context_build_end(bl_jit_context);
