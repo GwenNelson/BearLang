@@ -57,7 +57,7 @@ bl_val_t* split_str(char* s, char* sep) { // LCOV_EXCL_LINE
 	return retval;
 }
 
-char* str_replace(char* s, char* a, char* b) {
+char* str_replace(char* s, char* a, char* b) { // LCOV_EXCL_LINE
       char* retval = NULL;
       if(strstr(s,a)==NULL) { // if it's not there, we just return s
          return s;

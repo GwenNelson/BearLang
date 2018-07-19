@@ -10,28 +10,14 @@ Add BearLang tests (as in, test suite written in BearLang instead of just plain 
 Add mechanism for error values to go up the stack until hitting a handler
 Add argc/argv global symbols in bli
 Fix all TODO comments in codebase
-Replace mpc with a custom higher-performing parser
 Add context/metadata to the AST
 Ensure 0 compiler warnings
 Make bl_ser_sexp return a string that can always be turned back into the original expression or a placeholder symbo
-Add builtin symbols (nil/None, #t, #f, *VERSION* etc etc)
 Ensure 100% code coverage of runtime lib
 Test runtime lib with all possible error conditions for all params
 Add context/traceback stuff to error type
-Add throw/raise/catch (piggyback on top of error type)
 Handle floats and bignum - dynamically choose type of number at runtime
-Misc lisp primitives
-Make builtin operators work with other data types (concat strings with + operator etc)
-Custom operators - like functions, but params aren't evaluated, instead passed as a simple list
 Macros - like custom operators, but return expressions to be evaluated at compile time
-String input
-Tail call optimisation
-FFI / Interop
-Standard lib + import path
-Basic modules support
-  Native code extension modules
-     Dynamic lib with special symbols
-  .bl modules
 Compiler
   Emit LLVM IR or C
   Compile code down to extension modules

@@ -1140,6 +1140,18 @@ int test_throw_oper() {
     return 0;
 }
 
+int test_str_replace() {
+    char* orig_str = "FOOBAR";
+    char* new_str  = str_replace(orig_str,"FOO","BLA");
+    ASSERT("str_replace works", strcmp(new_str,"BLABAR")==0)
+    
+    orig_str = "IDoNotContainIt";
+    new_str  = str_replace(orig_str,"TheThing","AnotherThing");
+    ASSERT("str_replace works", strcmp(new_str,"IDoNotContainIt")==0)
+
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1222,6 +1234,7 @@ int main(int argc, char** argv) {
     TEST("import .bl file                            ", test_import_bl_file)
     TEST("aget oper                                  ", test_aget_oper)
     TEST("throw oper                                 ", test_throw_oper)
+    TEST("string ops: str_replace                    ", test_str_replace)
 
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
