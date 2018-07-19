@@ -71,6 +71,8 @@ struct bl_hash_t {
 
 typedef struct bl_val_t {
         bl_val_type_t type;
+	// TODO: move the below stuff into a seperate header
+	//       add a bl_header_t* header field
 	bl_val_t* eval_last; // used by bl_eval_cons
 	bl_val_t* docstr;    // docstring for this value
 	bl_val_t* invoked_sym; // informs native opers what symbol was used to invoke them, set on the params

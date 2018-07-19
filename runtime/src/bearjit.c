@@ -82,16 +82,15 @@ void* bl_jit_func(bl_val_t* f) {
       bl_val_t* E;
       for(L=f->bl_func_ptr; L!=NULL; L=L->cdr) {
           E = L->car;
-	  if(E->type == BL_VAL_TYPE_CONS) {
+	  if(E->type == BL_VAL_TYPE_CONS) { // we try to directly generate code here instead of calling out to bl_ctx_eval
 		  bl_val_t* first;
 		  if(E->car->type == BL_VAL_TYPE_SYMBOL) {
-		     first = bl_ctx_get(f->lexical_closure,E->car);
+		     first = bl_ctx_get(f->lexical_closure,E->car); // TODO: handle case where symbols are reassigned inside of function
 		  } else {
 		     first = E->car;
 		  }
 		  switch(first->type) {
                   	case BL_VAL_TYPE_OPER_NATIVE:
-				// TODO - pass invoked_sym and custom_data
 			     E->cdr->invoked_sym = E->car;
 			     E->cdr->custom_data = first->custom_data;
                              eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, (jit_nint)E->cdr);
