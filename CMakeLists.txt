@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.0)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 add_compile_options("-DHASH_FUNCTION=HASH_OAT")
 
+if (UNIX AND NOT APPLE)
+	add_definitions(-D_GNU_SOURCE=1)
+endif()
+
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_compile_options("-ffast-math")
 	add_compile_options("-funroll-loops")
