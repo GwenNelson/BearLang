@@ -108,7 +108,7 @@ void* bl_jit_func(bl_val_t* f) {
          set_params_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, (jit_nint)f->bl_operargs_ptr);
          set_params_args[2] = func_called_params;
 
-//         jit_insn_call_native(jitted_func,"bl_set_params", &bl_set_params, bl_jit_sig_set_params, set_params_args,3,0);
+         jit_insn_call_native(jitted_func,"bl_set_params", &bl_set_params, bl_jit_sig_set_params, set_params_args,3,0);
       }
 
       // iterate over the function body and call bl_ctx_eval on each
@@ -123,7 +123,8 @@ void* bl_jit_func(bl_val_t* f) {
           E = L->car;
 	  switch(E->type) {
 		  case BL_VAL_TYPE_SYMBOL: // if a naked symbol is in a function body, we just look up the value
-			fprintf(stderr,"NAKED SYMBOL! %s\n", bl_ser_sexp(E));
+			// TODO - add checks for non-existent symbols here etc
+  			  fprintf(stderr,"NAKED SYMBOL! %s\n", bl_ser_sexp(E));
  			  jit_insn_store(jitted_func,func_ret,jit_insn_load_elem(jitted_func,inner_closure_symvals,jit_value_create_nint_constant(jitted_func, jit_type_int,E->sym_id),jit_type_void_ptr));
 		  break;
 		  case BL_VAL_TYPE_CONS:

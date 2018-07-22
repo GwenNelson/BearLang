@@ -77,7 +77,11 @@ bl_val_t* bl_ctx_new(bl_val_t* parent) { // LCOV_EXCL_LINE
    bl_val_t* retval   = bl_mk_val(BL_VAL_TYPE_CTX);
    retval->parent     = parent;
    retval->secondary  = NULL;
-   retval->vals_count = 8;
+   if(parent==NULL) {
+	   retval->vals_count = 8;
+   } else {
+	   retval->vals_count = parent->vals_count;
+   }
    retval->vals       = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*retval->vals_count);
    retval->keys       = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*retval->vals_count);
    retval->write_to_parent = false;
