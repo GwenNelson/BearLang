@@ -93,10 +93,10 @@ void* bl_jit_func(bl_val_t* f) {
       jit_value_t inner_closure_symvals   = jit_insn_load_relative(jitted_func,inner_closure,offsetof(bl_val_t,vals),jit_type_void_ptr);
 
       // copy symbol values from lexical to inner closure
-      jit_value_t inner_closure_symkeys   = jit_insn_load_relative(jitted_func,inner_closure,offsetof(bl_val_t,vals),jit_type_void_ptr);
-      jit_value_t lexical_closure_symkeys = jit_insn_load_relative(jitted_func,lexical_closure,offsetof(bl_val_t,vals),jit_type_void_ptr);
-      jit_insn_memmove(jitted_func,inner_closure_symkeys,lexical_closure_symvals,jit_value_create_nint_constant(jitted_func, jit_type_int, sizeof(bl_val_t*)*f->lexical_closure->vals_count));
-      jit_insn_memmove(jitted_func,inner_closure_symvals,lexical_closure_symvals,jit_value_create_nint_constant(jitted_func, jit_type_int, sizeof(bl_val_t*)*f->lexical_closure->vals_count));
+      jit_value_t inner_closure_symkeys   = jit_insn_load_relative(jitted_func,inner_closure,offsetof(bl_val_t,keys),jit_type_void_ptr);
+      jit_value_t lexical_closure_symkeys = jit_insn_load_relative(jitted_func,lexical_closure,offsetof(bl_val_t,keys),jit_type_void_ptr);
+      jit_insn_memcpy(jitted_func,inner_closure_symkeys,lexical_closure_symkeys,jit_value_create_nint_constant(jitted_func, jit_type_int, sizeof(bl_val_t*)*f->lexical_closure->vals_count));
+      jit_insn_memcpy(jitted_func,inner_closure_symvals,lexical_closure_symvals,jit_value_create_nint_constant(jitted_func, jit_type_int, sizeof(bl_val_t*)*f->lexical_closure->vals_count));
 
       // update number of values
       jit_insn_store_relative(jitted_func, inner_closure,offsetof(bl_val_t,vals_count),jit_value_create_nint_constant(jitted_func, jit_type_int, f->lexical_closure->vals_count));
@@ -108,7 +108,7 @@ void* bl_jit_func(bl_val_t* f) {
          set_params_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, (jit_nint)f->bl_operargs_ptr);
          set_params_args[2] = func_called_params;
 
-         jit_insn_call_native(jitted_func,"bl_set_params", &bl_set_params, bl_jit_sig_set_params, set_params_args,3,0);
+//         jit_insn_call_native(jitted_func,"bl_set_params", &bl_set_params, bl_jit_sig_set_params, set_params_args,3,0);
       }
 
       // iterate over the function body and call bl_ctx_eval on each
@@ -123,13 +123,14 @@ void* bl_jit_func(bl_val_t* f) {
           E = L->car;
 	  switch(E->type) {
 		  case BL_VAL_TYPE_SYMBOL: // if a naked symbol is in a function body, we just look up the value
-  			 jit_insn_store(jitted_func,func_ret,jit_insn_load_elem(jitted_func,inner_closure_symvals,jit_value_create_nint_constant(jitted_func, jit_type_int,E->sym_id),jit_type_void_ptr));
+			fprintf(stderr,"NAKED SYMBOL! %s\n", bl_ser_sexp(E));
+ 			  jit_insn_store(jitted_func,func_ret,jit_insn_load_elem(jitted_func,inner_closure_symvals,jit_value_create_nint_constant(jitted_func, jit_type_int,E->sym_id),jit_type_void_ptr));
 		  break;
 		  case BL_VAL_TYPE_CONS:
 			if(E->car->type == BL_VAL_TYPE_SYMBOL) {
 
      				// if it's the first thing in an expression inside of a function body, it must be an oper, right?
-			   jit_value_t oper_sym_val = jit_insn_load_elem(jitted_func,lexical_closure_symvals,jit_value_create_nint_constant(jitted_func, jit_type_int, E->car->sym_id),jit_type_void_ptr);
+			   jit_value_t oper_sym_val = jit_insn_load_elem(jitted_func,inner_closure_symvals,jit_value_create_nint_constant(jitted_func, jit_type_int, E->car->sym_id),jit_type_void_ptr);
 			   jit_value_t oper_sym_code = jit_insn_load_relative(jitted_func,oper_sym_val,offsetof(bl_val_t,code_ptr),jit_type_void_ptr);
 
 			   eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, (jit_nint)E->cdr); 
@@ -137,9 +138,11 @@ void* bl_jit_func(bl_val_t* f) {
 			   tmp = jit_insn_call_indirect(jitted_func, oper_sym_code, bl_jit_sig_native_oper,eval_args,2,0);
 			   jit_insn_store(jitted_func,func_ret,tmp);
 			} else {
+			   fprintf(stderr,"WARNING - car is not symbol in %s\n", bl_ser_sexp(E));
 			}	
 		  break;
 		  default:
+			fprintf(stderr,"WARNING - don't know how to handle %s\n", bl_ser_sexp(E));
 		  break;
 	  }
 
@@ -183,9 +186,9 @@ void* bl_jit_func(bl_val_t* f) {
       jit_insn_label(jitted_func, &end_of_func);
       jit_insn_return(jitted_func, func_ret);
 
-      jit_dump_function(stdout,jitted_func,f->sym->s_val);
+//      jit_dump_function(stdout,jitted_func,f->sym->s_val);
       jit_function_compile(jitted_func);
-      jit_dump_function(stdout,jitted_func,f->sym->s_val);
+//      jit_dump_function(stdout,jitted_func,f->sym->s_val);
 
       jit_context_build_end(bl_jit_context);
       return jit_function_to_closure(jitted_func);
