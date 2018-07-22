@@ -38,7 +38,33 @@ void bl_init_jit() {
      bl_jit_intptr = jit_type_create_pointer(jit_type_sys_int,0);
 }
 
+// precompile optimisations
+// does the following:
+//   1 - scan through for all symbols in the function body
+//   2 - copy their bindings from the parent context into the lexical closure unless they're param symbols or quoted
+//
+// this means that at compile time it's possible to link directly to the symbol value for most symbols
+
+void precompile_opt_func_syms(bl_val_t* f, bl_val_t* expr);
+void precompile_opt_func_syms(bl_val_t* f, bl_val_t* expr) {
+     bl_val_t* L = expr;
+     if(expr->type == BL_VAL_TYPE_CONS) {
+	     for(;L != NULL; L = L->cdr) {
+		 precompile_opt_func_syms(f,L->car);
+	     }
+     } else if(expr->type == BL_VAL_TYPE_SYMBOL) {
+	// first check if it's in the params
+        for(L=f->bl_funcargs_ptr; L != NULL; L = L->cdr) {
+	    if(L->car == expr) return; // if it's in the args, skip it
+	    // otherwise, it's time to copy
+	    bl_ctx_set(f->lexical_closure,expr,bl_ctx_get(f->lexical_closure,expr)); // if it's already in the lexical closure, this won't overwrite with the parent
+	}
+     }
+
+}
+
 void* bl_jit_func(bl_val_t* f) {
+      precompile_opt_func_syms(f,f->bl_func_ptr);
       jit_context_build_start(bl_jit_context);
       jit_function_t jitted_func;
 
@@ -62,6 +88,19 @@ void* bl_jit_func(bl_val_t* f) {
       lexical_closure = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr,(jit_nint)f->lexical_closure);
       inner_closure   = jit_insn_call_native(jitted_func,"bl_ctx_new",&bl_ctx_new,bl_jit_sig_ctx_new, &lexical_closure,1,0);
 
+      // setup pointers for symbols
+      jit_value_t lexical_closure_symvals = jit_insn_load_relative(jitted_func,lexical_closure,offsetof(bl_val_t,vals),jit_type_void_ptr);
+      jit_value_t inner_closure_symvals   = jit_insn_load_relative(jitted_func,inner_closure,offsetof(bl_val_t,vals),jit_type_void_ptr);
+
+      // copy symbol values from lexical to inner closure
+      jit_value_t inner_closure_symkeys   = jit_insn_load_relative(jitted_func,inner_closure,offsetof(bl_val_t,vals),jit_type_void_ptr);
+      jit_value_t lexical_closure_symkeys = jit_insn_load_relative(jitted_func,lexical_closure,offsetof(bl_val_t,vals),jit_type_void_ptr);
+      jit_insn_memmove(jitted_func,inner_closure_symkeys,lexical_closure_symvals,jit_value_create_nint_constant(jitted_func, jit_type_int, sizeof(bl_val_t*)*f->lexical_closure->vals_count));
+      jit_insn_memmove(jitted_func,inner_closure_symvals,lexical_closure_symvals,jit_value_create_nint_constant(jitted_func, jit_type_int, sizeof(bl_val_t*)*f->lexical_closure->vals_count));
+
+      // update number of values
+      jit_insn_store_relative(jitted_func, inner_closure,offsetof(bl_val_t,vals_count),jit_value_create_nint_constant(jitted_func, jit_type_int, f->lexical_closure->vals_count));
+
       // bind params
       if(bl_list_len(f->bl_operargs_ptr)>0) {
          jit_value_t set_params_args[3];
@@ -82,10 +121,34 @@ void* bl_jit_func(bl_val_t* f) {
       bl_val_t* E;
       for(L=f->bl_func_ptr; L!=NULL; L=L->cdr) {
           E = L->car;
-	  if(E->type == BL_VAL_TYPE_CONS) { // we try to directly generate code here instead of calling out to bl_ctx_eval
+	  switch(E->type) {
+		  case BL_VAL_TYPE_SYMBOL: // if a naked symbol is in a function body, we just look up the value
+  			 jit_insn_store(jitted_func,func_ret,jit_insn_load_elem(jitted_func,inner_closure_symvals,jit_value_create_nint_constant(jitted_func, jit_type_int,E->sym_id),jit_type_void_ptr));
+		  break;
+		  case BL_VAL_TYPE_CONS:
+			if(E->car->type == BL_VAL_TYPE_SYMBOL) {
+
+     				// if it's the first thing in an expression inside of a function body, it must be an oper, right?
+			   jit_value_t oper_sym_val = jit_insn_load_elem(jitted_func,lexical_closure_symvals,jit_value_create_nint_constant(jitted_func, jit_type_int, E->car->sym_id),jit_type_void_ptr);
+			   jit_value_t oper_sym_code = jit_insn_load_relative(jitted_func,oper_sym_val,offsetof(bl_val_t,code_ptr),jit_type_void_ptr);
+
+			   eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, (jit_nint)E->cdr); 
+
+			   tmp = jit_insn_call_indirect(jitted_func, oper_sym_code, bl_jit_sig_native_oper,eval_args,2,0);
+			   jit_insn_store(jitted_func,func_ret,tmp);
+			} else {
+			}	
+		  break;
+		  default:
+		  break;
+	  }
+
+/*	  if(E->type == BL_VAL_TYPE_CONS) { // we try to directly generate code here instead of calling out to bl_ctx_eval
 		  bl_val_t* first;
+
+
 		  if(E->car->type == BL_VAL_TYPE_SYMBOL) {
-		     first = bl_ctx_get(f->lexical_closure,E->car); // TODO: handle case where symbols are reassigned inside of function
+		     first = bl_ctx_get(f->lexical_closure,E->car);
 		  } else {
 		     first = E->car;
 		  }
@@ -107,7 +170,7 @@ void* bl_jit_func(bl_val_t* f) {
 		  eval_args[1] = jit_value_create_nint_constant(jitted_func, jit_type_void_ptr, (jit_nint)E);
 	          tmp = jit_insn_call_native(jitted_func,safe_strcat("eval ",bl_ser_sexp(E)),&bl_ctx_eval,bl_jit_sig_native_oper,eval_args,2,0);
 	          jit_insn_store(jitted_func,func_ret, tmp);
-	  }
+	  }*/
 
 
 	  // check if func_ret is an error, since the error type is the first field in bl_val_t we can simply cast it
@@ -120,8 +183,9 @@ void* bl_jit_func(bl_val_t* f) {
       jit_insn_label(jitted_func, &end_of_func);
       jit_insn_return(jitted_func, func_ret);
 
-//      jit_dump_function(stdout,jitted_func,f->sym->s_val);
+      jit_dump_function(stdout,jitted_func,f->sym->s_val);
       jit_function_compile(jitted_func);
+      jit_dump_function(stdout,jitted_func,f->sym->s_val);
 
       jit_context_build_end(bl_jit_context);
       return jit_function_to_closure(jitted_func);

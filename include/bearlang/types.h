@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <bearlang/uthash.h>
+#include <jit/jit.h>
 #include <gmp.h>
 
 #undef uthash_malloc
@@ -93,7 +94,8 @@ typedef struct bl_val_t {
 
 		// BL_VAL_TYPE_SYMBOL | BL_VAL_TYPE_STRING
 		struct { char*   s_val;
-	                 uint64_t sym_id; };
+	                 uint64_t sym_id;
+	    		 };
 
 		// BL_VAL_TYPE_CONS
 		struct { bl_val_t* car;
@@ -124,7 +126,8 @@ typedef struct bl_val_t {
 		         bl_val_t* bl_funcargs_ptr;
 	                 bl_val_t* lexical_closure;
 			 bl_val_t* inner_closure;
-	       		 bl_val_t* sym;	};
+	       		 bl_val_t* sym;	
+			  };
 
 		// BL_VAL_TYPE_FUNC_NATIVE
 		struct { bl_val_t* (*func_ptr)(bl_val_t*,bl_val_t*); };

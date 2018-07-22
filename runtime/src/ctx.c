@@ -81,6 +81,7 @@ bl_val_t* bl_ctx_new(bl_val_t* parent) { // LCOV_EXCL_LINE
    retval->vals       = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*retval->vals_count);
    retval->keys       = (bl_val_t**)GC_MALLOC(sizeof(bl_val_t*)*retval->vals_count);
    retval->write_to_parent = false;
+
    return retval;
 }
 
