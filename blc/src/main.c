@@ -5,6 +5,7 @@
 #include <bearlang/error_tools.h>
 #include <bearlang/utils.h>
 #include <bearlang/list_ops.h>
+#include <bearlang/string_ops.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,10 +26,58 @@ void print_usage() {
      fprintf(stderr,"usage: %s -i filename -o output_file [-v] [-l]\n", exe_name);
 }
 
+void compile_string(char* s,FILE* outfd) {
+      fprintf(outfd,"(char[]){");
+      int i=0;
+      for(i=0; i< strlen(s); i++) {
+          fprintf(outfd,"%d,",s[i]);
+      }
+      fprintf(outfd,"0}");
+}
+
+void compile_cons(bl_val_t* L, FILE* outfd);
+void compile_atom(bl_val_t* E, FILE* outfd) {
+     if(E==NULL) {
+        fprintf(outfd,"NULL");
+	return;
+     }
+     switch(E->type) {
+		case BL_VAL_TYPE_CONS:
+			compile_cons(E,outfd);
+		break;
+                case BL_VAL_TYPE_NULL:
+			fprintf(outfd,"NULL");
+		break;
+		case BL_VAL_TYPE_SYMBOL:
+			fprintf(outfd,"bl_mk_symbol(\"%s\")",bl_ser_sexp(E));
+		break;
+		case BL_VAL_TYPE_NUMBER:
+			fprintf(outfd,"bl_mk_integer(\"%s\"",bl_ser_sexp(E));
+		break;
+		case BL_VAL_TYPE_STRING:
+			fprintf(outfd,"&(bl_val_t) {.type=BL_VAL_TYPE_STRING, .s_val=");
+			compile_string(E->s_val,outfd);
+			fprintf(outfd,"}");
+		break;
+     }
+
+}
+
+void compile_cons(bl_val_t* L, FILE* outfd) {
+     fprintf(outfd,"&(bl_val_t) {.type = BL_VAL_TYPE_CONS, .car=");
+     compile_atom(L->car,outfd);
+     fprintf(outfd,", .cdr=");
+     compile_atom(L->cdr,outfd);
+     fprintf(outfd,"}");
+}
+
 void compile_expr(bl_val_t* expr, FILE* outfd) {
-     size_t expr_len = bl_list_len(expr);
-     fprintf(outfd,"retval = bl_ctx_eval(ctx,bl_mk_list(%d,",expr_len);
-     bl_val_t* L = expr;
+    
+
+     fprintf(outfd,"retval = bl_ctx_eval(ctx,");
+     compile_cons(expr,outfd);
+     fprintf(outfd,");");
+     /* bl_val_t* L = expr;
      for(; L != NULL; L=L->cdr) {
 	 switch(L->car->type) {
 		case BL_VAL_TYPE_NULL:
@@ -41,12 +90,12 @@ void compile_expr(bl_val_t* expr, FILE* outfd) {
 			fprintf(outfd,"bl_mk_integer(\"%s\"",bl_ser_sexp(L->car));
 		break;
 		case BL_VAL_TYPE_STRING:
-			fprintf(outfd,"bl_mk_str(\"%s\")", L->car->s_val);
+			fprintf(outfd,"&(bl_val_t) {.type=BL_VAL_TYPE_STRING, .s_val=\"%s\"}", L->car->s_val);
 		break;
 	 }
 	 if(L->cdr != NULL) fprintf(outfd,",");
      }
-     fprintf(outfd,"));");
+     fprintf(outfd,"));");*/
 
 }
 
