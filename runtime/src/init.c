@@ -1,6 +1,5 @@
 #include <bearlang/common.h>
 #include <bearlang/sexp.h>
-#include <bearlang/bearjit.h>
 #include <gc.h>
 #include <gmp.h>
 
@@ -20,6 +19,5 @@ void gmp_free(void* ptr, size_t size) {
 int bl_init() { // LCOV_EXCL_LINE
     GC_INIT();
     mp_set_memory_functions(&gmp_malloc, &gmp_realloc, &gmp_free);
-    bl_init_jit();
     return 0;
 }

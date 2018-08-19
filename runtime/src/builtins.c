@@ -7,7 +7,6 @@
 #include <bearlang/error_tools.h>
 #include <bearlang/utils.h>
 #include <bearlang/string_ops.h>
-#include <bearlang/bearjit.h>
 #include <glob.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -203,35 +202,28 @@ bl_val_t* bl_oper_eval(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 }
 // LCOV_EXCL_STOP
 
+
 bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
    params = bl_eval_cons(ctx,params);
    if(params->type == BL_VAL_TYPE_ERROR) return params;
 
-   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_OPER_NATIVE,BL_VAL_TYPE_CONS};
+   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_FUNC_BL,BL_VAL_TYPE_CONS};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
 
    bl_val_t* func = bl_list_first(params);
    bl_val_t* L    = bl_list_second(params);
-   if(L==NULL) return L;
 
    bl_val_t* func_expr = NULL;
    bl_val_t* retval_L = NULL;
-   bl_val_t* tmp = NULL;
-   for(; L != NULL; L=L->cdr) {
-       if(L->car->type == BL_VAL_TYPE_ERROR) return L->car;
-       tmp = func->code_ptr(ctx, bl_mk_list(1,L->car));
-       if(tmp->type==BL_VAL_TYPE_ERROR) return tmp;
-       retval_L = bl_list_prepend(retval_L,tmp);
-   }
-   return bl_list_reverse(retval_L);
+
    // TODO - make this support native functions etc
-/*   bl_val_t* i = NULL;
+   bl_val_t* i = NULL;
    bl_val_t* j = NULL;
    bl_val_t* tmp=bl_mk_val(BL_VAL_TYPE_CONS);
    for(i=L; i != NULL; i=i->cdr) {
-   	   bl_ctx_set(func->inner_closure,func->bl_funcargs_ptr->car,i->car);
+       bl_ctx_set(func->inner_closure,func->bl_funcargs_ptr->car,i->car);
        for(j = func->bl_func_ptr; j != NULL; j=j->cdr) {
            if(retval_L == NULL) {
               retval_L = bl_mk_val(BL_VAL_TYPE_CONS);
@@ -246,7 +238,7 @@ bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 	      retval_L=retval_L->cdr;
 	   }
        }
-   }*/
+   }
    return retval;
 
 
@@ -453,6 +445,7 @@ bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
 }
 //LCOV_EXCL_STOP
 
+
 bl_val_t* bl_oper_fn(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
    bl_val_t* retval        = bl_mk_val(BL_VAL_TYPE_FUNC_BL);
@@ -461,7 +454,7 @@ bl_val_t* bl_oper_fn(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    retval->lexical_closure = ctx;
    retval->inner_closure   = bl_ctx_new(ctx);
    retval->sym = bl_mk_symbol("anonymous-lambda");
-   return bl_mk_native_oper(bl_jit_func(retval));
+   return retval;
 }
 
 bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
@@ -476,11 +469,8 @@ bl_val_t* bl_oper_fun(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    retval->lexical_closure = ctx;
    retval->inner_closure   = bl_ctx_new(ctx);
    retval->sym = bl_list_first(params); 
-
-   bl_val_t* new_retval = bl_mk_native_oper(bl_jit_func(retval));
-   new_retval->sym      = retval->sym;
-   new_retval->docstr   = retval->docstr;   
-   bl_ctx_set(ctx, retval->sym, new_retval);
+   
+   bl_ctx_set(ctx, retval->sym, retval);
    return retval;
 }
 
