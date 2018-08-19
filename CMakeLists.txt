@@ -51,6 +51,11 @@ FLEX_TARGET(BLLexer
 add_library(blruntime SHARED ${RUNTIME_SOURCE} ${FLEX_BLLexer_OUTPUTS})
 target_link_libraries(blruntime ${LIBGC_LIBRARIES} ${FLEX_LIBRARIES} ${Readline_LIBRARY} dl gmp)
 
+add_library(blruntime_s STATIC ${RUNTIME_SOURCE} ${FLEX_BLLexer_OUTPUTS})
+target_link_libraries(blruntime_s ${LIBGC_LIBRARIES} ${FLEX_LIBRARIES} ${Readline_LIBRARY} dl gmp)
+
+add_library(blstub STATIC "blc/stub/stub.c")
+
 add_subdirectory(stdlib)
 
 enable_testing()

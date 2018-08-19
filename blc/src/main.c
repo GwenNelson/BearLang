@@ -30,14 +30,24 @@ void compile_expr(bl_val_t* expr, FILE* outfd) {
      fprintf(outfd,"retval = bl_ctx_eval(ctx,bl_mk_list(%d,",expr_len);
      bl_val_t* L = expr;
      for(; L != NULL; L=L->cdr) {
-         if(L->car->type == BL_VAL_TYPE_STRING) {
-	    fprintf(outfd,"bl_mk_str(\"%s\")",L->car->s_val);
-         } else {
-            fprintf(outfd,"bl_parse_sexp(\"%s\")",bl_ser_sexp(L->car));
+	 switch(L->car->type) {
+		case BL_VAL_TYPE_NULL:
+			fprintf(outfd,"NULL");
+		break;
+		case BL_VAL_TYPE_SYMBOL:
+			fprintf(outfd,"bl_mk_symbol(\"%s\")",bl_ser_sexp(L->car));
+		break;
+		case BL_VAL_TYPE_NUMBER:
+			fprintf(outfd,"bl_mk_integer(\"%s\"",bl_ser_sexp(L->car));
+		break;
+		case BL_VAL_TYPE_STRING:
+			fprintf(outfd,"bl_mk_str(\"%s\")", L->car->s_val);
+		break;
 	 }
 	 if(L->cdr != NULL) fprintf(outfd,",");
      }
-     fprintf(outfd,");");
+     fprintf(outfd,"));");
+
 }
 
 void compile_fun(bl_val_t* fun_expr, FILE* outfd) {
@@ -53,6 +63,7 @@ void compile_fun(bl_val_t* fun_expr, FILE* outfd) {
      for(; L != NULL; L=L->cdr) {
          compile_expr(L->car,outfd);
      }
+     fprintf(outfd,"return retval;");
      fprintf(outfd,"}");
 }
 
