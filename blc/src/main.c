@@ -12,7 +12,8 @@
 #include <unistd.h>
 #include <errno.h>
 
-static int verbose = 0;
+static int verbose   = 0;
+static int build_lib = 0;
 
 static char* exe_name;
 
@@ -21,7 +22,7 @@ static char* exe_name;
 
 
 void print_usage() {
-     fprintf(stderr,"usage: %s -i filename -o output_file [-v]\n", exe_name);
+     fprintf(stderr,"usage: %s -i filename -o output_file [-v] [-l]\n", exe_name);
 }
 
 void compile_expr(bl_val_t* expr, FILE* outfd) {
@@ -30,10 +31,11 @@ void compile_expr(bl_val_t* expr, FILE* outfd) {
      bl_val_t* L = expr;
      for(; L != NULL; L=L->cdr) {
          if(L->car->type == BL_VAL_TYPE_STRING) {
-	    fprintf(outfd,"bl_mk_str(\"%s\"",L->car->s_val);
+	    fprintf(outfd,"bl_mk_str(\"%s\")",L->car->s_val);
          } else {
-            fprintf(outfd,"bl_parse_sexp(\"%s\"),",bl_ser_sexp(L->car));
+            fprintf(outfd,"bl_parse_sexp(\"%s\")",bl_ser_sexp(L->car));
 	 }
+	 if(L->cdr != NULL) fprintf(outfd,",");
      }
      fprintf(outfd,");");
 }
@@ -65,6 +67,7 @@ void compile_file(char* infile, char* outfile) {
 	fclose(infd);
 	return;
      }
+     fprintf(outfd,"#include <bearlang/bearlang.h>\n");
      bl_val_t* L = parsed_file;
      bl_val_t* set_oper = bl_mk_symbol("=");
      bl_val_t* fun_oper = bl_mk_symbol("fun");
@@ -98,7 +101,7 @@ int main(int argc, char** argv) {
 
     int c = 0;
 
-    while ((c = getopt(argc, argv, "i:o:v")) != -1) {
+    while ((c = getopt(argc, argv, "i:o:lv")) != -1) {
        switch(c) {
           case 'i':
              input_filename = strdup(optarg);
@@ -111,6 +114,10 @@ int main(int argc, char** argv) {
           case 'v':
              verbose = 1;
           break;
+
+	  case 'l':
+	     build_lib = 1;
+	  break;
 
           case '?':
              print_usage();
