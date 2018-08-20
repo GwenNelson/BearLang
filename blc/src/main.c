@@ -91,7 +91,7 @@ void compile_cons(bl_val_t* L, FILE* outfd) {
 
 void compile_expr(bl_val_t* expr, FILE* outfd) {
     
-     fprintf(outfd,"\n#line %s %d\n",infile_name,expr->line_num);
+     fprintf(outfd,"\n#line %d \"%s\"\n",infile_name,expr->line_num);
      fprintf(outfd,"retval = bl_ctx_eval(ctx,");
      compile_cons(expr,outfd);
      fprintf(outfd,");\n");
