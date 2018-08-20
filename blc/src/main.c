@@ -18,6 +18,8 @@ static int build_lib = 0;
 
 static char* exe_name;
 
+static char* infile_name;
+
 #define ERR_BAD_PARAMS 1
 #define ERR_NOT_OPEN   2
 
@@ -89,10 +91,10 @@ void compile_cons(bl_val_t* L, FILE* outfd) {
 
 void compile_expr(bl_val_t* expr, FILE* outfd) {
     
-
+     fprintf(outfd,"\n#line %s %d\n",infile_name,expr->line_num);
      fprintf(outfd,"retval = bl_ctx_eval(ctx,");
      compile_cons(expr,outfd);
-     fprintf(outfd,");");
+     fprintf(outfd,");\n");
      /* bl_val_t* L = expr;
      for(; L != NULL; L=L->cdr) {
 	 switch(L->car->type) {
@@ -126,13 +128,15 @@ void compile_fun(bl_val_t* fun_expr, FILE* outfd) {
      fprintf(outfd,"bl_val_t* retval = NULL;");
      bl_val_t* L = body;
      for(; L != NULL; L=L->cdr) {
-         compile_expr(L->car,outfd);
+	  if(verbose) fprintf(stderr,"%s\n",bl_ser_sexp(L->car));
+    	     compile_expr(L->car,outfd);
      }
      fprintf(outfd,"return retval;");
      fprintf(outfd,"}");
 }
 
 void compile_file(char* infile, char* outfile) {
+     infile_name = strdup(infile);
      FILE* outfd = fopen(outfile,"w");
      FILE* infd  = fopen(infile,"r");
      bl_val_t* parsed_file = bl_parse_file(infile,infd);

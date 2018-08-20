@@ -82,36 +82,39 @@ bl_val_t* read_form(yyscan_t scanner) { // LCOV_EXCL_LINE
     char* s = NULL;
     bl_token_type_t tok = yylex(scanner);
     if(tok == 0) return NULL;
+    bl_val_t* retval = NULL;
     switch(tok) {
 	case BL_TOKEN_STRING:
-		return bl_mk_str(unescape(yyget_text(scanner)));
+		retval = bl_mk_str(unescape(yyget_text(scanner)));
 	break;
 	case BL_TOKEN_LPAREN:
-		return read_list(scanner);
+		retval = read_list(scanner);
 	break;
 	case BL_TOKEN_RPAREN:
-		return &end_list_val;
+		retval = &end_list_val;
 	break;
 	case BL_TOKEN_INTEGER:
-		return bl_mk_integer(yyget_text(scanner));
+		retval = bl_mk_integer(yyget_text(scanner));
 	break;
 	case BL_TOKEN_SYMBOL:
 		s = yyget_text(scanner);
-		return bl_mk_symbol(yyget_text(scanner));
+		retval = bl_mk_symbol(yyget_text(scanner));
 	break;
 	case BL_TOKEN_IF:
-		return &if_oper_val;
+		retval = &if_oper_val;
 	break;
 	case BL_TOKEN_DO:
-		return &do_oper_val;
+		retval = &do_oper_val;
 	break;
 	case BL_TOKEN_WHILE:
-		return &while_oper_val;
+		retval = &while_oper_val;
 	break;
 	case BL_TOKEN_DOCSTRING:
-		return bl_mk_docstr(yyget_text(scanner));
+		retval = bl_mk_docstr(yyget_text(scanner));
 	break;
    }
+   retval->line_num = yyget_lineno(scanner);
+   return retval;
 }
 
 bl_val_t* bl_parse_sexp(char* sexp) { // LCOV_EXCL_LINE
