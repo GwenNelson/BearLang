@@ -35,6 +35,7 @@ void compile_string(char* s,FILE* outfd) {
 }
 
 void compile_cons(bl_val_t* L, FILE* outfd);
+
 void compile_atom(bl_val_t* E, FILE* outfd) {
      if(E==NULL) {
         fprintf(outfd,"NULL");
@@ -52,6 +53,22 @@ void compile_atom(bl_val_t* E, FILE* outfd) {
 		break;
 		case BL_VAL_TYPE_NUMBER:
 			fprintf(outfd,"bl_mk_integer(\"%s\"",bl_ser_sexp(E));
+		break;
+		case BL_VAL_TYPE_OPER_DO:
+			fprintf(outfd,"&(bl_val_t) {.type = BL_VAL_TYPE_OPER_DO}");
+		break;
+		case BL_VAL_TYPE_OPER_IF:
+			fprintf(outfd,"&(bl_val_t) {.type = BL_VAL_TYPE_OPER_IF}");
+		break;
+		case BL_VAL_TYPE_OPER_WHILE:
+			fprintf(outfd,"&(bl_val_t) {.type = BL_VAL_TYPE_OPER_WHILE}");
+		break;
+		case BL_VAL_TYPE_BOOL:
+			if(E->b_val) {
+				fprintf(outfd,"&(bl_val_t) {.type = BL_VAL_TYPE_BOOL, .b_val=true}");
+			} else {
+				fprintf(outfd,"&(bl_val_t) {.type = BL_VAL_TYPE_BOOL, .b_val=false}");
+			}
 		break;
 		case BL_VAL_TYPE_STRING:
 			fprintf(outfd,"&(bl_val_t) {.type=BL_VAL_TYPE_STRING, .s_val=");
