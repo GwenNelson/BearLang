@@ -1,3 +1,4 @@
+// LCOV_EXCL_START
 #include <bearlang/common.h>
 #include <bearlang/list_ops.h>
 #include <bearlang/builtins.h>
@@ -16,10 +17,12 @@
 #include <stdbool.h>
 #include <libgen.h>
 #include <time.h>
+// LCOV_EXCL_STOP LCOV_EXCL_LINE
 
-#define PARAM_LEN_CHECK(min,max) bl_val_t* retval = bl_errif_invalid_len(params,min,max); \
-				 if(retval != NULL) return retval;
 
+#define PARAM_LEN_CHECK(min,max) bl_val_t* retval = bl_errif_invalid_len(params,min,max); if(retval != NULL) return retval;
+
+// LCOV_EXCL_START
 bl_val_t* bl_oper_profile(bl_val_t* ctx, bl_val_t* params) {
    clock_t start = clock();
    bl_ctx_eval(ctx,params);
@@ -28,7 +31,7 @@ bl_val_t* bl_oper_profile(bl_val_t* ctx, bl_val_t* params) {
    char outbuf[512];
    snprintf(outbuf,512,"Took %f seconds", elapsed_time);
    return bl_mk_str(outbuf);
-}
+} // LCOV_EXCL_STOP LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    PARAM_LEN_CHECK(2,2)
@@ -42,6 +45,7 @@ bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    return retval;
 }
 
+// LCOV_EXCL_START
 bl_val_t* bl_oper_listbuiltins(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    PARAM_LEN_CHECK(0,0)
    #define BUILTIN_RETURN(builtin_name,builtin_symbol,builtin_docstr) retval=bl_list_prepend(retval,bl_mk_symbol(builtin_symbol));
@@ -49,7 +53,7 @@ bl_val_t* bl_oper_listbuiltins(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_L
    #include <bearlang/builtins.inc>
    #undef BUILTIN_X
    return bl_list_reverse(retval);
-}
+} // LCOV_EXCL_STOP LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_pmatch(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    PARAM_LEN_CHECK(2,2)

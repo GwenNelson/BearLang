@@ -67,6 +67,3 @@ char* str_replace(char* s, char* a, char* b) { // LCOV_EXCL_LINE
       return retval;
 }
 
-char* str_escape(char* s) {
-      char* retval = str_replace(s, "\n", "\\n");
-}

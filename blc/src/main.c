@@ -21,7 +21,6 @@ static char* exe_name;
 #define ERR_BAD_PARAMS 1
 #define ERR_NOT_OPEN   2
 
-
 void print_usage() {
      fprintf(stderr,"usage: %s -i filename -o output_file [-v] [-l]\n", exe_name);
 }
@@ -134,6 +133,7 @@ void compile_file(char* infile, char* outfile) {
      for(; L != NULL; L=L->cdr) {
          bl_val_t* expr = L->car;
          if(expr->car==set_oper) {
+           // TODO - implement toplevel set expressions
 	 } else if (expr->car==fun_oper) {
            compile_fun(expr,outfd);
 	 } else {
