@@ -133,6 +133,38 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
     return bl_mk_null();
 }
 
+bl_val_t* bl_ctx_eval_funcbody(bl_val_t* func, bl_val_t* i) {
+    bl_val_t* retval = bl_mk_null();
+    bl_val_t* symval = NULL;
+    bool cont = false;
+    while(true) {
+    	   if(i->car->car->type == BL_VAL_TYPE_SYMBOL) {
+           symval = bl_ctx_get(func->inner_closure,i->car->car);
+           if(symval == func) {
+
+             bl_val_t* args = bl_ctx_eval(func->inner_closure,i->car->cdr);
+	     if(bl_list_len(args)>0) bl_set_params(func->inner_closure,func->bl_funcargs_ptr,args);
+             i=func->bl_func_ptr;
+	     cont = true;
+	   } else {
+             retval = bl_ctx_eval(func->inner_closure,i->car);
+	     i = i->cdr;
+             if(i != NULL) cont = true;
+	   }
+	} else {
+          retval = bl_ctx_eval(func->inner_closure,i->car);
+	  i = i->cdr;
+          if(i != NULL) cont = true;
+	}
+       if(cont) {
+	  cont=false;
+       } else {
+	  return retval;
+       }
+
+    }
+}
+
 bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
     if(expr==NULL) return bl_mk_null();
     bl_val_t* retval = bl_mk_null();
@@ -143,7 +175,6 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 	    if(expr->type == BL_VAL_TYPE_ERROR) return expr;
 	    bl_val_t* symval  = NULL;
 	    bl_val_t* car     = NULL;
-	    bl_val_t* retval  = NULL;
 	    bl_val_t* new_closure = NULL;
 	    bl_val_t* cond = NULL;
 	    bl_val_t* args = NULL;
@@ -172,15 +203,23 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 					expr = expr->cdr;
 					for(i=expr; i != NULL; i=i->cdr) {
 						retval = bl_ctx_eval(ctx,i->car);
+						if(retval != NULL) { 
+							if(retval->type == BL_VAL_TYPE_ERROR) return retval;
+						}
 					}
 					return retval;
 				break;
 				case BL_VAL_TYPE_OPER_IF:
 					cond = bl_ctx_eval(ctx,bl_list_first(expr->cdr));
-					if(cond->b_val) {
-						expr = bl_list_second(expr->cdr);
-					} else {
-						expr = bl_list_third(expr->cdr);
+					if(cond != NULL) {
+						if(cond->type == BL_VAL_TYPE_ERROR) return cond;
+						if(cond->type != BL_VAL_TYPE_BOOL) return bl_mk_err(BL_ERR_PARSE);
+					
+						if(cond->b_val) {
+							expr = bl_list_second(expr->cdr);
+						} else {
+							expr = bl_list_third(expr->cdr);
+						}
 					}
 				break;
 				case BL_VAL_TYPE_OPER_WHILE:
@@ -197,14 +236,21 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 				break;
 				case BL_VAL_TYPE_FUNC_BL:
 					args        = bl_ctx_eval(ctx,expr->cdr);
-					car->inner_closure = bl_ctx_new(car->lexical_closure);
+					//car->inner_closure = bl_ctx_new(car->lexical_closure);
 					if(bl_list_len(expr) > 1) bl_set_params(car->inner_closure,car->bl_funcargs_ptr,args);
+					retval = bl_ctx_eval_funcbody(car,car->bl_func_ptr);
+/*
 					ctx = car->inner_closure;
 					expr = car->bl_func_ptr;
+
 					for(i=expr; i != NULL; i=i->cdr) {
 						retval = bl_ctx_eval(ctx,i->car);
-					}
+						if(retval != NULL) { 
+							if(retval->type == BL_VAL_TYPE_ERROR) return retval;
+						}
+					}*/
 					return retval;
+					
 				break;
 				case BL_VAL_TYPE_OPER_BL:
 					args        = expr->cdr;
@@ -215,6 +261,9 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 					expr = car->bl_oper_ptr;
 					for(i=expr; i != NULL; i=i->cdr) {
 						retval = bl_ctx_eval(ctx,i->car);
+						if(retval != NULL) { 
+							if(retval->type == BL_VAL_TYPE_ERROR) return retval;
+						}
 					}
 					return retval;
 				break;
@@ -232,9 +281,7 @@ bl_val_t* bl_ctx_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 	           if(symval == NULL) {
 	              return bl_err_symnotfound(expr->s_val);
 		   } else {
-		     if(symval->type != BL_VAL_TYPE_ERROR) {
-                        return symval;
-		     }
+                     return symval;
 		   }
 	      break;
 	      default:
@@ -250,20 +297,22 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) { // LCOV_EXCL_LINE
    if(ctx->ctx_get != NULL) return ctx->ctx_get(ctx,key); // LCOV_EXCL_BR_LINE
    if(key->type != BL_VAL_TYPE_SYMBOL) return bl_mk_err(BL_ERR_INTERNAL);
    if(key->s_val[0]=='\'') return bl_mk_symbol(key->s_val+1); // LCOV_EXCL_BR_LINE
-   if(strstr(key->s_val,"::")) {
-     char* tmp = strdup(key->s_val);
-     strstr(tmp,"::")[0]='\0';
-     char* ctx_key = tmp;
-     char* sym_key = tmp+strlen(ctx_key)+2;
-     bl_val_t* other_ctx = bl_ctx_get(ctx, bl_mk_symbol(ctx_key));
-     free(tmp);
-      // LCOV_EXCL_START
-     if(other_ctx == NULL) { 
-   	return NULL;
-     }
-     // LCOV_EXCL_STOP 
-     return bl_ctx_get(other_ctx,bl_mk_symbol(sym_key));
+   if(strlen(key->s_val)>=1) {
+     if(strstr(key->s_val,"::")) {
+        char* tmp = strdup(key->s_val);
+        strstr(tmp,"::")[0]='\0';
+        char* ctx_key = tmp;
+        char* sym_key = tmp+strlen(ctx_key)+2;
+        bl_val_t* other_ctx = bl_ctx_get(ctx, bl_mk_symbol(ctx_key));
+        free(tmp);
+        // LCOV_EXCL_START
+        if(other_ctx == NULL) { 
+           return NULL;
+        }
+        // LCOV_EXCL_STOP 
+        return bl_ctx_get(other_ctx,bl_mk_symbol(sym_key));
 
+      }
    }
    bl_val_t* retval = NULL;
    if(key->sym_id < ctx->vals_count) {

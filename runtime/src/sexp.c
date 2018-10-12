@@ -138,55 +138,69 @@ bl_val_t* bl_parse_file(char* filename, FILE* fd) { // LCOV_EXCL_LINE
    return retval;
 }
 
+char* any_str = "<any>";
+char* if_str  = "if";
+char* nativefunc_str = "<nativefunction>";
+char* none_str = "None";
+char* ctx_str  = "<ctx>";
+char* true_str = "True";
+char* false_str = "False";
+char* nativeoper_str = "<nativeoper>";
+
 // LCOV_EXCL_START
 char* bl_ser_sexp(bl_val_t* expr) {
 
       if(expr == NULL) return "";
-      char* retval=GC_MALLOC_ATOMIC(4096);
+      char* retval="";
       char* s="";
       switch(expr->type) {
          case BL_VAL_TYPE_ANY:
-	   snprintf(retval,5,"<any>");
+           return any_str;
 	 break;
          case BL_VAL_TYPE_OPER_IF:
-	   snprintf(retval,3,"if");
+           return if_str;
 	 break;
 	 case BL_VAL_TYPE_FUNC_NATIVE:
-	   snprintf(retval,32,"<nativefunction>");
+	   return nativefunc_str;
 	 case BL_VAL_TYPE_NULL:
-           snprintf(retval, 5, "None");
+           return none_str;
          break;
 	 case BL_VAL_TYPE_CTX:
-	   snprintf(retval,6,"<ctx>");
+           return ctx_str;
 	 break;
 	 case BL_VAL_TYPE_ERROR:
-           retval = bl_errmsg(expr);
+           return bl_errmsg(expr);
 	 break;
          case BL_VAL_TYPE_SYMBOL:
+           retval = GC_MALLOC_ATOMIC(strlen(expr->s_val)+1);
            snprintf(retval,strlen(expr->s_val)+1,"%s",expr->s_val);
          break;
          case BL_VAL_TYPE_STRING:
-           snprintf(retval,strlen(expr->s_val)+3,"\"%s\"",expr->s_val);
+           retval = GC_MALLOC_ATOMIC(strlen(expr->s_val)+3);
+	 snprintf(retval,strlen(expr->s_val)+3,"\"%s\"",expr->s_val);
          break;
          case BL_VAL_TYPE_NUMBER:
-	   snprintf(retval,10,"%lld", expr->fix_int);
+           retval = GC_MALLOC_ATOMIC(10);
+	 snprintf(retval,10,"%lld", expr->fix_int);
 	 //            retval = mpz_get_str(NULL, 10, expr->i_val);
          break;
 	 case BL_VAL_TYPE_BOOL:
            if(expr->b_val) {
-              snprintf(retval,10,"True");
+              return true_str;
 	   } else {
-              snprintf(retval,10,"False");
+              return false_str;
 	   }
 	 break;
          case BL_VAL_TYPE_FUNC_BL:
-	   snprintf(retval,1024,"(fn %s %s)",bl_ser_sexp(expr->bl_funcargs_ptr), bl_ser_sexp(expr->bl_func_ptr));
+           retval = GC_MALLOC_ATOMIC(1024);
+           snprintf(retval,1024,"(fn %s %s)",bl_ser_sexp(expr->bl_funcargs_ptr), bl_ser_sexp(expr->bl_func_ptr));
 	 break;
          case BL_VAL_TYPE_OPER_NATIVE:
-	   snprintf(retval,32,"<nativeoper>");
+	   return nativeoper_str;
 	 break;
 	 case BL_VAL_TYPE_CONS:
-	   snprintf(retval,2,"%s","(");
+           retval = GC_MALLOC_ATOMIC(8);
+           snprintf(retval,2,"%s","(");
            if(expr->car == NULL)  {
      	       snprintf(retval,4,"%s","()");
 	   } else {
