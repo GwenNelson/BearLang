@@ -9,15 +9,11 @@
       (print "\tTesting " testname)
 
       (oper PASSTEST () 
-            (if (not (isset TESTS_PASSED))
-	             (= TESTS_PASSED 1)
-                     (= TESTS_PASSED (+ TESTS_PASSED 1)))
+	    (inc TESTS_PASSED)
             (print " PASS\n"))
 
       (oper FAILTEST ()
-	    (if (not (isset TESTS_FAILED))
-	             (= TESTS_FAILED 1)
-		     (= TESTS_FAILED (+ TESTS_FAILED 1)))
+            (inc TESTS_FAILED)
 	    (print " FAIL\n"))
       
       (if (TESTING) (PASSTEST)
@@ -31,8 +27,8 @@
       (foreach t tests (eval t))
       )
 
-(fun TEST-SUMMARY ()
+(oper TEST-SUMMARY ()
      (print "\n")
-     (print (+ TESTS_PASSED TESTS_FAILED) " Tests run,")
-     (print TESTS_PASSED  " passed,")
+     (print (+ TESTS_PASSED TESTS_FAILED) " Tests run, ")
+     (print TESTS_PASSED  " passed, ")
      (print TESTS_FAILED  " failed\n\n"))
