@@ -5,7 +5,7 @@
       (= TESTS_FAILED 0))
 
 (oper TEST (testname testfunc)
-      (= TESTING testfunc)
+      (= TESTING (eval testfunc))
       (print "\tTesting " testname)
 
       (oper PASSTEST () 
@@ -20,7 +20,6 @@
 		     (= TESTS_FAILED (+ TESTS_FAILED 1)))
 	    (print " FAIL\n"))
       
-
       (if (TESTING) (PASSTEST)
                     (FAILTEST))
 
@@ -29,7 +28,8 @@
 (oper BEGIN-TEST (test-desc tests) 
       (RESET-TESTS)
       (print test-desc "\n")
-      (do tests))
+      (foreach t tests (eval t))
+      )
 
 (fun TEST-SUMMARY ()
      (print "\n")

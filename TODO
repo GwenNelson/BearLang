@@ -1,3 +1,11 @@
+Better symbol table
+	Support precalculation with perfect hash function for builtins
+	Support best-effort precalculation for compiled modules
+	Global symbol table
+		Map strings to integers + instances of bl_val_t*
+	Context table
+		Map symbol value to arbritrary bl_val_t*
+
 For first release (0.1):
 	* Documentation for all of stdlib
 	* Examples for each stdlib module

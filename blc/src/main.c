@@ -91,7 +91,7 @@ void compile_cons(bl_val_t* L, FILE* outfd) {
 
 void compile_expr(bl_val_t* expr, FILE* outfd) {
     
-     fprintf(outfd,"\n#line %d \"%s\"\n",infile_name,expr->line_num);
+     fprintf(outfd,"\n#line %d \"%s\"\n",expr->line_num,infile_name);
      fprintf(outfd,"retval = bl_ctx_eval(ctx,");
      compile_cons(expr,outfd);
      fprintf(outfd,");\n");
@@ -123,6 +123,7 @@ void compile_fun(bl_val_t* fun_expr, FILE* outfd) {
      bl_val_t* args     = bl_list_second(params);
      bl_val_t* body     = bl_list_rest(bl_list_rest(params));
      if(body->car->type == BL_VAL_TYPE_DOCSTRING) body=body->cdr;
+     fprintf(outfd,"\n#line %d \"%s\"\n",fun_expr->car->line_num,infile_name);
      fprintf(outfd,"bl_val_t* bl_%s(bl_val_t* ctx, bl_val_t* params) {",fun_name->s_val);
      fprintf(outfd,"params = bl_ctx_eval(ctx,params);");
      fprintf(outfd,"bl_val_t* retval = NULL;");
