@@ -10,3 +10,4 @@ ERR_X(CUSTOM,           8)    // custom error, used by C modules
 ERR_X(IO,               9)    // generic I/O error
 ERR_X(MODULE_NOTFOUND,  10)   // a module could not be found
 ERR_X(BL_CUSTOM,        11)   // custom error, used by BearLang code
+ERR_X(INTERNAL,         12)   // internal error

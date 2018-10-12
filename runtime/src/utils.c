@@ -146,6 +146,7 @@ bl_val_t* bl_mk_list(size_t count,...) { // LCOV_EXCL_LINE
 bl_val_t* bl_eval_file(bl_val_t* ctx, char* filename, FILE* fd) { // LCOV_EXCL_LINE
 
    bl_val_t*     sexp = bl_parse_file(filename, fd);
+   GC_gcollect();
    bl_val_t*   retval = bl_ctx_eval(ctx, sexp);
    return retval;
 }

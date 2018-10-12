@@ -67,6 +67,7 @@ bl_val_t* bl_oper_pmatch(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
        char* prefix = L->car->car->s_val;
        if(strstr(S->s_val,prefix)==S->s_val) return L->car->cdr->car;
    }
+   if (retval==NULL) return bl_mk_null();
    return retval;
 }
 
@@ -597,6 +598,7 @@ bl_val_t* bl_oper_rest(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
    if(bl_list_len(params)==1) params = bl_ctx_eval(ctx,bl_list_first(params));
    bl_val_t* retval = bl_list_rest(params);
+   if(retval == NULL) return bl_mk_null();
    return retval;
 }
 
