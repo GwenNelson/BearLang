@@ -162,6 +162,10 @@ char* bl_ser_sexp(bl_val_t* expr) {
 	 break;
 	 case BL_VAL_TYPE_FUNC_NATIVE:
 	   return nativefunc_str;
+	 break;
+	 case BL_VAL_TYPE_NONE:
+	   return none_str;
+	 break;
 	 case BL_VAL_TYPE_NULL:
            return none_str;
          break;
@@ -198,6 +202,10 @@ char* bl_ser_sexp(bl_val_t* expr) {
          case BL_VAL_TYPE_OPER_NATIVE:
 	   return nativeoper_str;
 	 break;
+	 case BL_VAL_TYPE_OPER_BL:
+           retval = GC_MALLOC_ATOMIC(1024);
+           snprintf(retval,1024,"(oper %s %s)", "user-oper", bl_ser_sexp(expr->bl_oper_ptr));
+	 break;
 	 case BL_VAL_TYPE_CONS:
            retval = GC_MALLOC_ATOMIC(8);
            snprintf(retval,2,"%s","(");
@@ -215,6 +223,8 @@ char* bl_ser_sexp(bl_val_t* expr) {
 	   }
 
          break;
+	 default:
+	 break;
       }
       return retval;
 }

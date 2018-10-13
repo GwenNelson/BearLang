@@ -191,7 +191,7 @@ char* bl_ser_types(uint64_t count, bl_val_type_t* types) {
       int i=0;
       size_t maxlen = sizeof(char)*32*count;
       char* retbuf = (char*)GC_MALLOC_ATOMIC(maxlen);
-      retbuf[0] = NULL;
+      retbuf[0] = '\0';
       for(i=0; i<count; i++) {
           char* s = bl_ser_type(types[i]);
           snprintf(retbuf + strlen(retbuf),maxlen,"%s,",s);
@@ -240,6 +240,12 @@ char* bl_errmsg(bl_val_t* E) {
 	  break;
 	  case BL_ERR_BL_CUSTOM:
 	       snprintf(retval,1023,"%s: %s", E->err_val.err_sym->s_val, bl_ser_sexp(E->err_val.err_val));
+	  break;
+	  case BL_ERR_ANY:
+               snprintf(retval,1023,"Invalid error: ANY is for use in try/catch!");
+	  break;
+	  case BL_ERR_INTERNAL:
+               snprintf(retval,1023,"Internal error");
 	  break;
       }
       return retval;
