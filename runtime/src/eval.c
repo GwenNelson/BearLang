@@ -115,6 +115,7 @@ bl_val_t* bl_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
             			     expr->cdr->invoked_sym = expr->car; // let the operator know what symbol was used to invoke it
 				     expr->cdr->custom_data = car->custom_data; // pass any custom data
 				     retval = car->code_ptr(ctx, expr->cdr);
+				     if(retval == NULL) return bl_mk_null();
 				     return retval;
 				break;
 				case BL_VAL_TYPE_OPER_DO:
@@ -125,6 +126,7 @@ bl_val_t* bl_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 							if(retval->type == BL_VAL_TYPE_ERROR) return retval;
 						}
 					}
+					if(retval == NULL) return bl_mk_null();
 					return retval;
 				break;
 				case BL_VAL_TYPE_OPER_IF:
@@ -167,6 +169,7 @@ bl_val_t* bl_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 							if(retval->type == BL_VAL_TYPE_ERROR) return retval;
 						}
 					}*/
+					if(retval==NULL) return bl_mk_null();
 					return retval;
 					
 				break;
@@ -183,6 +186,7 @@ bl_val_t* bl_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 							if(retval->type == BL_VAL_TYPE_ERROR) return retval;
 						}
 					}
+					if(retval==NULL) return bl_mk_null();
 					return retval;
 				break;
 
@@ -190,6 +194,7 @@ bl_val_t* bl_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 				
 
 					retval = bl_eval_cons(ctx, expr);
+					if(retval==NULL) return bl_mk_null();
 					return retval;
 				break;
 			   }
