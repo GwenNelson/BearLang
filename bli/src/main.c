@@ -86,7 +86,12 @@ void hint_hook(char const* prefix, int bp,replxx_hints* lc, ReplxxColor* c, void
 	for(i=0; i <= ctx->parent->vals_count; i++) {
           if(ctx->parent->vals[i] != NULL) {
       		if (strncmp(prefix + bp, ctx->parent->keys[i]->s_val, strlen(prefix) - bp) == 0) {
-				replxx_add_hint(lc, ctx->parent->keys[i]->s_val + len - bp);
+			
+				if(ctx->parent->vals[i]->docstr != NULL) {
+					replxx_add_hint(lc, ctx->parent->vals[i]->docstr->s_val + len);
+				} else {
+					replxx_add_hint(lc, ctx->parent->keys[i]->s_val + len - bp);
+				}
 		}
 	  }
 	 }
