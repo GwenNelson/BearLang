@@ -1152,6 +1152,13 @@ int test_str_replace() {
     return 0;
 }
 
+int test_str_first_token() {
+    char* s = "FOO BAR MEOW";
+    char* tok = str_first_token(s," ");
+    ASSERT("str_first_token works", strcmp(tok,"FOO")==0)
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1235,7 +1242,7 @@ int main(int argc, char** argv) {
     TEST("aget oper                                  ", test_aget_oper)
     TEST("throw oper                                 ", test_throw_oper)
     TEST("string ops: str_replace                    ", test_str_replace)
-
+    TEST("string ops: str_first_token                ", test_str_first_token)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

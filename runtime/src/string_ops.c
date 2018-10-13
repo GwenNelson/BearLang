@@ -57,6 +57,11 @@ bl_val_t* split_str(char* s, char* sep) { // LCOV_EXCL_LINE
 	return retval;
 }
 
+char* str_first_token(char* s, char* sep) { // LCOV_EXCL_LINE
+	bl_val_t* split_s = split_str(s,sep);
+	return bl_list_first(split_str(s,sep))->s_val;
+}
+
 char* str_replace(char* s, char* a, char* b) { // LCOV_EXCL_LINE
       char* retval = NULL;
       if(strstr(s,a)==NULL) { // if it's not there, we just return s
