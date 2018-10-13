@@ -20,7 +20,7 @@ runtime lib:
 
        bl_ctx_new()   - create a new context, optionally with a parent context
        bl_ctx_close() - close a context
-       bl_ctx_eval()  - evaluate an expression within a context
+       bl_eval()  - evaluate an expression within a context
 
        bl_ctx_set()   - set the value of a symbol in a context
        bl_ctx_get()   - lookup the value of a symbol in a context, if not found tries the parent, returns NULL on failure

@@ -1,5 +1,7 @@
 #include <bearlang/bearlang.h>
 
+bl_val_t* bl_main(bl_val_t* ctx, bl_val_t* params);
+
 int main(int argc, char** argv) {
     bl_init();
     bl_val_t* ctx = bl_ctx_new_std();

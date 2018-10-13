@@ -14,7 +14,7 @@
 
 bl_val_t val_pool_static[POOL_DEFAULT_SIZE];
 
-bl_val_t* val_pool = &val_pool_static;
+bl_val_t* val_pool = val_pool_static;
 uint64_t last_alloc = 0;
 uint64_t val_pool_size = POOL_DEFAULT_SIZE;
 
@@ -27,7 +27,7 @@ bl_val_t* bl_mk_val(bl_val_type_t type) { // LCOV_EXCL_LINE
       GC_collect_a_little();
    }
 
-   bl_val_t* retval = &(val_pool[last_alloc++]);
+   bl_val_t* retval = (bl_val_t*)(&(val_pool[last_alloc++]));
    retval->type = type;
    return retval;
 }
@@ -148,7 +148,7 @@ bl_val_t* bl_eval_file(bl_val_t* ctx, char* filename, FILE* fd) { // LCOV_EXCL_L
 
    bl_val_t*     sexp = bl_parse_file(filename, fd);
    GC_gcollect();
-   bl_val_t*   retval = bl_ctx_eval(ctx, sexp);
+   bl_val_t*   retval = bl_eval(ctx, sexp);
    return retval;
 }
 

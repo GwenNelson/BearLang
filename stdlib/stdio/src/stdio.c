@@ -202,7 +202,7 @@ bl_val_t* bl_fprintf(bl_val_t* ctx, bl_val_t* params) {
 // FD is a file descriptor as returned by fopen, maxlen is a number specifying the size of the buffer to use
 // returns a string on success, or an error
 bl_val_t* bl_fgets(bl_val_t* ctx, bl_val_t* params) {
-     params = bl_ctx_eval(ctx,params);
+     params = bl_eval(ctx,params);
      bl_val_type_t expected_types[2] = {BL_VAL_TYPE_CPTR,BL_VAL_TYPE_NUMBER};
      bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
      if(retval != NULL) return retval;
@@ -250,7 +250,7 @@ bl_val_t* bl_readline(bl_val_t* ctx, bl_val_t* params) {
 // simple wrapper around popen(3)
 // on success, returns a FILE* pointer
 bl_val_t* bl_popen(bl_val_t* ctx, bl_val_t* params) {
-     params = bl_ctx_eval(ctx,params);
+     params = bl_eval(ctx,params);
      bl_val_t* first   = bl_list_first(params);
      bl_val_t* second  = bl_list_second(params);
      char* cmd  = first->s_val;
@@ -262,7 +262,7 @@ bl_val_t* bl_popen(bl_val_t* ctx, bl_val_t* params) {
 // (pclose stream)
 // simple wrapper around pclose(3) - must be used instead of fclose
 bl_val_t* bl_pclose(bl_val_t* ctx, bl_val_t* params) {
-     params = bl_ctx_eval(ctx,params);
+     params = bl_eval(ctx,params);
      bl_val_t* first   = bl_list_first(params);
      pclose(first->c_ptr);
      return bl_mk_null();

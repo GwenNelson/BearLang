@@ -18,7 +18,7 @@ typedef struct simpleweb_html_resp_t {
 } simpleweb_html_resp_t;
 
 bl_val_t* bl_html_response(bl_val_t* ctx, bl_val_t* params) {
-        params = bl_ctx_eval(ctx,params);
+        params = bl_eval(ctx,params);
 	bl_val_t* first = bl_list_first(params);
 	simpleweb_html_resp_t* resp_obj = GC_MALLOC(sizeof(simpleweb_html_resp_t));
 	resp_obj->html_content = bl_ser_naked_sexp(first);
@@ -51,7 +51,7 @@ static void ev_handler(struct mg_connection *c, int ev, void *p) {
 			       bl_mk_str(body));
 
     // eval the expression
-    bl_val_t* resp = bl_ctx_eval(ctx,L);
+    bl_val_t* resp = bl_eval(ctx,L);
 
     // pull out the resp_obj
     simpleweb_html_resp_t* resp_obj = (simpleweb_html_resp_t*)resp->c_ptr;
@@ -65,7 +65,7 @@ static void ev_handler(struct mg_connection *c, int ev, void *p) {
 }
 
 bl_val_t* bl_serve(bl_val_t* ctx, bl_val_t* params) {
-	params = bl_ctx_eval(ctx,params);
+	params = bl_eval(ctx,params);
 	bl_val_t* portnum      = bl_list_first(params);
 	bl_val_t* handler_func = bl_list_second(params);
         handler_func->custom_data = ctx;

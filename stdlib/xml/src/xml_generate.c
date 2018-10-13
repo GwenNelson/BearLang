@@ -44,15 +44,15 @@ bl_val_t* xml_gen_oper(bl_val_t* ctx, bl_val_t* params) {
          if(i->car->type == BL_VAL_TYPE_CONS) {
             if(i->car->car->type == BL_VAL_TYPE_SYMBOL) {
                if(strcmp(i->car->car->s_val,"@")==0) {
-                  attr_list = bl_list_append(attr_list,bl_ctx_eval(ctx,i->car->cdr));
+                  attr_list = bl_list_append(attr_list,bl_eval(ctx,i->car->cdr));
                } else {
-                  ret_list  = bl_list_append(ret_list,bl_mk_str(bl_ser_naked_sexp(bl_ctx_eval(ctx,i->car))));
+                  ret_list  = bl_list_append(ret_list,bl_mk_str(bl_ser_naked_sexp(bl_eval(ctx,i->car))));
                }
             } else {
-               ret_list  = bl_list_append(ret_list,bl_mk_str(bl_ser_naked_sexp(bl_ctx_eval(ctx,i->car))));
+               ret_list  = bl_list_append(ret_list,bl_mk_str(bl_ser_naked_sexp(bl_eval(ctx,i->car))));
             }
          } else {
-           ret_list  = bl_list_append(ret_list,bl_mk_str(bl_ser_naked_sexp(bl_ctx_eval(ctx,i->car))));
+           ret_list  = bl_list_append(ret_list,bl_mk_str(bl_ser_naked_sexp(bl_eval(ctx,i->car))));
          }
      }
 
@@ -94,7 +94,7 @@ bl_val_t* x_get(bl_val_t* ctx, bl_val_t* sym) {
 }
 
 bl_val_t* xml_escape(bl_val_t* ctx, bl_val_t* params) {
-     params = bl_ctx_eval(ctx,params);
+     params = bl_eval(ctx,params);
      bl_val_t* s = bl_list_first(params);
      char* escaped = s->s_val;
      escaped = str_replace(escaped,"<","&lt;");

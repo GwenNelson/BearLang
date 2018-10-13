@@ -184,10 +184,10 @@ int test_simple_arithmetic() {
 
     bl_val_t* sexp = bl_parse_sexp(sum_str);
 
-    bl_val_t* result = bl_ctx_eval(ctx,sexp);
+    bl_val_t* result = bl_eval(ctx,sexp);
     ASSERT("simple addition (+ 2 3)", (result->type==BL_VAL_TYPE_NUMBER) && (strcmp(bl_ser_sexp(result),"5")==0))
 
-    result = bl_ctx_eval(ctx,bl_parse_sexp("(+ (2 3 1))"));
+    result = bl_eval(ctx,bl_parse_sexp("(+ (2 3 1))"));
     ASSERT("simple addition (+ (2 3 1))", (result->type==BL_VAL_TYPE_NUMBER) && (strcmp(bl_ser_sexp(result),"6")==0))
     bl_ctx_close(ctx);
     return 0;
@@ -200,7 +200,7 @@ int test_nested_addition() {
 
     bl_val_t* pure_sexp = bl_parse_sexp(sum_str);
 
-    bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
+    bl_val_t* result = bl_eval(ctx,pure_sexp);
     ASSERT("(+ 1 1 (+ 2 1))", (result->type==BL_VAL_TYPE_NUMBER) && (strcmp(bl_ser_sexp(result),"5")==0))
 
     bl_ctx_close(ctx);
@@ -213,7 +213,7 @@ int test_sub_add() {
 
     bl_val_t* pure_sexp = bl_parse_sexp(sum_str);
 
-    bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
+    bl_val_t* result = bl_eval(ctx,pure_sexp);
     ASSERT("(- 5 (+ 1 2))", (result->type==BL_VAL_TYPE_NUMBER) && (strcmp(bl_ser_sexp(result),"2")==0))
     bl_ctx_close(ctx);
     return 0;
@@ -225,7 +225,7 @@ int test_mult() {
 
     bl_val_t* pure_sexp = bl_parse_sexp(sum_str);
 
-    bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
+    bl_val_t* result = bl_eval(ctx,pure_sexp);
     ASSERT("(* 3 2)", (result->type==BL_VAL_TYPE_NUMBER)  && (strcmp(bl_ser_sexp(result),"6")==0))
 
     bl_ctx_close(ctx);
@@ -238,7 +238,7 @@ int test_div() {
 
     bl_val_t* pure_sexp = bl_parse_sexp(sum_str);
 
-    bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
+    bl_val_t* result = bl_eval(ctx,pure_sexp);
     ASSERT("(/ 12 4)", (result->type==BL_VAL_TYPE_NUMBER) && (strcmp(bl_ser_sexp(result),"3")==0))
     
     bl_ctx_close(ctx);
@@ -252,13 +252,13 @@ int test_set_oper() {
 
     bl_val_t* pure_sexp = bl_parse_sexp(set_str);
 
-    bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
+    bl_val_t* result = bl_eval(ctx,pure_sexp);
 
     char* sum_str = "(+ test 3)";
 
     pure_sexp = bl_parse_sexp(sum_str);
 
-    result = bl_ctx_eval(ctx,pure_sexp);
+    result = bl_eval(ctx,pure_sexp);
 
     ASSERT("(= test 2) (+ test 3)", (result->type==BL_VAL_TYPE_NUMBER)  && (strcmp(bl_ser_sexp(result),"5")==0))
 
@@ -271,12 +271,12 @@ int test_simple_func() {
     char* defun_str = "(= test (fn (a b) (- (+ a b) 1)))";
     bl_val_t*      pure_sexp = bl_parse_sexp(defun_str);
     
-    bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
+    bl_val_t* result = bl_eval(ctx,pure_sexp);
 
     char* test_str = "(test 2 2)";
     pure_sexp = bl_parse_sexp(test_str);
 
-    result = bl_ctx_eval(ctx,pure_sexp);
+    result = bl_eval(ctx,pure_sexp);
 
     ASSERT("Calling (= test (fn (a b) (- (+ a b) 1))) with (2 2)", (result->type==BL_VAL_TYPE_NUMBER)  && (strcmp(bl_ser_sexp(result),"3")==0))
 
@@ -292,12 +292,12 @@ int test_multiexpr_func() {
                                        (- c 1)))";
     bl_val_t*      pure_sexp = bl_parse_sexp(defun_str);
     
-    bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
+    bl_val_t* result = bl_eval(ctx,pure_sexp);
 
     char* test_str = "(test 2 2)";
     pure_sexp = bl_parse_sexp(test_str);
 
-    result = bl_ctx_eval(ctx,pure_sexp);
+    result = bl_eval(ctx,pure_sexp);
     ASSERT("Calling (= test (fn (a b) (- (+ a b) 1))) with (2 2)", (result->type==BL_VAL_TYPE_NUMBER) && (strcmp(bl_ser_sexp(result),"3")==0))
 
     bl_ctx_close(ctx);
@@ -311,12 +311,12 @@ int test_fun_oper() {
                                        (- c 1))";
     bl_val_t*      pure_sexp = bl_parse_sexp(defun_str);
     
-    bl_val_t* result = bl_ctx_eval(ctx,pure_sexp);
+    bl_val_t* result = bl_eval(ctx,pure_sexp);
 
     char* test_str = "(test 2 2)";
     pure_sexp = bl_parse_sexp(test_str);
 
-    result = bl_ctx_eval(ctx,pure_sexp);
+    result = bl_eval(ctx,pure_sexp);
     ASSERT("Calling (= test (fn (a b) (- (+ a b) 1))) with (2 2)", (result->type==BL_VAL_TYPE_NUMBER) && (strcmp(bl_ser_sexp(result),"3")==0))
 
     bl_ctx_close(ctx);
@@ -364,19 +364,19 @@ int test_eq_oper() {
     
     bl_val_t* not_equal_exp = bl_parse_sexp(not_eq_str);
 
-    bl_val_t* is_eq_result  = bl_ctx_eval(ctx,equal_exp);
-    bl_val_t* not_eq_result = bl_ctx_eval(ctx,not_equal_exp);
+    bl_val_t* is_eq_result  = bl_eval(ctx,equal_exp);
+    bl_val_t* not_eq_result = bl_eval(ctx,not_equal_exp);
 
     ASSERT("(eq 2 2) is #t", is_eq_result->b_val)
     ASSERT("(eq 2 3) is #f", !not_eq_result->b_val)
 
-    is_eq_result = bl_ctx_eval(ctx,bl_parse_sexp("(eq \"foo\" \"foo\")"));
+    is_eq_result = bl_eval(ctx,bl_parse_sexp("(eq \"foo\" \"foo\")"));
     ASSERT("(eq \"foo\" \"foo\") is #t", is_eq_result->b_val)
 
-    not_eq_result = bl_ctx_eval(ctx,bl_parse_sexp("(eq \"foo\" \"bar\")"));
+    not_eq_result = bl_eval(ctx,bl_parse_sexp("(eq \"foo\" \"bar\")"));
     ASSERT("(eq \"foo\" \"bar\") is #f", !not_eq_result->b_val)
 
-    not_eq_result = bl_ctx_eval(ctx,bl_parse_sexp("(eq \"foo\" 2)"));
+    not_eq_result = bl_eval(ctx,bl_parse_sexp("(eq \"foo\" 2)"));
     ASSERT("(eq \"foo\" 2) is #f", !not_eq_result->b_val)
 
     bl_ctx_close(ctx);
@@ -393,8 +393,8 @@ int test_simple_if() {
     
     bl_val_t* false_exp = bl_parse_sexp(false_if_str);
 
-    bl_val_t* true_if_result  = bl_ctx_eval(ctx,true_exp);
-    bl_val_t* false_if_result = bl_ctx_eval(ctx,false_exp);
+    bl_val_t* true_if_result  = bl_eval(ctx,true_exp);
+    bl_val_t* false_if_result = bl_eval(ctx,false_exp);
 
     ASSERT("(if True 666 42) returns 666",  strcmp(bl_ser_sexp(true_if_result),"666")==0)
     ASSERT("(if False 1337 69) returns 69", strcmp(bl_ser_sexp(false_if_result),"69")==0)
@@ -416,8 +416,8 @@ int test_multiexpr_if() {
     
     bl_val_t* false_exp = bl_parse_sexp(false_if_str);
 
-    bl_val_t* true_if_result  = bl_ctx_eval(ctx,true_exp);
-    bl_val_t* false_if_result = bl_ctx_eval(ctx,false_exp);
+    bl_val_t* true_if_result  = bl_eval(ctx,true_exp);
+    bl_val_t* false_if_result = bl_eval(ctx,false_exp);
 
     ASSERT("(if True (do (= x 2) (+ x 1) 42) returns 3", strcmp(bl_ser_sexp(true_if_result),"3")==0)
     ASSERT("(if False 1337 69) returns 69",  strcmp(bl_ser_sexp(false_if_result),"69")==0)
@@ -433,9 +433,9 @@ int test_and_oper() {
     char* ff_str = "(and False False)";
     char* tf_str = "(and True False)";
 
-    bl_val_t* tt_result = bl_ctx_eval(ctx,bl_parse_sexp(tt_str));
-    bl_val_t* ff_result = bl_ctx_eval(ctx,bl_parse_sexp(ff_str));
-    bl_val_t* tf_result = bl_ctx_eval(ctx,bl_parse_sexp(tf_str));
+    bl_val_t* tt_result = bl_eval(ctx,bl_parse_sexp(tt_str));
+    bl_val_t* ff_result = bl_eval(ctx,bl_parse_sexp(ff_str));
+    bl_val_t* tf_result = bl_eval(ctx,bl_parse_sexp(tf_str));
 
     ASSERT("(and True True) returns True",    tt_result->b_val==true)
     ASSERT("(and False False) returns False", ff_result->b_val==false)
@@ -451,8 +451,8 @@ int test_not_oper() {
     char* t_str = "(not False)";
     char* f_str = "(not True)";
 
-    bl_val_t* t_result = bl_ctx_eval(ctx,bl_parse_sexp(t_str));
-    bl_val_t* f_result = bl_ctx_eval(ctx,bl_parse_sexp(f_str));
+    bl_val_t* t_result = bl_eval(ctx,bl_parse_sexp(t_str));
+    bl_val_t* f_result = bl_eval(ctx,bl_parse_sexp(f_str));
 
     ASSERT("(not False) returns True", t_result->b_val==true)
     ASSERT("(not True) returns False", f_result->b_val==false)
@@ -469,10 +469,10 @@ int test_or_oper() {
     char* tf_str = "(or True False)";
     char* ft_str = "(or False True)";
 
-    bl_val_t* tt_result = bl_ctx_eval(ctx,bl_parse_sexp(tt_str));
-    bl_val_t* ff_result = bl_ctx_eval(ctx,bl_parse_sexp(ff_str));
-    bl_val_t* tf_result = bl_ctx_eval(ctx,bl_parse_sexp(tf_str));
-    bl_val_t* ft_result = bl_ctx_eval(ctx,bl_parse_sexp(ft_str));
+    bl_val_t* tt_result = bl_eval(ctx,bl_parse_sexp(tt_str));
+    bl_val_t* ff_result = bl_eval(ctx,bl_parse_sexp(ff_str));
+    bl_val_t* tf_result = bl_eval(ctx,bl_parse_sexp(tf_str));
+    bl_val_t* ft_result = bl_eval(ctx,bl_parse_sexp(ft_str));
 
     ASSERT("(or True True) returns True",    tt_result->b_val)
     ASSERT("(or False False) returns False", !ff_result->b_val)
@@ -490,9 +490,9 @@ int test_xor_oper() {
     char* ff_str = "(xor False False)";
     char* tf_str = "(xor True False)";
 
-    bl_val_t* tt_result = bl_ctx_eval(ctx,bl_parse_sexp(tt_str));
-    bl_val_t* ff_result = bl_ctx_eval(ctx,bl_parse_sexp(ff_str));
-    bl_val_t* tf_result = bl_ctx_eval(ctx,bl_parse_sexp(tf_str));
+    bl_val_t* tt_result = bl_eval(ctx,bl_parse_sexp(tt_str));
+    bl_val_t* ff_result = bl_eval(ctx,bl_parse_sexp(ff_str));
+    bl_val_t* tf_result = bl_eval(ctx,bl_parse_sexp(tf_str));
 
     ASSERT("(xor True True) returns True",    tt_result->b_val==false)
     ASSERT("(xor False False) returns False", ff_result->b_val==false)
@@ -518,18 +518,18 @@ int test_list_opers() {
     char* append_str    = "(append (1 2 3 4) 5";
     char* prepend_str   = "(prepend (1 2 3 4) 5";
 
-    bl_val_t* first_result     = bl_ctx_eval(ctx,bl_parse_sexp(first_str));
-    bl_val_t* first_result_b   = bl_ctx_eval(ctx,bl_parse_sexp(first_str_b));
-    bl_val_t* second_result    = bl_ctx_eval(ctx,bl_parse_sexp(second_str));
-    bl_val_t* second_result_b  = bl_ctx_eval(ctx,bl_parse_sexp(second_str_b));
-    bl_val_t* third_result     = bl_ctx_eval(ctx,bl_parse_sexp(third_str));
-    bl_val_t* third_result_b   = bl_ctx_eval(ctx,bl_parse_sexp(third_str_b));
-    bl_val_t* rest_result      = bl_ctx_eval(ctx,bl_parse_sexp(rest_str));
-    bl_val_t* rest_result_b    = bl_ctx_eval(ctx,bl_parse_sexp(rest_str_b));
-    bl_val_t* reverse_result   = bl_ctx_eval(ctx,bl_parse_sexp(reverse_str));
-    bl_val_t* reverse_result_b = bl_ctx_eval(ctx,bl_parse_sexp(reverse_str_b));
-    bl_val_t* append_result    = bl_ctx_eval(ctx,bl_parse_sexp(append_str));
-    bl_val_t* prepend_result   = bl_ctx_eval(ctx,bl_parse_sexp(prepend_str));
+    bl_val_t* first_result     = bl_eval(ctx,bl_parse_sexp(first_str));
+    bl_val_t* first_result_b   = bl_eval(ctx,bl_parse_sexp(first_str_b));
+    bl_val_t* second_result    = bl_eval(ctx,bl_parse_sexp(second_str));
+    bl_val_t* second_result_b  = bl_eval(ctx,bl_parse_sexp(second_str_b));
+    bl_val_t* third_result     = bl_eval(ctx,bl_parse_sexp(third_str));
+    bl_val_t* third_result_b   = bl_eval(ctx,bl_parse_sexp(third_str_b));
+    bl_val_t* rest_result      = bl_eval(ctx,bl_parse_sexp(rest_str));
+    bl_val_t* rest_result_b    = bl_eval(ctx,bl_parse_sexp(rest_str_b));
+    bl_val_t* reverse_result   = bl_eval(ctx,bl_parse_sexp(reverse_str));
+    bl_val_t* reverse_result_b = bl_eval(ctx,bl_parse_sexp(reverse_str_b));
+    bl_val_t* append_result    = bl_eval(ctx,bl_parse_sexp(append_str));
+    bl_val_t* prepend_result   = bl_eval(ctx,bl_parse_sexp(prepend_str));
 
     ASSERT("(first 1 2 3 4 5)  returns 1", strcmp(bl_ser_sexp(first_result),"1")==0)
     ASSERT("(first (1 2 3 4 5))  returns 1", strcmp(bl_ser_sexp(first_result_b),"1")==0)
@@ -612,8 +612,8 @@ int test_eval_file() {
 
 int test_while_oper() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_ctx_eval(ctx,bl_parse_sexp("(= x 10)"));
-    bl_ctx_eval(ctx,bl_parse_sexp("(while (gt x 0) (= x (- x 1)))"));
+    bl_eval(ctx,bl_parse_sexp("(= x 10)"));
+    bl_eval(ctx,bl_parse_sexp("(while (gt x 0) (= x (- x 1)))"));
 
     bl_val_t* x_val = bl_ctx_get(ctx,bl_mk_symbol("x"));
     ASSERT("while works correctly", strcmp(bl_ser_sexp(x_val),"0")==0)
@@ -624,13 +624,13 @@ int test_while_oper() {
 
 int test_inc_dec() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_ctx_eval(ctx,bl_parse_sexp("(= x 10)"));
-    bl_ctx_eval(ctx,bl_parse_sexp("(inc x)"));
+    bl_eval(ctx,bl_parse_sexp("(= x 10)"));
+    bl_eval(ctx,bl_parse_sexp("(inc x)"));
     bl_val_t* x_val = bl_ctx_get(ctx,bl_mk_symbol("x"));
     ASSERT("inc works correctly", strcmp(bl_ser_sexp(x_val),"11")==0)
 
-    bl_ctx_eval(ctx,bl_parse_sexp("(= y 10)"));
-    bl_ctx_eval(ctx,bl_parse_sexp("(dec y)"));
+    bl_eval(ctx,bl_parse_sexp("(= y 10)"));
+    bl_eval(ctx,bl_parse_sexp("(dec y)"));
     bl_val_t* y_val = bl_ctx_get(ctx,bl_mk_symbol("y"));
     ASSERT("dec works correctly", strcmp(bl_ser_sexp(y_val),"9")==0)
     bl_ctx_close(ctx);
@@ -639,13 +639,13 @@ int test_inc_dec() {
 
 int test_lt_gt() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* lt_true_result = bl_ctx_eval(ctx,bl_parse_sexp("(lt 2 3)"));
-    bl_val_t* gt_true_result = bl_ctx_eval(ctx,bl_parse_sexp("(gt 3 2)"));
+    bl_val_t* lt_true_result = bl_eval(ctx,bl_parse_sexp("(lt 2 3)"));
+    bl_val_t* gt_true_result = bl_eval(ctx,bl_parse_sexp("(gt 3 2)"));
     ASSERT("(lt 2 3) returns true", lt_true_result->b_val)
     ASSERT("(gt 3 2) returns true", gt_true_result->b_val)
 
-    bl_val_t* lt_false_result = bl_ctx_eval(ctx,bl_parse_sexp("(lt 2 2)"));
-    bl_val_t* gt_false_result = bl_ctx_eval(ctx,bl_parse_sexp("(gt 3 3)"));
+    bl_val_t* lt_false_result = bl_eval(ctx,bl_parse_sexp("(lt 2 2)"));
+    bl_val_t* gt_false_result = bl_eval(ctx,bl_parse_sexp("(gt 3 3)"));
     ASSERT("(lt 2 2) returns false", !lt_false_result->b_val)
     ASSERT("(gt 3 3) returns false", !gt_false_result->b_val)
 
@@ -655,10 +655,10 @@ int test_lt_gt() {
 
 int test_isset() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_ctx_eval(ctx,bl_parse_sexp("(= x 10)"));
+    bl_eval(ctx,bl_parse_sexp("(= x 10)"));
 
-    bl_val_t* set_true_result = bl_ctx_eval(ctx,bl_parse_sexp("(isset x)"));
-    bl_val_t* set_false_result = bl_ctx_eval(ctx,bl_parse_sexp("(isset doesnotexist)"));
+    bl_val_t* set_true_result = bl_eval(ctx,bl_parse_sexp("(isset x)"));
+    bl_val_t* set_false_result = bl_eval(ctx,bl_parse_sexp("(isset doesnotexist)"));
     ASSERT("(isset x) returns true", set_true_result->b_val)
 
     ASSERT("(isset doesnotexist) returns false", !set_false_result->b_val)
@@ -669,7 +669,7 @@ int test_isset() {
 
 int test_map() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* map_result = bl_ctx_eval(ctx,bl_parse_sexp("(map (fn (x) (+ x 1)) (1 2 3 4))"));
+    bl_val_t* map_result = bl_eval(ctx,bl_parse_sexp("(map (fn (x) (+ x 1)) (1 2 3 4))"));
 
     ASSERT("(map (fn (x) (+ x 1)) (1 2 3 4) returns (2 3 4 5)", strcmp(bl_ser_sexp(map_result),"(2 3 4 5)")==0)
 
@@ -679,10 +679,10 @@ int test_map() {
 
 int test_modulo() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* modulo_result = bl_ctx_eval(ctx,bl_parse_sexp("(% 5 3)"));
+    bl_val_t* modulo_result = bl_eval(ctx,bl_parse_sexp("(% 5 3)"));
     ASSERT("(% 5 3) returns 2", strcmp(bl_ser_sexp(modulo_result),"2")==0)
     
-    modulo_result = bl_ctx_eval(ctx,bl_parse_sexp("(% 15 5)"));
+    modulo_result = bl_eval(ctx,bl_parse_sexp("(% 15 5)"));
     ASSERT("(% 15 5) returns 0", strcmp(bl_ser_sexp(modulo_result),"0")==0)
 
     bl_ctx_close(ctx);
@@ -692,10 +692,10 @@ int test_modulo() {
 
 int test_add_strings() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(+ \"foo\" \"bar\")"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(+ \"foo\" \"bar\")"));
     ASSERT("(+ \"foo\" \"bar\") returns \"foobar\"", strcmp(bl_ser_naked_sexp(result),"foobar")==0)
    
-    result = bl_ctx_eval(ctx,bl_parse_sexp("(+ = \"foo\" 20 =)")); 
+    result = bl_eval(ctx,bl_parse_sexp("(+ = \"foo\" 20 =)")); 
     ASSERT("(+ = \"foo\" 20 =)", strcmp(bl_ser_naked_sexp(result),"<nativeoper>foo20<nativeoper>")==0)
 
     bl_ctx_close(ctx);
@@ -705,7 +705,7 @@ int test_add_strings() {
 
 int test_add_lists() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(+ (1) 2 3 4 (5 6))"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(+ (1) 2 3 4 (5 6))"));
     ASSERT("(+ (1) 2 3 4 (5 6)) returns (1 2 3 4 5 6)", strcmp(bl_ser_naked_sexp(result),"(1 2 3 4 5 6)")==0)
 
     bl_ctx_close(ctx);
@@ -714,9 +714,9 @@ int test_add_lists() {
 
 int test_serexp_oper() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(serexp (1 2 3))"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(serexp (1 2 3))"));
     ASSERT("(serexp (1 2 3)) returns \"(1 2 3)\"", strcmp(bl_ser_sexp(result),"\"(1 2 3)\"")==0)
-    result = bl_ctx_eval(ctx,bl_parse_sexp("(serexp 1 2 3)"));
+    result = bl_eval(ctx,bl_parse_sexp("(serexp 1 2 3)"));
     ASSERT("(serexp 1 2 3) returns \"(1 2 3)\"", strcmp(bl_ser_sexp(result),"\"(1 2 3)\"")==0)
     bl_ctx_close(ctx);
     return 0;
@@ -728,7 +728,7 @@ int test_include_oper() {
     fprintf(fd,"True\n");
     fclose(fd);
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(include \"/tmp/bearlang-test.bl\")"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(include \"/tmp/bearlang-test.bl\")"));
     ASSERT("include successfully tested", strcmp(bl_ser_naked_sexp(result),"(True)")==0)
     return 0;
 }
@@ -784,11 +784,11 @@ int test_ctx_stress() {
 
 int test_symnotfound() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(+ 1 2 bacon)"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(+ 1 2 bacon)"));
 
     ASSERT("get non-existent symbol error", result->type==BL_VAL_TYPE_ERROR)
 
-    result = bl_ctx_eval(ctx,bl_parse_sexp("(foobar 1 2 3)"));
+    result = bl_eval(ctx,bl_parse_sexp("(foobar 1 2 3)"));
 
     ASSERT("get non-existent symbol error", result->type==BL_VAL_TYPE_ERROR)
 
@@ -798,19 +798,19 @@ int test_symnotfound() {
 
 int test_eval_invalid() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("()"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("()"));
 
     ASSERT("eval(None) returns None", result->type==BL_VAL_TYPE_NULL)
 
-    result = bl_ctx_eval(ctx,NULL);
+    result = bl_eval(ctx,NULL);
     ASSERT("eval(None) returns None", result->type==BL_VAL_TYPE_NULL)
 
     bl_val_t* err = bl_mk_val(BL_VAL_TYPE_ERROR);
-    result = bl_ctx_eval(ctx,err);
+    result = bl_eval(ctx,err);
     ASSERT("eval(error) returns error", result==err)
 
     bl_val_t* err_list = bl_mk_list(2,err,bl_mk_str("bla"));
-    result = bl_ctx_eval(ctx,err_list);
+    result = bl_eval(ctx,err_list);
     ASSERT("eval(error) returns error", result==err)
 	
     bl_ctx_close(ctx);
@@ -819,8 +819,8 @@ int test_eval_invalid() {
 
 int test_zeroparam_func() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_ctx_eval(ctx,bl_parse_sexp("(fun myfunc () True)"));
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(myfunc)"));
+    bl_eval(ctx,bl_parse_sexp("(fun myfunc () True)"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(myfunc)"));
 
     ASSERT("Zero-param function returns correct value", result->b_val)
 
@@ -830,7 +830,7 @@ int test_zeroparam_func() {
 
 int test_eval_numberlist() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(1 2 3 )"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(1 2 3 )"));
     ASSERT("Return value is a list", result->type==BL_VAL_TYPE_CONS)
     ASSERT("Return value is the correct list",  strcmp(bl_ser_sexp(result),"(1 2 3)")==0)
     bl_ctx_close(ctx);
@@ -839,34 +839,34 @@ int test_eval_numberlist() {
 
 int test_while_error() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(while True foo)"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(while True foo)"));
     ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
     return 0;
 }
 
 int test_simple_oper() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_ctx_eval(ctx,bl_parse_sexp("(oper test () (= x 2))"));
-    bl_ctx_eval(ctx,bl_parse_sexp("(test)"));
-    bl_val_t* result = bl_ctx_eval(ctx, bl_parse_sexp("x"));
+    bl_eval(ctx,bl_parse_sexp("(oper test () (= x 2))"));
+    bl_eval(ctx,bl_parse_sexp("(test)"));
+    bl_val_t* result = bl_eval(ctx, bl_parse_sexp("x"));
     ASSERT("Return value is correct",  strcmp(bl_ser_sexp(result),"2")==0)
     return 0;
 }
 
 int test_map_error() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(map foo)"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(map foo)"));
     ASSERT("(map foo) Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
 
-    result = bl_ctx_eval(ctx,bl_parse_sexp("(map 1 2)"));
+    result = bl_eval(ctx,bl_parse_sexp("(map 1 2)"));
     ASSERT("(map 1 2) Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
 
-    bl_ctx_eval(ctx,bl_parse_sexp("(fun errfunc (x) True bar)"));
-    result = bl_ctx_eval(ctx,bl_parse_sexp("(map errfunc (1 2 3))"));
+    bl_eval(ctx,bl_parse_sexp("(fun errfunc (x) True bar)"));
+    result = bl_eval(ctx,bl_parse_sexp("(map errfunc (1 2 3))"));
     ASSERT("(map errfunc 1 2 3) Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
 
-    bl_ctx_eval(ctx,bl_parse_sexp("(fun errfunc (x) foobar True)"));
-    result = bl_ctx_eval(ctx,bl_parse_sexp("(map errfunc (1 2 3))"));
+    bl_eval(ctx,bl_parse_sexp("(fun errfunc (x) foobar True)"));
+    result = bl_eval(ctx,bl_parse_sexp("(map errfunc (1 2 3))"));
     ASSERT("(map errfunc 1 2 3) Return value is an error", result->type==BL_VAL_TYPE_ERROR) 
 
     bl_ctx_close(ctx);
@@ -875,7 +875,7 @@ int test_map_error() {
 
 int test_add_noargs() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(+)"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(+)"));
     ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR)
     bl_ctx_close(ctx);
     return 0;
@@ -883,7 +883,7 @@ int test_add_noargs() {
 
 int test_div_toomanyargs() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(/ 1 2 3)"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(/ 1 2 3)"));
     ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR)
     bl_ctx_close(ctx);
     return 0;
@@ -891,7 +891,7 @@ int test_div_toomanyargs() {
 
 int test_div_stringargs() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(/ \"a\" \"b\" )"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(/ \"a\" \"b\" )"));
     ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR)
     bl_ctx_close(ctx);
     return 0;
@@ -899,7 +899,7 @@ int test_div_stringargs() {
 
 int test_div_onearg() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(/ 1 )"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(/ 1 )"));
     ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR)
     bl_ctx_close(ctx);
     return 0;
@@ -907,7 +907,7 @@ int test_div_onearg() {
 
 int test_sub_onearg() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(- 1 )"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(- 1 )"));
     ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR)
     bl_ctx_close(ctx);
     return 0;
@@ -915,7 +915,7 @@ int test_sub_onearg() {
 
 int test_mult_onearg() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(* 1 )"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(* 1 )"));
     ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR)
     bl_ctx_close(ctx);
     return 0;
@@ -923,7 +923,7 @@ int test_mult_onearg() {
 
 int test_div_zero() {
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(/ 42 0 )"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(/ 42 0 )"));
     ASSERT("Return value is an error", result->type==BL_VAL_TYPE_ERROR)
     bl_ctx_close(ctx);
     return 0;
@@ -940,19 +940,19 @@ int test_import_testmod() {
 
     bl_ctx_set(ctx,bl_mk_symbol("*MAINFILE*"), bl_mk_str(""));
     bl_ctx_set(ctx,bl_mk_symbol("*FILENAME*"), bl_mk_str(""));
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(import testmod)"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(import testmod)"));
     ASSERT("import does not return an error", result->type != BL_VAL_TYPE_ERROR)
-    result = bl_ctx_eval(ctx,bl_parse_sexp("(testmod::get_cptr)"));
+    result = bl_eval(ctx,bl_parse_sexp("(testmod::get_cptr)"));
     ASSERT("get_cptr returns a pointer type", result->type == BL_VAL_TYPE_CPTR)
     void* ptr = result->c_ptr;
     ASSERT("ptr is not NULL", ptr != NULL)
     char* test_str = (char*)ptr;
     ASSERT("ptr as string is correct", strcmp(test_str,"TEST STRING")==0)
-    bl_val_t* nested = bl_ctx_eval(ctx,bl_parse_sexp("(import testmod::nested)"));
+    bl_val_t* nested = bl_eval(ctx,bl_parse_sexp("(import testmod::nested)"));
     ASSERT("nested imported ok", nested->type == BL_VAL_TYPE_CTX)
     bl_val_t* nested_str = bl_ctx_get(ctx, bl_mk_symbol("nested::teststr"));
     ASSERT("nested string correct", strcmp(nested_str->s_val,"TEST STRING2")==0)
-    bl_val_t* nested2 = bl_ctx_eval(ctx,bl_parse_sexp("(import testmod::nested::nested2)"));
+    bl_val_t* nested2 = bl_eval(ctx,bl_parse_sexp("(import testmod::nested::nested2)"));
     ASSERT("nested2 imported ok", nested2->type == BL_VAL_TYPE_CTX)
     bl_val_t* nested2_str = bl_ctx_get(ctx, bl_mk_symbol("nested2::teststr2"));
     ASSERT("nested2 string correct", strcmp(nested2_str->s_val,"TEST STRING3")==0)
@@ -961,7 +961,7 @@ int test_import_testmod() {
 
 int test_parse_builtin() {
     bl_val_t* ctx    = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(parse \"(1 2 3)\""));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(parse \"(1 2 3)\""));
     ASSERT("result is a list", result->type == BL_VAL_TYPE_CONS)
     ASSERT("result is correctly parsed", strcmp(bl_ser_sexp(result),"(1 2 3)")==0)
     return 0;
@@ -970,10 +970,10 @@ int test_parse_builtin() {
 
 int test_quote_builtin() {
     bl_val_t* ctx    = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(quote print)"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(quote print)"));
     ASSERT("result is a symbol", result->type == BL_VAL_TYPE_SYMBOL)
     ASSERT("result is correct symbol", strcmp(result->s_val,"print")==0)
-    result = bl_ctx_eval(ctx,bl_parse_sexp("(quote 1 2 3)"));
+    result = bl_eval(ctx,bl_parse_sexp("(quote 1 2 3)"));
     ASSERT("result is a list", result->type == BL_VAL_TYPE_CONS)
     ASSERT("result is correct list", strcmp(bl_ser_sexp(result),"(1 2 3)")==0)
 
@@ -982,27 +982,27 @@ int test_quote_builtin() {
 
 int test_import_noexist() {
     bl_val_t* ctx    = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(import notexist)"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(import notexist)"));
     ASSERT("result is an error", result->type == BL_VAL_TYPE_ERROR)
-    result = bl_ctx_eval(ctx,bl_parse_sexp("(import testmod)"));
-    result = bl_ctx_eval(ctx,bl_parse_sexp("(import testmod::notexist)"));
+    result = bl_eval(ctx,bl_parse_sexp("(import testmod)"));
+    result = bl_eval(ctx,bl_parse_sexp("(import testmod::notexist)"));
     ASSERT("result is an error", result->type == BL_VAL_TYPE_ERROR)
-    result = bl_ctx_eval(ctx,bl_parse_sexp("(import notexist::alsonotexist)"));
+    result = bl_eval(ctx,bl_parse_sexp("(import notexist::alsonotexist)"));
     ASSERT("result is an error", result->type == BL_VAL_TYPE_ERROR)
     return 0;
 }
 
 int test_docstr_fun() {
     bl_val_t* ctx    = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx, bl_parse_sexp("(fun test (x) \"\"\"foobar\"\"\" (+ x 1))"));
-    result           = bl_ctx_eval(ctx, bl_parse_sexp("(doc test)"));
+    bl_val_t* result = bl_eval(ctx, bl_parse_sexp("(fun test (x) \"\"\"foobar\"\"\" (+ x 1))"));
+    result           = bl_eval(ctx, bl_parse_sexp("(doc test)"));
     ASSERT("result is correct docstr", strcmp(bl_ser_naked_sexp(result),"foobar")==0)
     return 0;
 }
 
 int test_invalid_dylib_import() {
     bl_val_t* ctx    = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(import testmod2)"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(import testmod2)"));
     ASSERT("result is an error", result->type == BL_VAL_TYPE_ERROR)
 
     return 0;
@@ -1019,18 +1019,18 @@ int test_using_oper() {
 
     bl_ctx_set(ctx_b,bl_mk_symbol("ctx_a"),ctx_a);
 
-    bl_ctx_eval(ctx_b, bl_parse_sexp("(using ctx_a::a)"));
-    bl_val_t* result = bl_ctx_eval(ctx_b, bl_parse_sexp("a"));
+    bl_eval(ctx_b, bl_parse_sexp("(using ctx_a::a)"));
+    bl_val_t* result = bl_eval(ctx_b, bl_parse_sexp("a"));
     ASSERT("value a", strcmp(bl_ser_naked_sexp(result),"foo")==0)
 
-    bl_ctx_eval(ctx_b, bl_parse_sexp("(using ctx_a::*)"));
-    result = bl_ctx_eval(ctx_b, bl_parse_sexp("b"));
+    bl_eval(ctx_b, bl_parse_sexp("(using ctx_a::*)"));
+    result = bl_eval(ctx_b, bl_parse_sexp("b"));
     ASSERT("value a", strcmp(bl_ser_naked_sexp(result),"bar")==0)
 
-    result = bl_ctx_eval(ctx_a, bl_parse_sexp("(using doesnotexist::something)"));
+    result = bl_eval(ctx_a, bl_parse_sexp("(using doesnotexist::something)"));
     ASSERT("error on nonexistent module", result->type == BL_VAL_TYPE_ERROR)
 
-    result = bl_ctx_eval(ctx_b, bl_parse_sexp("(using ctx_a::doesnotexist)"));
+    result = bl_eval(ctx_b, bl_parse_sexp("(using ctx_a::doesnotexist)"));
     ASSERT("error on nonexistent symbol", result->type == BL_VAL_TYPE_ERROR)
 	
     return 0;
@@ -1038,16 +1038,16 @@ int test_using_oper() {
 
 int test_filtered_oper() {
     bl_val_t* ctx    = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(filtered (1 2 3 4 5 6) (2 3 4))"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(filtered (1 2 3 4 5 6) (2 3 4))"));
     ASSERT("filtered list is correct", strcmp(bl_ser_sexp(result),"(1 5 6)")==0)
     return 0;
 }
 
 int test_foreach_oper() {
     bl_val_t* ctx    = bl_ctx_new_std();
-    bl_ctx_eval(ctx,bl_parse_sexp("(= x 0)"));
-    bl_ctx_eval(ctx,bl_parse_sexp("(foreach i (1 2 3) (= x (+ x i)))"));
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("x"));
+    bl_eval(ctx,bl_parse_sexp("(= x 0)"));
+    bl_eval(ctx,bl_parse_sexp("(foreach i (1 2 3) (= x (+ x i)))"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("x"));
     ASSERT("foreach works", strcmp(bl_ser_sexp(result),"6")==0)
     return 0;
 }
@@ -1056,11 +1056,11 @@ int test_try_oper() {
     bl_val_t* ctx = bl_ctx_new_std();
     bl_val_t* try_expr = bl_parse_sexp("(try (/ 2 0)"
 		                       "     (catch ERR_DIVIDE_BY_ZERO \"CAUGHT DIV0\"))");
-    bl_val_t* result = bl_ctx_eval(ctx,try_expr);
+    bl_val_t* result = bl_eval(ctx,try_expr);
     ASSERT("Catch works",strcmp(bl_ser_naked_sexp(result),"CAUGHT DIV0")==0)
 
     try_expr = bl_parse_sexp("(try True)");
-    result   = bl_ctx_eval(ctx,try_expr);
+    result   = bl_eval(ctx,try_expr);
     ASSERT("Empty catch works", result->b_val==true)
     return 0;
 }
@@ -1101,7 +1101,7 @@ int test_import_bl_file() {
     fclose(fd);
 
     bl_val_t* ctx = bl_ctx_new_std();
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(import tmp)"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(import tmp)"));
     ASSERT("imported successfully", result->type == BL_VAL_TYPE_CTX)
     bl_val_t* testval = bl_ctx_get(result,bl_mk_symbol("testsym"));
     ASSERT("testsym is present", testval->b_val)
@@ -1110,7 +1110,7 @@ int test_import_bl_file() {
     fprintf(fd,"(import tmp)");
     fclose(fd);
 
-    result = bl_ctx_eval(result,bl_parse_sexp("(import tmp2)"));
+    result = bl_eval(result,bl_parse_sexp("(import tmp2)"));
     ASSERT("imported successfully", result->type == BL_VAL_TYPE_CTX)
     testval = bl_ctx_get(result,bl_mk_symbol("testsym"));
 
@@ -1123,9 +1123,9 @@ int test_import_bl_file() {
 int test_aget_oper() {
     bl_val_t* ctx      = bl_ctx_new_std();
     bl_val_t* set_expr = bl_parse_sexp("(= atest (('x 1) ('y 2) ('z 3)))");
-    bl_ctx_eval(ctx,set_expr);
+    bl_eval(ctx,set_expr);
     
-    bl_val_t* result = bl_ctx_eval(ctx,bl_parse_sexp("(aget 'x atest)"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(aget 'x atest)"));
     ASSERT("Got x correctly", strcmp(bl_ser_sexp(result),"1")==0)
     return 0;
 
@@ -1134,7 +1134,7 @@ int test_aget_oper() {
 int test_throw_oper() {
     bl_val_t* ctx        = bl_ctx_new_std();
     bl_val_t* throw_expr = bl_parse_sexp("(throw myerr 1234)");
-    bl_val_t* err        = bl_ctx_eval(ctx,throw_expr);
+    bl_val_t* err        = bl_eval(ctx,throw_expr);
     ASSERT("error type is returned", err->type==BL_VAL_TYPE_ERROR)
     ASSERT("error type is correct",  err->err_val.err_sym == bl_mk_symbol("myerr"))
     return 0;

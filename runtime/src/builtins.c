@@ -8,6 +8,7 @@
 #include <bearlang/error_tools.h>
 #include <bearlang/utils.h>
 #include <bearlang/string_ops.h>
+#include <bearlang/eval.h>
 #include <glob.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -25,7 +26,7 @@
 // LCOV_EXCL_START
 bl_val_t* bl_oper_profile(bl_val_t* ctx, bl_val_t* params) {
    clock_t start = clock();
-   bl_ctx_eval(ctx,params);
+   bl_eval(ctx,params);
    clock_t end = clock();
    double elapsed_time = (end-start)/(double)CLOCKS_PER_SEC;
    char outbuf[512];
@@ -37,7 +38,7 @@ bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    PARAM_LEN_CHECK(2,2)
 
    bl_val_t* errtype = bl_list_first(params);
-   bl_val_t* errval  = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* errval  = bl_eval(ctx,bl_list_second(params));
    if(errval == NULL) errval = bl_mk_null();
    retval = bl_mk_err(BL_ERR_BL_CUSTOM);
    retval->err_val.err_sym = errtype;
@@ -57,7 +58,7 @@ bl_val_t* bl_oper_listbuiltins(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_L
 
 bl_val_t* bl_oper_pmatch(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    PARAM_LEN_CHECK(2,2)
-   params      = bl_ctx_eval(ctx,params);
+   params      = bl_eval(ctx,params);
    
    retval = bl_mk_null();
 
@@ -73,7 +74,7 @@ bl_val_t* bl_oper_pmatch(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_startswith(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-   params = bl_ctx_eval(ctx,params);
+   params = bl_eval(ctx,params);
    bl_val_t* first  = bl_list_first(params);
    bl_val_t* second = bl_list_second(params);
    if(strstr(first->s_val,second->s_val)==first->s_val) return bl_mk_bool(true);
@@ -81,15 +82,15 @@ bl_val_t* bl_oper_startswith(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LIN
 }
 
 bl_val_t* bl_oper_split(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   params           = bl_ctx_eval(ctx,params);
+   params           = bl_eval(ctx,params);
    bl_val_t* first  = bl_list_first(params);
    bl_val_t* second = bl_list_second(params);
    return split_str(first->s_val,second->s_val);
 }
 
 bl_val_t* bl_oper_aget(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   bl_val_t* sym    = bl_ctx_eval(ctx,bl_list_first(params));
-   bl_val_t* L      = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* sym    = bl_eval(ctx,bl_list_first(params));
+   bl_val_t* L      = bl_eval(ctx,bl_list_second(params));
    bl_val_t* retval = bl_err_symnotfound(sym->s_val);
    bl_val_t* L_car;
    for(; L != NULL; L=L->cdr) {
@@ -104,19 +105,19 @@ bl_val_t* bl_oper_aget(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_foreach(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* sym  = bl_list_first(params);
-   bl_val_t* L    = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* L    = bl_eval(ctx,bl_list_second(params));
    bl_val_t* expr = bl_list_third(params);
    for(; L != NULL; L=L->cdr) {
       bl_ctx_set(ctx,sym,L->car);
-      bl_ctx_eval(ctx,expr);
+      bl_eval(ctx,expr);
    }
    bl_ctx_set(ctx,sym,NULL);
    return bl_mk_null();
 }
 
 bl_val_t* bl_oper_filtered(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   bl_val_t* L     = bl_ctx_eval(ctx,bl_list_first(params));
-   bl_val_t* items = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* L     = bl_eval(ctx,bl_list_first(params));
+   bl_val_t* items = bl_eval(ctx,bl_list_second(params));
    // TODO implement an "in" operation and set data type and shit
    bl_val_t* retval = NULL;
    bl_val_t* I      = items;
@@ -158,7 +159,7 @@ bl_val_t* bl_oper_quote(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 // while evaluating the catch blocks, *ERR* is set to the actual error
 bl_val_t* bl_oper_try(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* try_expr    = bl_list_first(params);
-   bl_val_t* try_result  = bl_ctx_eval(ctx, try_expr);
+   bl_val_t* try_result  = bl_eval(ctx, try_expr);
    if(try_result->type != BL_VAL_TYPE_ERROR) return try_result;
 
    bl_val_t* other_exprs = bl_list_rest(params);
@@ -192,18 +193,18 @@ bl_val_t* bl_oper_try(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
        }
    }
 
-   bl_val_t* retval = bl_ctx_eval(ctx,catch_expr);
-   if(finally_expr != NULL) retval = bl_ctx_eval(ctx,finally_expr);
+   bl_val_t* retval = bl_eval(ctx,catch_expr);
+   if(finally_expr != NULL) retval = bl_eval(ctx,finally_expr);
    // LCOV_EXCL_STOP
    return retval;
 }
 
 // LCOV_EXCL_START
 bl_val_t* bl_oper_eval(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   params = bl_ctx_eval(ctx,params);
+   params = bl_eval(ctx,params);
    if(params->type == BL_VAL_TYPE_ERROR) return params;
-   if(bl_list_len(params)==1) return bl_ctx_eval(ctx,bl_list_first(params));
-   return bl_ctx_eval(ctx,params);
+   if(bl_list_len(params)==1) return bl_eval(ctx,bl_list_first(params));
+   return bl_eval(ctx,params);
 }
 // LCOV_EXCL_STOP
 
@@ -232,13 +233,13 @@ bl_val_t* bl_oper_map(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
        for(j = func->bl_func_ptr; j != NULL; j=j->cdr) {
            if(retval_L == NULL) {
               retval_L = bl_mk_val(BL_VAL_TYPE_CONS);
-	      retval_L->car = bl_ctx_eval(func->inner_closure,j->car);
+	      retval_L->car = bl_eval(func->inner_closure,j->car);
               if(retval_L->car->type == BL_VAL_TYPE_ERROR) return retval_L->car;
 	      retval_L->cdr = NULL;
 	      retval = retval_L;
 	   } else {
               retval_L->cdr = bl_mk_val(BL_VAL_TYPE_CONS);
-	      retval_L->cdr->car = bl_ctx_eval(func->inner_closure,j->car);
+	      retval_L->cdr->car = bl_eval(func->inner_closure,j->car);
               if(retval_L->cdr->car->type == BL_VAL_TYPE_ERROR) return retval_L->cdr->car;
 	      retval_L=retval_L->cdr;
 	   }
@@ -255,7 +256,7 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    if(L->type == BL_VAL_TYPE_ERROR) return L;
    bl_val_t* retval = bl_errif_invalid_len(L,1,BL_LONGEST_LIST);
    if(retval != NULL) return retval;
-   bl_val_t* first = bl_ctx_eval(ctx,bl_list_first(params));
+   bl_val_t* first = bl_eval(ctx,bl_list_first(params));
 
    if((first->type == BL_VAL_TYPE_CONS) && (bl_list_len(params)==1)) {
       params = first;
@@ -273,7 +274,7 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
       case BL_VAL_TYPE_CONS:
            retval = NULL;
 	   for(L=params; L != NULL; L=L->cdr) {
-              x = bl_ctx_eval(ctx,L->car);
+              x = bl_eval(ctx,L->car);
               if(x->type == BL_VAL_TYPE_CONS) {
                 for(; x != NULL; x=x->cdr) {
                     retval = bl_list_prepend(retval, x->car);
@@ -295,7 +296,7 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
    L = params;
    for(L=params; L!= NULL; L=L->cdr) {
-           x = bl_ctx_eval(ctx,L->car);
+           x = bl_eval(ctx,L->car);
         switch(retval->type) {
             case BL_VAL_TYPE_NUMBER:
            	 retval->fix_int = retval->fix_int + x->fix_int;
@@ -310,7 +311,7 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-   params = bl_ctx_eval(ctx,params);
+   params = bl_eval(ctx,params);
    bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
@@ -329,7 +330,7 @@ bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-   params = bl_ctx_eval(ctx, params);
+   params = bl_eval(ctx, params);
    bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
@@ -337,8 +338,8 @@ bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
    retval->fix_int = 0;
 
-   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
-   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_eval(ctx,bl_list_second(params));
 
 //   mpz_mul(retval->i_val, first->i_val, second->i_val);
    retval->fix_int = first->fix_int * second->fix_int;
@@ -355,8 +356,8 @@ bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
       retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
       retval->fix_int = 0;
-   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
-   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_eval(ctx,bl_list_second(params));
 
    if(second->fix_int == 0) return bl_err_divzero();
 
@@ -367,7 +368,7 @@ bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_mod(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-//   params = bl_ctx_eval(ctx,params);
+//   params = bl_eval(ctx,params);
 /*   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
@@ -378,8 +379,8 @@ bl_val_t* bl_oper_mod(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
       bl_val_t* retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
       retval->fix_int = 0;
 
-   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
-   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_eval(ctx,bl_list_second(params));
 
 /*   mpz_init(retval->i_val);
    mpz_mod(retval->i_val, first->i_val, second->i_val);*/
@@ -389,7 +390,7 @@ bl_val_t* bl_oper_mod(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_lt(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-//   params = bl_ctx_eval(ctx,params);
+//   params = bl_eval(ctx,params);
 /*   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
@@ -397,8 +398,8 @@ bl_val_t* bl_oper_lt(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    retval = bl_errif_invalid_len(params,2,2);
    if(retval != NULL) return retval;*/
 
-   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
-   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_eval(ctx,bl_list_second(params));
 
    if(first->fix_int < second->fix_int) return bl_mk_bool(true);
 //   if(mpz_cmp(first->i_val,second->i_val)>=0) return bl_mk_bool(false);
@@ -407,7 +408,7 @@ bl_val_t* bl_oper_lt(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_gt(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-//   params = bl_ctx_eval(ctx,params);
+//   params = bl_eval(ctx,params);
 /*   bl_val_type_t expected_types[2] = {BL_VAL_TYPE_NUMBER,BL_VAL_TYPE_NUMBER};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;
@@ -416,8 +417,8 @@ bl_val_t* bl_oper_gt(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    if(retval != NULL) return retval;*/
 
 
-   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
-   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_eval(ctx,bl_list_second(params));
 
    if(first->fix_int > second->fix_int) return bl_mk_bool(true);
   //   if(mpz_cmp(first->i_val,second->i_val)<0) return bl_mk_bool(false);
@@ -430,7 +431,7 @@ bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,2);
    if(retval != NULL) return retval;*/
     
-   bl_val_t* retval = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* retval = bl_eval(ctx,bl_list_second(params));
    bl_val_t* name   = bl_list_first(params); // TODO: Handle the case where this isn't a symbol
 
    bl_ctx_set(ctx, name, retval);
@@ -443,7 +444,7 @@ bl_val_t* bl_oper_print(bl_val_t* ctx, bl_val_t* params) {
    if(i->type == BL_VAL_TYPE_ERROR) return i;
 
    for(i=params; i!= NULL; i=i->cdr) {
-     	printf("%s", bl_ser_naked_sexp(bl_ctx_eval(ctx,i->car)));
+     	printf("%s", bl_ser_naked_sexp(bl_eval(ctx,i->car)));
 
    }
    return bl_mk_null();
@@ -500,8 +501,8 @@ bl_val_t* bl_oper_oper(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
-   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_eval(ctx,bl_list_second(params));
 
    // LCOV_EXCL_START
    if(first->type == BL_VAL_TYPE_TYPE && second->type == BL_VAL_TYPE_TYPE) {
@@ -535,8 +536,8 @@ bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_and(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
-   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_eval(ctx,bl_list_second(params));
 
    if((first->b_val) && (second->b_val)) return bl_mk_bool(true);
    return bl_mk_bool(false);
@@ -544,7 +545,7 @@ bl_val_t* bl_oper_and(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_not(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
+   bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
 
    if(first->b_val) return bl_mk_bool(false);
    return bl_mk_bool(true);
@@ -552,8 +553,8 @@ bl_val_t* bl_oper_not(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_or(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
-   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_eval(ctx,bl_list_second(params));
 
    if(first->b_val) return bl_mk_bool(true);
    if(second->b_val) return bl_mk_bool(true);
@@ -562,8 +563,8 @@ bl_val_t* bl_oper_or(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_xor(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-   bl_val_t* first  = bl_ctx_eval(ctx,bl_list_first(params));
-   bl_val_t* second = bl_ctx_eval(ctx,bl_list_second(params));
+   bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
+   bl_val_t* second = bl_eval(ctx,bl_list_second(params));
 
    if((first->b_val) ^ (second->b_val)) return bl_mk_bool(true);
    return bl_mk_bool(false);
@@ -571,14 +572,14 @@ bl_val_t* bl_oper_xor(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_first(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-   params = bl_ctx_eval(ctx,params);
+   params = bl_eval(ctx,params);
    if(bl_list_len(params)==1) return bl_list_first(bl_list_first(params));
    return bl_list_first(params);
 }
 
 bl_val_t* bl_oper_second(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-   params = bl_ctx_eval(ctx,params);
+   params = bl_eval(ctx,params);
    if(bl_list_len(params)==1) return bl_list_second(bl_list_first(params));
    bl_val_t* retval = bl_list_second(params);
    return retval;
@@ -586,7 +587,7 @@ bl_val_t* bl_oper_second(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_third(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-   if(bl_list_len(params)==1) params = bl_ctx_eval(ctx,bl_list_first(params));
+   if(bl_list_len(params)==1) params = bl_eval(ctx,bl_list_first(params));
    bl_val_t* retval = bl_list_third(params);
    return retval;
 }
@@ -594,9 +595,9 @@ bl_val_t* bl_oper_third(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 bl_val_t* bl_oper_rest(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 
-   params = bl_ctx_eval(ctx,params);
+   params = bl_eval(ctx,params);
 
-   if(bl_list_len(params)==1) params = bl_ctx_eval(ctx,bl_list_first(params));
+   if(bl_list_len(params)==1) params = bl_eval(ctx,bl_list_first(params));
    bl_val_t* retval = bl_list_rest(params);
    if(retval == NULL) return bl_mk_null();
    return retval;
@@ -604,7 +605,7 @@ bl_val_t* bl_oper_rest(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_include(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-   bl_val_t* filename = bl_ctx_eval(ctx,bl_list_first(params));
+   bl_val_t* filename = bl_eval(ctx,bl_list_first(params));
 
    FILE* fd         = fopen(filename->s_val,"r");
    bl_val_t* retval = bl_eval_file(ctx, filename->s_val, fd);
@@ -833,7 +834,7 @@ bl_val_t* bl_oper_isset(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 
 bl_val_t* bl_oper_serexp (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   params = bl_ctx_eval(ctx,params);
+   params = bl_eval(ctx,params);
    // LCOV_EXCL_START
    if(params->type == BL_VAL_TYPE_CONS) {
       if(bl_list_len(params)==1) params = bl_list_first(params);
@@ -845,22 +846,22 @@ bl_val_t* bl_oper_serexp (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_append(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-   bl_val_t* L = bl_ctx_eval(ctx,bl_list_first(params));
-   return bl_list_append(L, bl_ctx_eval(ctx,bl_list_second(params)));
+   bl_val_t* L = bl_eval(ctx,bl_list_first(params));
+   return bl_list_append(L, bl_eval(ctx,bl_list_second(params)));
 }
 
 bl_val_t* bl_oper_prepend(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-   bl_val_t* L = bl_ctx_eval(ctx,bl_list_first(params));
-   return bl_list_prepend(L, bl_ctx_eval(ctx,bl_list_second(params)));
+   bl_val_t* L = bl_eval(ctx,bl_list_first(params));
+   return bl_list_prepend(L, bl_eval(ctx,bl_list_second(params)));
 }
 
 bl_val_t* bl_oper_reverse(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 
-   params = bl_ctx_eval(ctx,params);
+   params = bl_eval(ctx,params);
 
-   if(bl_list_len(params)==1) params = bl_ctx_eval(ctx,bl_list_first(params));
+   if(bl_list_len(params)==1) params = bl_eval(ctx,bl_list_first(params));
    bl_val_t* retval = bl_list_reverse(params);
    return retval;
 }
@@ -933,7 +934,7 @@ bl_val_t* bl_genmod_doc(bl_val_t* ctx, bl_val_t* sym, bl_val_t* mod) { // LCOV_E
 bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
      bl_val_t* first      = bl_list_first(params);
-     bl_val_t* first_eval = bl_ctx_eval(ctx,first);
+     bl_val_t* first_eval = bl_eval(ctx,first);
 
      if(first_eval->type == BL_VAL_TYPE_SYMBOL) first_eval = bl_ctx_get(ctx,first_eval);
      char* retval = "";
@@ -1000,7 +1001,7 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_dir (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* symname = bl_list_first(params);
-   bl_val_t* symval  = bl_ctx_eval(ctx,bl_ctx_get(ctx,symname));
+   bl_val_t* symval  = bl_eval(ctx,bl_ctx_get(ctx,symname));
    if(symval->type != BL_VAL_TYPE_CTX) return NULL;
    bl_val_t* retval  = NULL;
    int i=0;
@@ -1015,22 +1016,22 @@ bl_val_t* bl_oper_dir (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 
 bl_val_t* bl_oper_mksym  (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   params = bl_ctx_eval(ctx,params);
+   params = bl_eval(ctx,params);
    bl_val_t* first = bl_list_first(params);
    return bl_mk_symbol(first->s_val);
 }
 
 bl_val_t* bl_oper_ctxget (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* symname = bl_list_first(params);
-   bl_val_t* symval  = bl_ctx_eval(ctx,bl_ctx_get(ctx,symname));
+   bl_val_t* symval  = bl_eval(ctx,bl_ctx_get(ctx,symname));
    if(symval->type != BL_VAL_TYPE_CTX) return NULL;
    bl_val_t* second = bl_list_second(params);
-   if(second->type == BL_VAL_TYPE_CONS) second = bl_ctx_eval(ctx,second);
+   if(second->type == BL_VAL_TYPE_CONS) second = bl_eval(ctx,second);
    return bl_ctx_get(symval,second);
 }
 
 bl_val_t* bl_oper_type (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   params = bl_ctx_eval(ctx,params);
+   params = bl_eval(ctx,params);
    if(params->type == BL_VAL_TYPE_ERROR) return params;
    return bl_mk_type(bl_list_first(params)->type);
 }

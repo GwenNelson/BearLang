@@ -66,7 +66,7 @@ static char* dlopen_doc_str = "\n"
 "		Opens a shared object / dynamic library file and returns a pointer to it\n"
 ;
 bl_val_t* dlopen_bearlang(bl_val_t* ctx, bl_val_t* params) {
-     params            = bl_ctx_eval(ctx,params);
+     params            = bl_eval(ctx,params);
      bl_val_t* libname = bl_list_first(params);
      void* retval = dlopen(libname->s_val,RTLD_LOCAL);
      return bl_mk_ptr(retval);
@@ -78,7 +78,7 @@ static char* dlsym_doc_str = "\n"
 ;
 
 bl_val_t* dlsym_bearlang(bl_val_t* ctx, bl_val_t* params) {
-     params              = bl_ctx_eval(ctx,params);
+     params              = bl_eval(ctx,params);
      bl_val_t* funcname  = bl_list_first(params);
      bl_val_t* libhandle = bl_list_second(params);
      void* retval = NULL;
@@ -139,7 +139,7 @@ static char* func_doc_str = "\n"
 // this sets up the ffi_func_t struct and then returns a new native oper
 bl_val_t* func_bearlang(bl_val_t* ctx, bl_val_t* params) {
      bl_val_t* retval_type = bl_list_first(params);
-     bl_val_t* func        = bl_ctx_eval(ctx,bl_list_second(params));
+     bl_val_t* func        = bl_eval(ctx,bl_list_second(params));
      bl_val_t* arg_types   = bl_list_third(params);
 
 

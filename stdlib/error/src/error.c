@@ -23,7 +23,7 @@ static char* getsym_doc_str = "\n"
 "		Returns the symbol referenced by the provided error/exception instance\n"
 ;
 bl_val_t* bl_getsym(bl_val_t* ctx, bl_val_t* params) {
-     params = bl_ctx_eval(ctx,params);
+     params = bl_eval(ctx,params);
      return bl_mk_str(params->err_val.symbol_name);
 }
 

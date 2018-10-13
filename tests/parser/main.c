@@ -116,7 +116,7 @@ bl_val_t params_cons = {.type = BL_VAL_TYPE_CONS,
 int main(int argc, char** argv) {
     bl_init();
 
-//    bl_val_t* resp = bl_ctx_eval(&eval_ctx,&run_expr);
+//    bl_val_t* resp = bl_eval(&eval_ctx,&run_expr);
 
 
 
