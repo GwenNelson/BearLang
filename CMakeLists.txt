@@ -24,7 +24,7 @@ find_package (LibGc REQUIRED)
 find_package (Readline REQUIRED)
 find_package (FLEX REQUIRED)
 find_package(PkgConfig)
-
+find_library(REPLXX NAMES replxx)
 file(GLOB RUNTIME_SOURCE "runtime/src/*.c")
 
 set(VERSION_STR  "0.WHATEVER")
@@ -69,7 +69,7 @@ add_executable(bli ${BLI_SRC})
 add_executable(blc ${BLC_SRC})
 target_link_libraries(bli blruntime)
 target_link_libraries(bli ${Readline_LIBRARY})
-
+target_link_libraries(bli ${REPLXX})
 
 target_link_libraries(blc blruntime)
 

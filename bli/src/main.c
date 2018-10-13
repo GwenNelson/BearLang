@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <libgen.h>
+#include <errno.h>
 
 #include <bearlang/common.h>
 #include <bearlang/types.h>
@@ -14,24 +15,27 @@
 
 #include <readline/readline.h>
 
-// shamelessly ripped straight from the readline documentation
+#include <replxx.h>
+
 static char *line_read = (char *)NULL;
+
+const char* history_file = ".bl_history";
+static Replxx* replxx;
 
 char *
 rl_gets ()
 {
-  if (line_read)
-    {
-      free (line_read);
-      line_read = (char *)NULL;
+    do {
+    	line_read = replxx_input(replxx, ">>> ");
+    } while((line_read==NULL) && (errno == EAGAIN));
+    if(line_read==NULL) {
+       printf("\n");
+       
+    } else {
+      replxx_history_add( replxx, line_read );
     }
 
-  line_read = readline (">>> ");
-
-  if (line_read && *line_read)
-    add_history (line_read);
-
-  return (line_read);
+    return line_read;
 }
 
 void run_file(char* filename, int argc, char** argv) {
@@ -60,7 +64,35 @@ void run_file(char* filename, int argc, char** argv) {
 
 bl_val_t* quit_cmd(bl_val_t* ctx, bl_val_t* params) {
     printf("Goodbye!\n");
+    replxx_history_save(replxx, history_file);
+    replxx_end(replxx);
     exit(0);
+}
+
+void hint_hook(char const* prefix, int bp,replxx_hints* lc, ReplxxColor* c, void* ud) {
+     bl_val_t* ctx = (bl_val_t*)ud;
+     size_t len = strlen(prefix);
+     int i=0;
+     if (len > bp) {
+        for(i=0; i <= ctx->vals_count; i++) {
+          if(ctx->vals[i] != NULL) {
+      		if (strncmp(prefix + bp, ctx->keys[i]->s_val, strlen(prefix) - bp) == 0) {
+				replxx_add_hint(lc, ctx->keys[i]->s_val + len - bp);
+		}
+	  }
+	 }
+
+        if(ctx->parent != NULL) {
+	for(i=0; i <= ctx->parent->vals_count; i++) {
+          if(ctx->parent->vals[i] != NULL) {
+      		if (strncmp(prefix + bp, ctx->parent->keys[i]->s_val, strlen(prefix) - bp) == 0) {
+				replxx_add_hint(lc, ctx->parent->keys[i]->s_val + len - bp);
+		}
+	  }
+	 }
+        }
+
+    }
 }
 
 int main(int argc, char** argv) {
@@ -74,6 +106,13 @@ int main(int argc, char** argv) {
 
     printf("BearLang Version %s\n\n",BL_VERSION);
 
+    replxx = replxx_init();
+    replxx_install_window_change_handler(replxx);
+
+
+    replxx_history_load(replxx,history_file);
+
+
     bl_val_t* STDLIB_CTX = bl_ctx_new_std();
     bl_val_t* REPL_CTX   = bl_ctx_new(STDLIB_CTX);
 
@@ -83,6 +122,9 @@ int main(int argc, char** argv) {
 
     bl_eval(REPL_CTX,bl_parse_sexp("(import bldoc)"));
     bl_eval(REPL_CTX,bl_parse_sexp("(using bldoc::help)"));
+
+
+    replxx_set_hint_callback( replxx, hint_hook, REPL_CTX );
 
     char* errmsg;
     for(;;) {
