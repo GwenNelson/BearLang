@@ -1211,6 +1211,16 @@ int test_call_other_func() {
 
 }
 
+int test_if_in_func() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_eval(ctx,bl_parse_sexp("(fun a (x) (if x 1 2))"));
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(a True)"));
+    ASSERT("If in function works", strcmp(bl_ser_sexp(result),"1")==0);
+    result = bl_eval(ctx,bl_parse_sexp("(a False)"));
+    ASSERT("If in function works", strcmp(bl_ser_sexp(result),"2")==0);
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1300,6 +1310,7 @@ int main(int argc, char** argv) {
     TEST("split oper                                 ", test_split_oper)
     TEST("tail-recursive function                    ", test_tail_recurse)
     TEST("call another function                      ", test_call_other_func)
+    TEST("if inside function                         ", test_if_in_func)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 

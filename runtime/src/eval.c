@@ -58,15 +58,19 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 bl_val_t* bl_eval_funcbody(bl_val_t* func, bl_val_t* i) { // LCOV_EXCL_LINE
     bl_val_t* retval = bl_mk_null();
     bl_val_t* symval = NULL;
+    bl_val_t* if_result = NULL;
     bool cont = false;
     bl_val_t* cond;
     while(true) {
-
+           symval = NULL;
            if(i->car->type == BL_VAL_TYPE_CONS) {
 		   if(i->car->car->type == BL_VAL_TYPE_SYMBOL) {
            symval = bl_ctx_get(func->inner_closure,i->car->car);
 	   } else if(i->car->car->type == BL_VAL_TYPE_OPER_IF) {
-	   symval = bl_ctx_get(func->inner_closure,bl_eval_if(func->inner_closure,i->car)->car);
+                   if_result = bl_eval_if(func->inner_closure,i->car);
+		   if(if_result->type == BL_VAL_TYPE_CONS) if (if_result->car->type == BL_VAL_TYPE_SYMBOL) {
+             		   symval = bl_ctx_get(func->inner_closure,if_result->car);
+		   }
 	   }
 	   if(symval == func) {
 
@@ -171,20 +175,10 @@ bl_val_t* bl_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 				break;
 				case BL_VAL_TYPE_FUNC_BL:
 					args        = bl_eval(ctx,expr->cdr);
-					//car->inner_closure = bl_ctx_new(car->lexical_closure);
 					if(bl_list_len(expr) > 1) bl_set_params(car->inner_closure,car->bl_funcargs_ptr,args);
 					retval = bl_eval_funcbody(car,car->bl_func_ptr);
-/*
-					ctx = car->inner_closure;
-					expr = car->bl_func_ptr;
 
-					for(i=expr; i != NULL; i=i->cdr) {
-						retval = bl_eval(ctx,i->car);
-						if(retval != NULL) { 
-							if(retval->type == BL_VAL_TYPE_ERROR) return retval;
-						}
-					}*/
-					if(retval==NULL) return bl_mk_null();
+					if(retval==NULL) return bl_mk_null(); // LCOV_EXCL_BR_LINE
 					return retval;
 					
 				break;
