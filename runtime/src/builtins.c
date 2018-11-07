@@ -21,8 +21,7 @@
 // LCOV_EXCL_STOP LCOV_EXCL_LINE
 
 
-#define PARAM_LEN_CHECK(min,max) bl_val_t* retval = bl_errif_invalid_len(params,min,max); if(retval != NULL) return retval;
-
+#define PARAM_LEN_CHECK(min,max) bl_val_t* retval = bl_errif_invalid_len(params,min,max); if(retval != NULL) return retval; // LCOV_EXCL_BR_LINE
 // LCOV_EXCL_START
 bl_val_t* bl_oper_profile(bl_val_t* ctx, bl_val_t* params) {
    clock_t start = clock();
@@ -36,7 +35,6 @@ bl_val_t* bl_oper_profile(bl_val_t* ctx, bl_val_t* params) {
 
 bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    PARAM_LEN_CHECK(2,2)
-
    bl_val_t* errtype = bl_list_first(params);
    bl_val_t* errval  = bl_eval(ctx,bl_list_second(params));
    if(errval == NULL) errval = bl_mk_null();
@@ -888,6 +886,7 @@ bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    return symval;
 }
 
+//LCOV_EXCL_START
 // utility function used by below oper to generate documentation for a module
 bl_val_t* bl_genmod_doc(bl_val_t* ctx, bl_val_t* sym, bl_val_t* mod) { // LCOV_EXCL_LINE
      bl_val_t* NAME = bl_ctx_get(mod,bl_mk_symbol("*NAME*"));
@@ -929,6 +928,7 @@ bl_val_t* bl_genmod_doc(bl_val_t* ctx, bl_val_t* sym, bl_val_t* mod) { // LCOV_E
 
      return bl_mk_str(retval);
 }
+// LCOV_EXCL_STOP
 
 bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
