@@ -51,12 +51,16 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
     return bl_mk_null();
 }
 
+// TODO - clean up this fucking mess
+// TODO - add support for tail recursive when using if statements
 bl_val_t* bl_eval_funcbody(bl_val_t* func, bl_val_t* i) {
     bl_val_t* retval = bl_mk_null();
     bl_val_t* symval = NULL;
     bool cont = false;
     while(true) {
-    	   if(i->car->car->type == BL_VAL_TYPE_SYMBOL) {
+
+           if(i->car->type == BL_VAL_TYPE_CONS) {
+		   if(i->car->car->type == BL_VAL_TYPE_SYMBOL) {
            symval = bl_ctx_get(func->inner_closure,i->car->car);
            if(symval == func) {
 
@@ -64,7 +68,7 @@ bl_val_t* bl_eval_funcbody(bl_val_t* func, bl_val_t* i) {
 	     if(bl_list_len(args)>0) bl_set_params(func->inner_closure,func->bl_funcargs_ptr,args);
              i=func->bl_func_ptr;
 	     cont = true;
-	   } else {
+	   } else { 
              retval = bl_eval(func->inner_closure,i->car);
 	     i = i->cdr;
              if(i != NULL) cont = true;
@@ -74,6 +78,11 @@ bl_val_t* bl_eval_funcbody(bl_val_t* func, bl_val_t* i) {
 	  i = i->cdr;
           if(i != NULL) cont = true;
 	}
+       } else {
+          retval = bl_eval(func->inner_closure,i->car);
+	  i = i->cdr;
+          if(i != NULL) cont = true;
+       }
        if(cont) {
 	  cont=false;
        } else {
