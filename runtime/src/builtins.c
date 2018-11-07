@@ -34,10 +34,10 @@ bl_val_t* bl_oper_profile(bl_val_t* ctx, bl_val_t* params) {
 } // LCOV_EXCL_STOP LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   PARAM_LEN_CHECK(2,2)
+   PARAM_LEN_CHECK(2,2) // LCOV_EXCL_BR_LINE
    bl_val_t* errtype = bl_list_first(params);
    bl_val_t* errval  = bl_eval(ctx,bl_list_second(params));
-   if(errval == NULL) errval = bl_mk_null();
+   if(errval == NULL) errval = bl_mk_null(); // LCOV_EXCL_BR_LINE
    retval = bl_mk_err(BL_ERR_BL_CUSTOM);
    retval->err_val.err_sym = errtype;
    retval->err_val.err_val = errval;
@@ -46,7 +46,7 @@ bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
 // LCOV_EXCL_START
 bl_val_t* bl_oper_listbuiltins(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   PARAM_LEN_CHECK(0,0)
+   PARAM_LEN_CHECK(0,0) // LCOV_EXCL_BR_LINE
    #define BUILTIN_RETURN(builtin_name,builtin_symbol,builtin_docstr) retval=bl_list_prepend(retval,bl_mk_symbol(builtin_symbol));
    #define BUILTIN_X BUILTIN_RETURN
    #include <bearlang/builtins.inc>
@@ -55,7 +55,7 @@ bl_val_t* bl_oper_listbuiltins(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_L
 } // LCOV_EXCL_STOP LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_pmatch(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-   PARAM_LEN_CHECK(2,2)
+   PARAM_LEN_CHECK(2,2) // LCOV_EXCL_BR_LINE
    params      = bl_eval(ctx,params);
    
    retval = bl_mk_null();
@@ -66,7 +66,6 @@ bl_val_t* bl_oper_pmatch(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
        char* prefix = L->car->car->s_val;
        if(strstr(S->s_val,prefix)==S->s_val) return L->car->cdr->car;
    }
-   if (retval==NULL) return bl_mk_null();
    return retval;
 }
 
@@ -94,7 +93,7 @@ bl_val_t* bl_oper_aget(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
        L_car = L->car;
        if(L_car->type != BL_VAL_TYPE_CONS) { // LCOV_EXCL_START
           return bl_mk_err(BL_ERR_PARSE);
-       } // LCOV_EXCL_STOP
+       } // LCOV_EXCL_LINE LCOV_EXCL_STOP
        if(strcmp(L_car->car->s_val,sym->s_val)==0) retval = bl_list_second(L_car);
    }
    return retval;
