@@ -73,7 +73,6 @@ bl_val_t* bl_oper_pmatch(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 }
 
 bl_val_t* bl_oper_startswith(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
-
    params = bl_eval(ctx,params);
    bl_val_t* first  = bl_list_first(params);
    bl_val_t* second = bl_list_second(params);

@@ -1159,6 +1159,35 @@ int test_str_first_token() {
     return 0;
 }
 
+int test_pmatch_oper() {
+    char* prefix_a = "(pmatch \"12345\" ((\"1234\" True)))";
+    char* prefix_b = "(pmatch \"12345\" ((\"2345\" True)))";
+    bl_val_t* ctx  = bl_ctx_new_std();
+    bl_val_t* prefix_expr = bl_parse_sexp(prefix_a);
+    bl_val_t* result = bl_eval(ctx,prefix_expr);
+    ASSERT("Got correct prefix",result->b_val);
+    prefix_expr = bl_parse_sexp(prefix_b);
+    result = bl_eval(ctx,prefix_expr);
+    ASSERT("Got correct result with 0 prefixes", !result->b_val);
+    return 0;
+}
+
+int test_startswith_oper() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(startswith \"foobar\" \"foo\""));
+    ASSERT("startswith works", result->b_val);
+    result = bl_eval(ctx,bl_parse_sexp("(startswith \"meow\" \"blabla\")"));
+    ASSERT("startswith works", !result->b_val);
+    return 0;
+}
+
+int test_split_oper() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    bl_val_t* result = bl_eval(ctx,bl_parse_sexp("(split \"1.2.3.4\" \".\")"));
+    ASSERT("split oper works", strcmp(bl_ser_sexp(result),"(\"1\" \"2\" \"3\" \"4\")")==0);
+    return 0;
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1243,6 +1272,9 @@ int main(int argc, char** argv) {
     TEST("throw oper                                 ", test_throw_oper)
     TEST("string ops: str_replace                    ", test_str_replace)
     TEST("string ops: str_first_token                ", test_str_first_token)
+    TEST("pmatch oper                                ", test_pmatch_oper)
+    TEST("startswith oper                            ", test_startswith_oper)
+    TEST("split oper                                 ", test_split_oper)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
