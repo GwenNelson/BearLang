@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+bl_val_t* bl_eval_if(bl_val_t* ctx, bl_val_t* expr);
+
 // binds variables into a context by copying them
 void bl_set_params(bl_val_t* ctx, bl_val_t* param_names, bl_val_t* param_vals) { // LCOV_EXCL_LINE
 
@@ -27,7 +29,7 @@ void bl_set_params(bl_val_t* ctx, bl_val_t* param_names, bl_val_t* param_vals) {
 }
 
 bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
-    if(expr==NULL) return bl_mk_null();
+    if(expr==NULL) return bl_mk_null(); // LCOV_EXCL_BR_LINE
     bl_val_t* retval = NULL;
     bl_val_t* L_start = NULL;
     bl_val_t* L      = NULL;
@@ -53,16 +55,20 @@ bl_val_t* bl_eval_cons(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 
 // TODO - clean up this fucking mess
 // TODO - add support for tail recursive when using if statements
-bl_val_t* bl_eval_funcbody(bl_val_t* func, bl_val_t* i) {
+bl_val_t* bl_eval_funcbody(bl_val_t* func, bl_val_t* i) { // LCOV_EXCL_LINE
     bl_val_t* retval = bl_mk_null();
     bl_val_t* symval = NULL;
     bool cont = false;
+    bl_val_t* cond;
     while(true) {
 
            if(i->car->type == BL_VAL_TYPE_CONS) {
 		   if(i->car->car->type == BL_VAL_TYPE_SYMBOL) {
            symval = bl_ctx_get(func->inner_closure,i->car->car);
-           if(symval == func) {
+	   } else if(i->car->car->type == BL_VAL_TYPE_OPER_IF) {
+	   symval = bl_ctx_get(func->inner_closure,bl_eval_if(func->inner_closure,i->car)->car);
+	   }
+	   if(symval == func) {
 
              bl_val_t* args = bl_eval(func->inner_closure,i->car->cdr);
 	     if(bl_list_len(args)>0) bl_set_params(func->inner_closure,func->bl_funcargs_ptr,args);
@@ -74,15 +80,10 @@ bl_val_t* bl_eval_funcbody(bl_val_t* func, bl_val_t* i) {
              if(i != NULL) cont = true;
 	   }
 	} else {
-          retval = bl_eval(func->inner_closure,i->car);
+      		retval = bl_eval(func->inner_closure,i->car);
 	  i = i->cdr;
           if(i != NULL) cont = true;
 	}
-       } else {
-          retval = bl_eval(func->inner_closure,i->car);
-	  i = i->cdr;
-          if(i != NULL) cont = true;
-       }
        if(cont) {
 	  cont=false;
        } else {
@@ -90,6 +91,19 @@ bl_val_t* bl_eval_funcbody(bl_val_t* func, bl_val_t* i) {
        }
 
     }
+}
+
+bl_val_t* bl_eval_if(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
+	bl_val_t* cond = bl_eval(ctx,bl_list_first(expr->cdr));
+	if(cond->type == BL_VAL_TYPE_ERROR) return cond;
+	if(cond->type != BL_VAL_TYPE_BOOL) return bl_mk_err(BL_ERR_PARSE);
+				
+	if(cond->b_val) {
+		return bl_list_second(expr->cdr);
+	} else {
+		return bl_list_third(expr->cdr);
+	}
+
 }
 
 bl_val_t* bl_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
@@ -140,17 +154,8 @@ bl_val_t* bl_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 				break;
 				// TODO - pull this out into a seperate function that returns the next expression to eval, including errors
 				case BL_VAL_TYPE_OPER_IF:
-					cond = bl_eval(ctx,bl_list_first(expr->cdr));
-					if(cond != NULL) {
-						if(cond->type == BL_VAL_TYPE_ERROR) return cond;
-						if(cond->type != BL_VAL_TYPE_BOOL) return bl_mk_err(BL_ERR_PARSE);
-					
-						if(cond->b_val) {
-							expr = bl_list_second(expr->cdr);
-						} else {
-							expr = bl_list_third(expr->cdr);
-						}
-					}
+					expr = bl_eval_if(ctx, expr);
+					if(expr->type == BL_VAL_TYPE_ERROR) return expr;
 				break;
 				case BL_VAL_TYPE_OPER_WHILE:
 					cond = bl_list_first(expr->cdr);

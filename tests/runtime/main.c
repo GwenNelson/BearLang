@@ -1070,6 +1070,10 @@ int test_safe_strcat() {
     char* b = "bar";
     char* result = safe_strcat(a,b);
     ASSERT("correct result", strcmp(result,"foobar")==0)
+    result = safe_strcat(NULL,b);
+    ASSERT("correct result", strcmp(result,"bar")==0)
+    result = safe_strcat(a,NULL);
+    ASSERT("correct result", strcmp(result,"foo")==0)
     return 0;
 }
 
