@@ -41,8 +41,7 @@ bl_val_t* bl_oper_throw(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    retval = bl_mk_err(BL_ERR_BL_CUSTOM);
    retval->err_val.err_sym = errtype;
    retval->err_val.err_val = errval;
-   return retval;
-}
+   return retval; }
 
 // LCOV_EXCL_START
 bl_val_t* bl_oper_listbuiltins(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
@@ -51,24 +50,20 @@ bl_val_t* bl_oper_listbuiltins(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_L
    #define BUILTIN_X BUILTIN_RETURN
    #include <bearlang/builtins.inc>
    #undef BUILTIN_X
-   return bl_list_reverse(retval);
-} // LCOV_EXCL_STOP LCOV_EXCL_LINE
+   return bl_list_reverse(retval); } // LCOV_EXCL_STOP LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_pmatch(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    PARAM_LEN_CHECK(2,2) // LCOV_EXCL_BR_LINE
    params      = bl_eval(ctx,params);
-   
    retval = bl_mk_null();
-
    bl_val_t* S = bl_list_first(params);
    bl_val_t* L = bl_list_second(params);
    for(; L != NULL; L=L->cdr) {
        char* prefix = L->car->car->s_val;
        if(strstr(S->s_val,prefix)==S->s_val) return L->car->cdr->car;
    }
-   return retval;
-}
-
+   return retval; }
+// LCOV_EXCL_LINE
 bl_val_t* bl_oper_startswith(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    params = bl_eval(ctx,params);
    bl_val_t* first  = bl_list_first(params);
@@ -114,7 +109,7 @@ bl_val_t* bl_oper_foreach(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 bl_val_t* bl_oper_filtered(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* L     = bl_eval(ctx,bl_list_first(params));
    bl_val_t* items = bl_eval(ctx,bl_list_second(params));
-   // TODO implement an "in" operation and set data type and shit
+   // TODO implement an "in" operation and set data type and shit LCOV_EXCL_LINE
    bl_val_t* retval = NULL;
    bl_val_t* I      = items;
    for(; L != NULL; L=L->cdr) {
@@ -125,8 +120,8 @@ bl_val_t* bl_oper_filtered(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
        }
        if(!is_in) retval = bl_list_prepend(retval,L->car);
    }
-   return bl_list_reverse(retval);
-}
+   return bl_list_reverse(retval); // LCOV_EXCL_LINE
+} // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_parse(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    params = bl_eval_cons(ctx,params);
@@ -135,15 +130,14 @@ bl_val_t* bl_oper_parse(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_type_t expected_types[1] = {BL_VAL_TYPE_STRING};
    bl_val_t* retval = bl_errif_invalid_fixed_args(params,expected_types,1);
    if(retval != NULL) return retval; // LCOV_EXCL_LINE
-
-   return bl_parse_sexp(params->car->s_val);
-}
+   return bl_parse_sexp(params->car->s_val); // LCOV_EXCL_LINE
+} // LCOV_EXCL_LINE
 
 bl_val_t* bl_oper_quote(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    if(bl_list_len(params)==1) return bl_list_first(params);
    return params;
 }
-
+// LCOV_EXCL_LINE LCOV_EXCL_START
 // basic syntax:
 // (try SOME_EXPR   ; optionally could be a (do) type expression
 //      (catch SOME_ERR SOME_EXPR)
@@ -153,6 +147,7 @@ bl_val_t* bl_oper_quote(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 // the SOME_ERR types are defined in the default environment as ERR_* symbols
 // e.g ERR_INSUFFICIENT_ARGS ERR_TOOMANY_ARGS etc
 // while evaluating the catch blocks, *ERR* is set to the actual error
+// LCOV_EXCL_LINE LCOV_EXCL_STOP
 bl_val_t* bl_oper_try(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* try_expr    = bl_list_first(params);
    bl_val_t* try_result  = bl_eval(ctx, try_expr);
@@ -481,11 +476,12 @@ bl_val_t* bl_oper_oper(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    retval->bl_operargs_ptr = bl_list_second(params);
    retval->bl_oper_ptr     = bl_list_rest(bl_list_rest(params));
 
+   // LCOV_EXCL_START
   if(retval->bl_func_ptr->car->type == BL_VAL_TYPE_DOCSTRING) {
       retval->docstr = retval->bl_oper_ptr->car;
       retval->bl_oper_ptr = retval->bl_oper_ptr->cdr;
    }
-
+  // LCOV_EXCL_STOP
 
    retval->lexical_closure = ctx;
    retval->inner_closure   = bl_ctx_new(ctx);
