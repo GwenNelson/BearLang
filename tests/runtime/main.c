@@ -1188,6 +1188,17 @@ int test_split_oper() {
     return 0;
 }
 
+int test_tail_recurse() {
+    bl_val_t* ctx = bl_ctx_new_std();
+    char* tail_recurse_src = "(fun x (n) (if (lt n 1) (x 1) None))";
+    bl_eval(ctx,bl_parse_sexp(tail_recurse_src));
+    bl_val_t* result = bl_eval(ctx, bl_parse_sexp("(x 0)"));
+    printf("%s\n",bl_ser_sexp(result));
+    ASSERT("Tail recursion works", result->type==BL_VAL_TYPE_NULL);
+    return 0;
+
+}
+
 int main(int argc, char** argv) {
     int passed_tests = 0;
     int failed_tests = 0;
@@ -1275,6 +1286,7 @@ int main(int argc, char** argv) {
     TEST("pmatch oper                                ", test_pmatch_oper)
     TEST("startswith oper                            ", test_startswith_oper)
     TEST("split oper                                 ", test_split_oper)
+    TEST("tail-recursive function                    ", test_tail_recurse)
 
     fprintf(stderr,"Ran %d tests, %d passed, %d failed\n", total_tests, passed_tests, failed_tests);
 
