@@ -138,6 +138,7 @@ bl_val_t* bl_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 					if(retval == NULL) return bl_mk_null();
 					return retval;
 				break;
+				// TODO - pull this out into a seperate function that returns the next expression to eval, including errors
 				case BL_VAL_TYPE_OPER_IF:
 					cond = bl_eval(ctx,bl_list_first(expr->cdr));
 					if(cond != NULL) {
