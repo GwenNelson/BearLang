@@ -925,6 +925,7 @@ bl_val_t* bl_genmod_doc(bl_val_t* ctx, bl_val_t* sym, bl_val_t* mod) { // LCOV_E
 }
 // LCOV_EXCL_STOP
 
+// LCOV_EXCL_START
 bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
      bl_val_t* first      = bl_list_first(params);
@@ -990,6 +991,8 @@ bl_val_t* bl_oper_doc (bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
      return bl_mk_str(retval);
 }
+
+// LCOV_EXCL_STOP
 
 // LCOV_EXCL_START
 
