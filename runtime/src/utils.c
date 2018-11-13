@@ -19,6 +19,9 @@ uint64_t last_alloc = 0;
 uint64_t val_pool_size = POOL_DEFAULT_SIZE;
 
 bl_val_t* bl_alloc_vals(size_t count) { // LCOV_EXCL_LINE
+   if(count > POOL_DEFAULT_SIZE) {
+      return (bl_val_t*)GC_MALLOC(sizeof(bl_val_t)*count);
+   }
 
    if(last_alloc >= val_pool_size) {
       val_pool = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t)*val_pool_size);
