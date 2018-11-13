@@ -18,8 +18,7 @@ bl_val_t* val_pool = val_pool_static;
 uint64_t last_alloc = 0;
 uint64_t val_pool_size = POOL_DEFAULT_SIZE;
 
-
-bl_val_t* bl_mk_val(bl_val_type_t type) { // LCOV_EXCL_LINE
+bl_val_t* bl_alloc_vals(size_t count) { // LCOV_EXCL_LINE
 
    if(last_alloc >= val_pool_size) {
       val_pool = (bl_val_t*)GC_MALLOC(sizeof(bl_val_t)*val_pool_size);
@@ -27,7 +26,13 @@ bl_val_t* bl_mk_val(bl_val_type_t type) { // LCOV_EXCL_LINE
       GC_collect_a_little();
    }
 
-   bl_val_t* retval = (bl_val_t*)(&(val_pool[last_alloc++]));
+   last_alloc += count;
+   bl_val_t* retval = (bl_val_t*)(&(val_pool[last_alloc]));
+   return retval;
+}
+
+bl_val_t* bl_mk_val(bl_val_type_t type) { // LCOV_EXCL_LINE
+   bl_val_t* retval = bl_alloc_vals(1);
    retval->type = type;
    return retval;
 }
