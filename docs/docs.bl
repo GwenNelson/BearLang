@@ -56,9 +56,9 @@
      )
 
 (= urls (
-	 ('/module/  handle_module)
-	 ('/builtins handle_builtins)
-	 ('/         handle_index)
+	 ("/module/"  handle_module)
+	 ("/builtins" handle_builtins)
+	 ("/"         handle_index)
 	 ))
 
 (= my_handler (web::get_handler urls))

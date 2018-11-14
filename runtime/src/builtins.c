@@ -60,10 +60,14 @@ bl_val_t* bl_oper_pmatch(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* L = bl_list_second(params);
    for(; L != NULL; L=L->cdr) {
        char* prefix = L->car->car->s_val;
-       if(strstr(S->s_val,prefix)==S->s_val) return L->car->cdr->car;
+       if(strstr(S->s_val,prefix)==S->s_val) { 
+ 		return L->car->cdr->car;
+       }
+
    }
-   return retval; }
-// LCOV_EXCL_LINE
+   return retval;
+}
+
 bl_val_t* bl_oper_startswith(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    params = bl_eval(ctx,params);
    bl_val_t* first  = bl_list_first(params);

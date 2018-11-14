@@ -106,7 +106,7 @@ void completion_hook(char const* prefix, int bp, replxx_hints* lc, ReplxxColor* 
      int i=0;
      for(i=0; i <= ctx->vals_count; i++) {
          if(ctx->vals[i] != NULL) {
-            if (strncmp(prefix + bp, ctx->keys[i]->s_val, strlen(prefix) - bp) == 0) {
+            if (strncmp(prefix + bp, ctx->keys[i]->s_val, len - bp) == 0) {
 			replxx_add_completion(lc, ctx->keys[i]->s_val);
 		}
 	 }
@@ -114,7 +114,7 @@ void completion_hook(char const* prefix, int bp, replxx_hints* lc, ReplxxColor* 
      if(ctx->parent != NULL) {
         for(i=0; i <= ctx->parent->vals_count; i++) {
    	     if(ctx->parent->vals[i] != NULL) {
-                if (strncmp(prefix + bp, ctx->parent->keys[i]->s_val, strlen(prefix) - bp) == 0) {
+                if (strncmp(prefix + bp, ctx->parent->keys[i]->s_val, len - bp) == 0) {
 			replxx_add_completion(lc, ctx->parent->keys[i]->s_val);
 		}
               }

@@ -103,11 +103,10 @@ bl_val_t* bl_eval_if(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
 	if(cond->type != BL_VAL_TYPE_BOOL) return bl_mk_err(BL_ERR_PARSE);
 				
 	if(cond->b_val) {
-		return bl_list_second(expr->cdr);
+		return bl_eval(ctx,bl_list_second(expr->cdr));
 	} else {
-		return bl_list_third(expr->cdr);
+		return bl_eval(ctx,bl_list_third(expr->cdr));
 	}
-
 }
 
 bl_val_t* bl_eval(bl_val_t* ctx, bl_val_t* expr) { // LCOV_EXCL_LINE
