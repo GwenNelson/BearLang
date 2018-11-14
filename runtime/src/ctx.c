@@ -33,15 +33,15 @@ bl_val_t* bl_ctx_new_std() { // LCOV_EXCL_LINE
    char* path_env = getenv("BEARLANGPATH");
 
    if(path_env != NULL) { // LCOV_EXCL_BR_LINE
-      path_env = strdup(getenv("BEARLANGPATH"));
+      path_env = strdup(getenv("BEARLANGPATH")); //LCOV_EXCL_LINE
       bl_val_t* path_val = NULL; // LCOV_EXCL_LINE
       char* path_dir;
-      char* rest = path_env;
+      char* rest = path_env; // LCOV_EXCL_LINE
       while((path_dir = strtok_r(rest, ":", &rest))) { // LCOV_EXCL_LINE
          path_val = bl_list_append(path_val,bl_mk_str(path_dir)); // LCOV_EXCL_LINE
       }
       bl_ctx_set(retval,bl_mk_symbol("*PATH*"), path_val);
-   } else {
+   } else { // LCOV_EXCL_LINE
       bl_ctx_set(retval,bl_mk_symbol("*PATH*"), bl_mk_list(4,bl_mk_str("."),bl_mk_str(BL_STDLIB_PATH1),bl_mk_str(BL_STDLIB_PATH2),bl_mk_str(BL_STDLIB_PATH3)));
    }
    free(path_env);
@@ -96,9 +96,9 @@ void bl_ctx_close(bl_val_t* ctx) { // LCOV_EXCL_LINE
 
 
 bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) { // LCOV_EXCL_LINE
-   if(key == NULL) return bl_mk_err(BL_ERR_INTERNAL);
+   if(key == NULL) return bl_mk_err(BL_ERR_INTERNAL); // LCOV_EXCL_BR_LINE
    if(ctx->ctx_get != NULL) return ctx->ctx_get(ctx,key); // LCOV_EXCL_BR_LINE
-   if(key->type != BL_VAL_TYPE_SYMBOL) return bl_mk_err(BL_ERR_INTERNAL);
+   if(key->type != BL_VAL_TYPE_SYMBOL) return bl_mk_err(BL_ERR_INTERNAL); // LCOV_EXCL_BR_LINE
    if(key->s_val[0]=='\'') return bl_mk_symbol(key->s_val+1); // LCOV_EXCL_BR_LINE
    if(strlen(key->s_val)>=1) {
      if(strstr(key->s_val,"::")) {
