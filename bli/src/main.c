@@ -100,6 +100,28 @@ void hint_hook(char const* prefix, int bp,replxx_hints* lc, ReplxxColor* c, void
     }
 }
 
+void completion_hook(char const* prefix, int bp, replxx_hints* lc, ReplxxColor* c, void* ud) {
+     bl_val_t* ctx = (bl_val_t*)ud;
+     size_t len = strlen(prefix);
+     int i=0;
+     for(i=0; i <= ctx->vals_count; i++) {
+         if(ctx->vals[i] != NULL) {
+            if (strncmp(prefix + bp, ctx->keys[i]->s_val, strlen(prefix) - bp) == 0) {
+			replxx_add_completion(lc, ctx->keys[i]->s_val);
+		}
+	 }
+     }
+     if(ctx->parent != NULL) {
+        for(i=0; i <= ctx->parent->vals_count; i++) {
+   	     if(ctx->parent->vals[i] != NULL) {
+                if (strncmp(prefix + bp, ctx->parent->keys[i]->s_val, strlen(prefix) - bp) == 0) {
+			replxx_add_completion(lc, ctx->parent->keys[i]->s_val);
+		}
+              }
+         }
+     }
+}
+
 int main(int argc, char** argv) {
     bl_init();
 
@@ -130,6 +152,7 @@ int main(int argc, char** argv) {
 
 
     replxx_set_hint_callback( replxx, hint_hook, REPL_CTX );
+    replxx_set_completion_callback( replxx, completion_hook, REPL_CTX);
 
     char* errmsg;
     for(;;) {
