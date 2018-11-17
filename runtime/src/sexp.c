@@ -185,8 +185,8 @@ char* bl_ser_sexp(bl_val_t* expr) {
          break;
          case BL_VAL_TYPE_NUMBER:
            retval = GC_MALLOC_ATOMIC(10);
-	 snprintf(retval,10,"%lld", expr->fix_int);
-	 //            retval = mpz_get_str(NULL, 10, expr->i_val);
+	 //snprintf(retval,10,"%lld", expr->fix_int);
+	             retval = mpz_get_str(NULL, 10, expr->i_val);
          break;
 	 case BL_VAL_TYPE_BOOL:
            if(expr->b_val) {

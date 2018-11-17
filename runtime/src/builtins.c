@@ -261,7 +261,6 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    switch(first->type) {
       case BL_VAL_TYPE_NUMBER:
            retval = bl_mk_val(BL_VAL_TYPE_NUMBER);
-	   retval->fix_int = 0;
       break;
       case BL_VAL_TYPE_STRING:
            retval = bl_mk_str("");
@@ -294,7 +293,7 @@ bl_val_t* bl_oper_add(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
            x = bl_eval(ctx,L->car);
         switch(retval->type) {
             case BL_VAL_TYPE_NUMBER:
-           	 retval->fix_int = retval->fix_int + x->fix_int;
+                    mpz_add(retval->i_val, retval->i_val, x->i_val);
 	    break;
 	    default:
 		 retval->s_val = safe_strcat(retval->s_val,bl_ser_naked_sexp(x));
@@ -318,8 +317,8 @@ bl_val_t* bl_oper_sub(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* second = bl_list_second(params);
 
 
-//   mpz_sub(retval->i_val, first->i_val, second->i_val);
-   retval->fix_int = first->fix_int - second->fix_int;
+   mpz_sub(retval->i_val, first->i_val, second->i_val);
+//   retval->fix_int = first->fix_int - second->fix_int;
    return retval;
 }
 
@@ -336,8 +335,8 @@ bl_val_t* bl_oper_mult(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_eval(ctx,bl_list_second(params));
 
-//   mpz_mul(retval->i_val, first->i_val, second->i_val);
-   retval->fix_int = first->fix_int * second->fix_int;
+   mpz_mul(retval->i_val, first->i_val, second->i_val);
+//   retval->fix_int = first->fix_int * second->fix_int;
    return retval;
 }
 
@@ -354,10 +353,10 @@ bl_val_t* bl_oper_div(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_eval(ctx,bl_list_second(params));
 
-   if(second->fix_int == 0) return bl_err_divzero();
+   if (mpz_get_d(second->i_val)==0) return bl_err_divzero();
 
-//   mpz_tdiv_q(retval->i_val, first->i_val, second->i_val);
-   retval->fix_int = first->fix_int / second->fix_int;
+   mpz_tdiv_q(retval->i_val, first->i_val, second->i_val);
+//   retval->fix_int = first->fix_int / second->fix_int;
    return retval;
 }
 
@@ -377,9 +376,9 @@ bl_val_t* bl_oper_mod(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_eval(ctx,bl_list_second(params));
 
-/*   mpz_init(retval->i_val);
-   mpz_mod(retval->i_val, first->i_val, second->i_val);*/
-   retval->fix_int = first->fix_int % second->fix_int;
+   mpz_init(retval->i_val);
+   mpz_mod(retval->i_val, first->i_val, second->i_val);
+//   retval->fix_int = first->fix_int % second->fix_int;
    return retval;
 }
 
@@ -396,9 +395,9 @@ bl_val_t* bl_oper_lt(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_eval(ctx,bl_list_second(params));
 
-   if(first->fix_int < second->fix_int) return bl_mk_bool(true);
-//   if(mpz_cmp(first->i_val,second->i_val)>=0) return bl_mk_bool(false);
-   return bl_mk_bool(false);
+//   if(first->fix_int < second->fix_int) return bl_mk_bool(true);
+   if(mpz_cmp(first->i_val,second->i_val)>=0) return bl_mk_bool(false);
+   return bl_mk_bool(true);
 }
 
 bl_val_t* bl_oper_gt(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
@@ -415,9 +414,9 @@ bl_val_t* bl_oper_gt(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
    bl_val_t* first  = bl_eval(ctx,bl_list_first(params));
    bl_val_t* second = bl_eval(ctx,bl_list_second(params));
 
-   if(first->fix_int > second->fix_int) return bl_mk_bool(true);
-  //   if(mpz_cmp(first->i_val,second->i_val)<0) return bl_mk_bool(false);
-   return bl_mk_bool(false);
+//   if(first->fix_int > second->fix_int) return bl_mk_bool(true);
+   if(mpz_cmp(first->i_val,second->i_val)<=0) return bl_mk_bool(false);
+   return bl_mk_bool(true);
 }
 
 bl_val_t* bl_oper_set(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
@@ -518,16 +517,16 @@ bl_val_t* bl_oper_eq(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
          return bl_mk_bool(false);
       }
    }
-   if(first->fix_int == second->fix_int) {
+/*   if(first->fix_int == second->fix_int) {
  	return bl_mk_bool(true);
    } else {
 	return bl_mk_bool(false);
-   }
-/*   if(mpz_cmp(first->i_val, second->i_val)==0) {
+   }*/
+   if(mpz_cmp(first->i_val, second->i_val)==0) {
       return bl_mk_bool(true);
    } else {
       return bl_mk_bool(false);
-   }*/
+   }
 }
 
 bl_val_t* bl_oper_and(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
@@ -867,21 +866,27 @@ static mpz_t integer_one;
 
 bl_val_t* bl_oper_inc(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-//   if(!has_init_integer_one) mpz_init_set_ui(integer_one,1);
+   if(!has_init_integer_one) { 
+      mpz_init_set_ui(integer_one,1);
+      has_init_integer_one = true;
+   }
    bl_val_t* symname = bl_list_first(params);
    bl_val_t* symval  = bl_ctx_get(ctx,symname);
-   symval->fix_int++;
-//   mpz_add(symval->i_val, symval->i_val, integer_one);
+   //symval->fix_int++;
+   mpz_add(symval->i_val, symval->i_val, integer_one);
    return symval;
 }
 
 bl_val_t* bl_oper_dec(bl_val_t* ctx, bl_val_t* params) { // LCOV_EXCL_LINE
 
-//   if(!has_init_integer_one) mpz_init_set_ui(integer_one,1);
+   if(!has_init_integer_one) {
+      mpz_init_set_ui(integer_one,1);
+      has_init_integer_one = true;
+   }
    bl_val_t* symname = bl_list_first(params);
    bl_val_t* symval  = bl_ctx_get(ctx,symname);
-   symval->fix_int--;
-   //   mpz_sub(symval->i_val, symval->i_val, integer_one);
+   //symval->fix_int--;
+   mpz_sub(symval->i_val, symval->i_val, integer_one);
    return symval;
 }
 
