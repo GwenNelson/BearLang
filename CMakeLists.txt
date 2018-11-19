@@ -27,7 +27,7 @@ find_package(PkgConfig)
 find_library(REPLXX NAMES replxx)
 file(GLOB RUNTIME_SOURCE "runtime/src/*.c")
 
-set(VERSION_STR  "0.WHATEVER")
+set(VERSION_STR  "0.1")
 set(STDLIB_PATH1 /usr/lib/bearlang/${VERSION_STR})
 set(STDLIB_PATH2 ${CMAKE_SOURCE_DIR}/stdlib)
 set(STDLIB_PATH3 ${CMAKE_CURRENT_BINARY_DIR}/stdlib)
