@@ -7,7 +7,9 @@ BOW!!!!
 
 ## Building + running it
 
-Ensure you have cmake and the LLVM developer packages installed, then do this:
+Build and install the dependencies under vendor/ first (running build.sh as root will do this for you automatically).
+
+Next do this:
 
 ```
  mkdir build
@@ -15,11 +17,12 @@ Ensure you have cmake and the LLVM developer packages installed, then do this:
  cmake ..
  make
  ./bli ../examples/euler/problem01.bl
- ````
+```
 
-Running bli on its own will give a REPL, and at some point blc will spit out a compiled binary.
+The REPL is named bli (for BearLang Interpreter), a compiler is currently under development.
 
-Read the code for more details, proper documentation is coming.
+Documentation on the language can be accessed by running the documentation browser webapp in docs/docs.bl
+
 
 ## Basic features
 
@@ -29,4 +32,3 @@ Read the code for more details, proper documentation is coming.
 * Fast flex-based parsing
 * Boehms GC
 
-Read DESIGN for a better overview, and TODO to see what is outstanding.
