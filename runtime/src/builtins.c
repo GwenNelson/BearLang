@@ -920,6 +920,8 @@ bl_val_t* bl_genmod_doc(bl_val_t* ctx, bl_val_t* sym, bl_val_t* mod) { // LCOV_E
      }
 
      bl_val_t* EXAMPLE = bl_ctx_get(mod, bl_mk_symbol("*EXAMPLE*"));
+
+
      if(EXAMPLE!=NULL) {
 	retval = safe_strcat(retval,"\nEXAMPLE\n");
         bl_val_t* split_desc = split_str(EXAMPLE->s_val,"\n");

@@ -4,7 +4,7 @@
 (import web)
 (import xml)
 
-(using xml::*)
+(using xml::x)
 
 (= modules_list (
 	("bldoc"     "BearLang documentation system")
@@ -25,11 +25,11 @@
      (= modname   (third split_url))
      (= modsym (mksym modname))
      (import modsym)
-     (= docval (doc (eval modsym)))
+     (= docval (doc modsym))
      (simpleweb::html_response (x::html 
      (x::head (x::title (+ "BearLang documentation - " modname)))
      (x::body
-	 (x::pre (escape docval))
+	 (x::pre (xml::escape docval))
 	 (x::a (@ 'href "/") "Return to index")
 	 ))))
 
