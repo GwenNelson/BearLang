@@ -102,10 +102,10 @@ bl_val_t* bl_ctx_get(bl_val_t* ctx, bl_val_t* key) { // LCOV_EXCL_LINE
    if(key->s_val[0]=='\'') return bl_mk_symbol(key->s_val+1); // LCOV_EXCL_BR_LINE
    if(strlen(key->s_val)>=1) {
      if(strstr(key->s_val,"::")) {
-        char* tmp = strdup(key->s_val);
+     	char* tmp = strdup(key->s_val);
         strstr(tmp,"::")[0]='\0';
         char* ctx_key = tmp;
-        char* sym_key = tmp+strlen(ctx_key)+2;
+        char* sym_key = strdup(tmp+strlen(ctx_key)+2);
         bl_val_t* other_ctx = bl_ctx_get(ctx, bl_mk_symbol(ctx_key));
         free(tmp);
         // LCOV_EXCL_START
