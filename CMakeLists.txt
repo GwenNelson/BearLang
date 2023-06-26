@@ -16,8 +16,6 @@ endif (CMAKE_BUILD_TYPE STREQUAL "Release")
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	add_compile_options("-DHASH_DEBUG=1")
 	add_compile_options("-DDEBUG")
-	include(CodeCoverage)
-	APPEND_COVERAGE_COMPILER_FLAGS()
 endif  (CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 find_package (LibGc REQUIRED)
@@ -85,9 +83,6 @@ target_link_libraries(test_parser blruntime)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set(COVERAGE_EXCLUDES ${CMAKE_CURRENT_BINARY_DIR} )
 
-	SETUP_TARGET_FOR_COVERAGE(NAME test_coverage
-                          EXECUTABLE test_blruntime
-                          DEPENDENCIES test_blruntime)
 
 endif  (CMAKE_BUILD_TYPE STREQUAL "Debug")
 

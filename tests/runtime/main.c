@@ -16,7 +16,7 @@
 
 #define TEST(desc,f) fprintf(stderr,"Testing: %s \t",desc); if(f()==0) { passed_tests++; fprintf(stderr,"PASS\n");} else { failed_tests++; fprintf(stderr,"FAIL\n");}; total_tests++;
 
-#define ASSERT(desc,cond) if(! (cond)) { fprintf(stderr,"Assert %s failed\t",desc); return 1;}
+#define ASSERT(desc,cond) if(! (cond)) { fprintf(stderr,"Assert %s failed\t",desc); for(;;); return 1;}
 
 bl_val_t* read_form(yyscan_t scanner);
 bl_val_t* read_list(yyscan_t scanner);
@@ -1114,9 +1114,9 @@ int test_import_bl_file() {
     fprintf(fd,"(import tmp)");
     fclose(fd);
 
-    result = bl_eval(result,bl_parse_sexp("(import tmp2)"));
+    result = bl_eval(ctx,bl_parse_sexp("(import tmp2)"));
     ASSERT("imported successfully", result->type == BL_VAL_TYPE_CTX)
-    testval = bl_ctx_get(result,bl_mk_symbol("testsym"));
+    testval = bl_ctx_get(result,bl_mk_symbol("tmp::testsym"));
 
     ASSERT("testsym is present", testval->b_val)  
 
